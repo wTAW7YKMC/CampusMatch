@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">校易配</string>
+    <string name="app_subtitle">校园二手智能交易</string>
+    <string name="app_brand">CampusTrade AI</string>
+    <string name="university">武汉理工大学</string>
+
+    <!-- 底部导航 -->
+    <string name="nav_home">首页</string>
+    <string name="nav_marketplace">商品广场</string>
+    <string name="nav_publish">智能发布</string>
+    <string name="nav_match">智能匹配</string>
+    <string name="nav_seller">卖家助手</string>
+
+    <!-- 按钮 -->
+    <string name="btn_contact_seller">联系卖家</string>
+    <string name="btn_view_detail">查看详情</string>
+    <string name="btn_publish_now">直接发布</string>
+    <string name="btn_save_draft">保存草稿</string>
+    <string name="btn_regenerate">重新生成</string>
+    <string name="btn_ai_generate">AI生成商品信息</string>
+    <string name="btn_start_match">开始匹配</string>
+    <string name="btn_favorite">收藏</string>
+</resources>

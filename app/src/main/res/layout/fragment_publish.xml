@@ -1,0 +1,414 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 智能发布页面 ⭐核心功能 -->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg_main">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- 页面标题 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_gradient_blue"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="16dp">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="✨ AI 智能发布"
+                android:textColor="@android:color/white"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="用AI轻松发布你的闲置好物"
+                android:textColor="#AAFFFFFF"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <!-- 步骤指示器 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/white"
+            android:elevation="2dp"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:padding="14dp">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:background="@drawable/bg_gradient_yellow" android:gravity="center"
+                android:paddingTop="8dp" android:paddingBottom="8dp" android:paddingStart="14dp" android:paddingEnd="14dp"
+                android:text="1 填写信息"
+                android:textColor="@android:color/white" android:textSize="12sp" android:textStyle="bold" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:layout_marginStart="3dp" android:text=" → " android:textColor="@color/text_hint" android:textSize="14sp" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:background="@color/bg_main" android:gravity="center"
+                android:paddingTop="8dp" android:paddingBottom="8dp" android:paddingStart="14dp" android:paddingEnd="14dp"
+                android:text="2 AI生成"
+                android:textColor="@color/text_hint" android:textSize="12sp" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:layout_marginStart="3dp" android:text=" → " android:textColor="@color/text_hint" android:textSize="14sp" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:background="@color/bg_main" android:gravity="center"
+                android:paddingTop="8dp" android:paddingBottom="8dp" android:paddingStart="14dp" android:paddingEnd="14dp"
+                android:text="3 预览发布"
+                android:textColor="@color/text_hint" android:textSize="12sp" />
+        </LinearLayout>
+
+        <!-- 表单区域 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- 商品类别 -->
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="商品类别" android:textColor="@color/text_primary"
+                android:textSize="14sp" android:textStyle="bold" />
+            <LinearLayout
+                android:id="@+id/publish_category_grid"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal">
+                <!-- 动态填充 -->
+            </LinearLayout>
+
+            <!-- 商品名称 -->
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:layout_marginTop="16dp" android:text="商品名称"
+                android:textColor="@color/text_primary" android:textSize="14sp" android:textStyle="bold" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/bg_card_white"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="12dp">
+                <EditText
+                    android:id="@+id/publish_title"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@null"
+                    android:hint="例如：管理学原理教材"
+                    android:textColor="@color/text_primary"
+                    android:textColorHint="@color/text_hint"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <!-- 价格 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:orientation="horizontal">
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="原价" android:textColor="@color/text_primary"
+                        android:textSize="14sp" android:textStyle="bold" />
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="44dp"
+                        android:layout_marginTop="8dp"
+                        android:background="@drawable/bg_card_white"
+                        android:gravity="center_vertical"
+                        android:paddingStart="12dp">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="¥" android:textColor="@color/text_hint" android:textSize="14sp" />
+                        <EditText android:id="@+id/publish_orig_price"
+                            android:layout_width="0dp" android:layout_height="wrap_content"
+                            android:layout_weight="1" android:background="@null"
+                            android:hint="原购买价格" android:inputType="numberDecimal"
+                            android:textColor="@color/text_primary" android:textColorHint="@color/text_hint"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="期望售价" android:textColor="@color/text_primary"
+                        android:textSize="14sp" android:textStyle="bold" />
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="44dp"
+                        android:layout_marginTop="8dp"
+                        android:background="@drawable/bg_card_white"
+                        android:gravity="center_vertical"
+                        android:paddingStart="12dp">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="¥" android:textColor="@color/text_hint" android:textSize="14sp" />
+                        <EditText android:id="@+id/publish_current_price"
+                            android:layout_width="0dp" android:layout_height="wrap_content"
+                            android:layout_weight="1" android:background="@null"
+                            android:hint="期望售价" android:inputType="numberDecimal"
+                            android:textColor="@color/text_primary" android:textColorHint="@color/text_hint"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- AI建议价格按钮 -->
+            <TextView
+                android:id="@+id/publish_ai_price_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/bg_tag_yellow"
+                android:gravity="center"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:text="💰 获取AI建议价格"
+                android:textColor="@color/yellow_deep"
+                android:textSize="12sp" />
+
+            <!-- 成色选择 -->
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:layout_marginTop="16dp" android:text="成色"
+                android:textColor="@color/text_primary" android:textSize="14sp" android:textStyle="bold" />
+            <LinearLayout
+                android:id="@+id/publish_condition_group"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal">
+                <!-- 动态填充 -->
+            </LinearLayout>
+
+            <!-- 使用时长 -->
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:layout_marginTop="16dp" android:text="使用时长"
+                android:textColor="@color/text_primary" android:textSize="14sp" android:textStyle="bold" />
+            <LinearLayout
+                android:id="@+id/publish_usage_group"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal">
+                <!-- 动态填充 -->
+            </LinearLayout>
+
+            <!-- 交易地点 -->
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:layout_marginTop="16dp" android:text="交易地点"
+                android:textColor="@color/text_primary" android:textSize="14sp" android:textStyle="bold" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/bg_card_white"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="12dp">
+                <EditText
+                    android:id="@+id/publish_location"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@null"
+                    android:hint="如：北区宿舍3号楼"
+                    android:textColor="@color/text_primary"
+                    android:textColorHint="@color/text_hint"
+                    android:textSize="14sp" />
+            </LinearLayout>
+            <!-- 快捷地点标签 -->
+            <LinearLayout
+                android:id="@+id/publish_location_tags"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal">
+                <!-- 动态填充 -->
+            </LinearLayout>
+
+            <!-- 补充说明 -->
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:layout_marginTop="16dp" android:text="补充说明"
+                android:textColor="@color/text_primary" android:textSize="14sp" android:textStyle="bold" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/bg_card_white"
+                android:padding="12dp">
+                <EditText
+                    android:id="@+id/publish_description"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@null"
+                    android:gravity="top"
+                    android:hint="描述商品的使用情况、特点、瑕疵等..."
+                    android:textColor="@color/text_primary"
+                    android:textColorHint="@color/text_hint"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <!-- 上传图片区域 -->
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:layout_marginTop="16dp" android:text="上传图片（最多5张）"
+                android:textColor="@color/text_primary" android:textSize="14sp" android:textStyle="bold" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:layout_marginTop="8dp"
+                android:background="@color/bg_card"
+                android:gravity="center"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="📷"
+                    android:textSize="32sp" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="点击上传图片（Demo中为装饰）"
+                    android:textColor="@color/text_hint"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <!-- AI生成按钮 -->
+            <TextView
+                android:id="@+id/publish_ai_generate_btn"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_marginTop="24dp"
+                android:background="@drawable/bg_gradient_yellow"
+                android:gravity="center"
+                android:text="✨ AI生成商品信息"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <!-- AI生成进度提示（默认隐藏） -->
+            <LinearLayout
+                android:id="@+id/publish_ai_progress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:background="@color/blue_ultra_light"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="20dp"
+                android:visibility="gone">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🧠"
+                    android:textSize="40sp" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="AI正在分析商品信息..."
+                    android:textColor="@color/blue_primary"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+                <TextView
+                    android:id="@+id/publish_ai_progress_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="分析商品类别 → 评估市场价格 → 生成卖点标签 → 优化商品描述"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="11sp" />
+            </LinearLayout>
+
+            <!-- 预览区（默认隐藏） -->
+            <LinearLayout
+                android:id="@+id/publish_preview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="🤖 AI生成结果预览"
+                        android:textColor="@color/text_primary"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="30dp"
+                        android:background="@drawable/btn_secondary_outline"
+                        android:gravity="center"
+                        android:paddingStart="12dp"
+                        android:paddingEnd="12dp"
+                        android:text="编辑"
+                        android:textColor="@color/blue_primary"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+                <!-- 预览商品卡片 -->
+                <LinearLayout
+                    android:id="@+id/publish_preview_card_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp" />
+
+                <!-- 操作按钮 -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="16dp"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:id="@+id/publish_confirm_btn"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginEnd="6dp"
+                        android:layout_weight="2"
+                        android:background="@drawable/btn_primary_blue"
+                        android:gravity="center"
+                        android:text="直接发布"
+                        android:textColor="@android:color/white"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="6dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/btn_secondary_outline"
+                        android:gravity="center"
+                        android:text="重新生成"
+                        android:textColor="@color/blue_primary"
+                        android:textSize="13sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- 底部间距 -->
+            <View android:layout_width="match_parent" android:layout_height="24dp" />
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

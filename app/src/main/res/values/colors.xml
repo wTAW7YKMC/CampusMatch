@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <!-- 武汉理工大学蓝黄配色系统 -->
+    <color name="blue_deep">#FF0A1F44</color>
+    <color name="blue_primary">#FF2061CA</color>
+    <color name="blue_mid">#FF4A85E8</color>
+    <color name="blue_light">#FFD6E8FC</color>
+    <color name="blue_ultra_light">#FFF0F6FF</color>
+
+    <color name="yellow_deep">#FFC78A00</color>
+    <color name="yellow_primary">#FFE6A000</color>
+    <color name="yellow_mid">#FFF5B800</color>
+    <color name="yellow_light">#FFFFF0B3</color>
+    <color name="yellow_ultra_light">#FFFFF9E6</color>
+
+    <!-- 中性色 -->
+    <color name="text_primary">#FF1A1A2E</color>
+    <color name="text_secondary">#FF666680</color>
+    <color name="text_hint">#FF9999AA</color>
+    <color name="border_color">#FFE8E8EE</color>
+    <color name="bg_main">#FFFAFAFC</color>
+    <color name="bg_card">#FFFFFFFF</color>
+
+    <!-- 渐变起始色（用于代码中创建渐变） -->
+    <color name="gradient_blue_start">#FF0E2B5E</color>
+    <color name="gradient_blue_end">#FF2061CA</color>
+    <color name="gradient_yellow_start">#FFE6A000</color>
+    <color name="gradient_yellow_end">#FFF5B800</color>
+
+    <!-- 状态色 -->
+    <color name="success_green">#FF10B981</color>
+    <color name="warning_orange">#FFF59E0B</color>
+    <color name="error_red">#FFEF4444</color>
+</resources>
