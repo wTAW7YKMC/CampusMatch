@@ -1,0 +1,2562 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>校易配 - 交互式动画演示Demo</title>
+
+<!-- GSAP核心 + ScrollTo插件 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollToPlugin.min.js"></script>
+
+<!-- Lucide图标 -->
+<script src="https://unpkg.com/lucide@latest"></script>
+
+<style>
+/* ============================================================
+   武汉理工大学蓝黄设计系统 - CSS变量
+   ============================================================ */
+:root {
+  --blue-900: #0A1F44;
+  --blue-800: #0E2B5E;
+  --blue-700: #143D82;
+  --blue-600: #1A4FA6;
+  --blue-500: #2061CA;
+  --blue-400: #4A85E8;
+  --blue-300: #7AA8F0;
+  --blue-200: #A8C8F8;
+  --blue-100: #D6E8FC;
+  --blue-50: #F0F6FF;
+
+  --yellow-600: #C78A00;
+  --yellow-500: #E6A000;
+  --yellow-400: #F5B800;
+  --yellow-300: #FFD233;
+  --yellow-200: #FFE066;
+  --yellow-100: #FFF0B3;
+  --yellow-50: #FFF9E6;
+
+  --text-primary: #1A1A2E;
+  --text-secondary: #6B6B85;
+  --text-hint: #9999AA;
+  --border: #E8E8EE;
+  --bg: #FAFAFC;
+  --white: #FFFFFF;
+
+  --success: #22C55E;
+  --warning: #F59E0B;
+  --error: #EF4444;
+}
+
+/* ============================================================
+   全局样式
+   ============================================================ */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  background: #0A1F44;
+  color: var(--text-primary);
+  overflow: hidden;
+  width: 100vw;
+  height: 100vh;
+  user-select: none;
+}
+
+/* ============================================================
+   主演示容器 (1280×720, 居中缩放)
+   ============================================================ */
+.demo-wrapper {
+  width: 1280px;
+  height: 720px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform-origin: center center;
+  overflow: hidden;
+  background: var(--bg);
+  border-radius: 8px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+
+/* ============================================================
+   场景容器 - 所有场景默认隐藏
+   ============================================================ */
+.scene {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: calc(100% - 60px); /* 留出底部控制面板空间 */
+  display: none;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.scene.active {
+  display: block;
+}
+
+/* 场景内滚动条美化 */
+.scene::-webkit-scrollbar { width: 4px; }
+.scene::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+/* ============================================================
+   模拟光标
+   ============================================================ */
+.sim-cursor {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--white);
+  border-radius: 50%;
+  background: var(--blue-500);
+  box-shadow: 0 0 12px rgba(32, 97, 202, 0.6);
+  position: fixed;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+  transition: transform 0.1s;
+}
+
+.sim-cursor.click {
+  transform: translate(-50%, -50%) scale(0.75);
+  background: var(--yellow-500);
+}
+
+/* 点击涟漪 */
+.cursor-ripple {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--blue-400);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  animation: cursorRipple 0.6s ease-out forwards;
+}
+
+@keyframes cursorRipple {
+  0% { width: 20px; height: 20px; opacity: 1; }
+  100% { width: 60px; height: 60px; opacity: 0; }
+}
+
+/* ============================================================
+   提示文字
+   ============================================================ */
+.hint-box {
+  position: fixed;
+  bottom: 90px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--blue-900);
+  color: var(--white);
+  padding: 10px 22px;
+  border-radius: 8px;
+  font-size: 14px;
+  opacity: 0;
+  transition: opacity 0.3s;
+  z-index: 100;
+  white-space: nowrap;
+  pointer-events: none;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+}
+
+.hint-box.active {
+  opacity: 1;
+}
+
+/* ============================================================
+   Toast通知
+   ============================================================ */
+.toast {
+  position: fixed;
+  top: 40px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-20px);
+  background: var(--success);
+  color: var(--white);
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: bold;
+  opacity: 0;
+  z-index: 200;
+  pointer-events: none;
+  transition: opacity 0.3s, transform 0.3s;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ============================================================
+   控制面板
+   ============================================================ */
+.control-panel {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 60px;
+  background: rgba(10, 31, 68, 0.92);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 10px;
+  z-index: 1000;
+}
+
+.ctrl-btn {
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: var(--white);
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.ctrl-btn:hover {
+  background: rgba(255,255,255,0.25);
+  border-color: var(--yellow-500);
+}
+
+.ctrl-btn.active {
+  background: var(--yellow-500);
+  border-color: var(--yellow-500);
+  color: var(--blue-900);
+}
+
+/* 进度条区域 */
+.progress-area {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.progress-bar-wrap {
+  flex: 1;
+  height: 8px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 4px;
+  cursor: pointer;
+  position: relative;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--blue-400), var(--yellow-500));
+  border-radius: 4px;
+  width: 0%;
+  transition: width 0.3s;
+}
+
+.progress-time {
+  color: rgba(255,255,255,0.7);
+  font-size: 12px;
+  min-width: 60px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+/* 章节跳转按钮 */
+.chapter-btns {
+  display: flex;
+  gap: 4px;
+}
+
+.chapter-btn {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.6);
+  padding: 4px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 11px;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.chapter-btn:hover {
+  background: rgba(255,255,255,0.2);
+  color: var(--white);
+}
+
+.chapter-btn.active {
+  background: var(--yellow-500);
+  border-color: var(--yellow-500);
+  color: var(--blue-900);
+  font-weight: bold;
+}
+
+/* 速度控制 */
+.speed-btn {
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: var(--white);
+  padding: 4px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.speed-btn:hover {
+  background: rgba(255,255,255,0.25);
+}
+
+/* ============================================================
+   场景1：启动加载
+   ============================================================ */
+.scene-launch {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--blue-900) 0%, var(--blue-700) 50%, var(--blue-600) 100%);
+  overflow: hidden;
+}
+
+/* 地址栏模拟 */
+.launch-address-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 40px;
+  background: rgba(0,0,0,0.3);
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 8px;
+  opacity: 0;
+}
+
+.launch-url {
+  background: rgba(255,255,255,0.12);
+  border-radius: 6px;
+  padding: 4px 12px;
+  color: rgba(255,255,255,0.6);
+  font-size: 12px;
+}
+
+.launch-logo-area {
+  text-align: center;
+  opacity: 0;
+}
+
+.launch-logo-icon {
+  font-size: 80px;
+  display: block;
+  margin-bottom: 16px;
+  animation: logoPulse 2s ease-in-out infinite;
+}
+
+@keyframes logoPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+
+.launch-logo-text {
+  font-size: 32px;
+  font-weight: bold;
+  color: var(--white);
+  letter-spacing: 4px;
+}
+
+.launch-slogan {
+  font-size: 13px;
+  color: rgba(255,255,255,0.6);
+  margin-top: 6px;
+}
+
+.launch-status {
+  color: rgba(255,255,255,0.8);
+  font-size: 14px;
+  margin-top: 24px;
+  opacity: 0;
+}
+
+.launch-progress-wrap {
+  width: 280px;
+  height: 4px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 2px;
+  margin-top: 16px;
+  overflow: hidden;
+  opacity: 0;
+}
+
+.launch-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--blue-400), var(--yellow-500));
+  border-radius: 2px;
+  width: 0%;
+}
+
+/* 脉冲光环 */
+.launch-ring {
+  position: absolute;
+  width: 160px;
+  height: 160px;
+  border: 2px solid rgba(255,255,255,0.2);
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -57%);
+  opacity: 0;
+  animation: ringPulse 2s ease-out infinite;
+}
+
+@keyframes ringPulse {
+  0% { width: 140px; height: 140px; opacity: 0.3; }
+  100% { width: 260px; height: 260px; opacity: 0; }
+}
+
+/* ============================================================
+   场景2~6 通用手机界面布局
+   ============================================================ */
+.phone-frame {
+  width: 390px;
+  height: 660px;
+  background: var(--bg);
+  border-radius: 16px;
+  overflow: hidden;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 8px 40px rgba(0,0,0,0.15);
+  display: flex;
+  flex-direction: column;
+}
+
+.phone-status-bar {
+  background: var(--blue-500);
+  color: var(--white);
+  padding: 6px 16px;
+  font-size: 10px;
+  display: flex;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+
+.phone-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-bottom: 50px; /* 底部导航空间 */
+}
+
+.phone-content::-webkit-scrollbar { width: 3px; }
+.phone-content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+/* 底部导航栏 */
+.phone-bottom-nav {
+  display: flex;
+  background: var(--white);
+  border-top: 1px solid var(--border);
+  padding: 6px 0;
+  flex-shrink: 0;
+}
+
+.nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  cursor: pointer;
+  padding: 4px 0;
+  font-size: 10px;
+  color: var(--text-hint);
+  transition: color 0.2s;
+}
+
+.nav-item .nav-icon {
+  font-size: 18px;
+}
+
+.nav-item.active {
+  color: var(--blue-500);
+}
+
+/* ============================================================
+   通用UI组件
+   ============================================================ */
+/* 蓝渐变Hero区 */
+.hero-gradient {
+  background: linear-gradient(135deg, var(--blue-800) 0%, var(--blue-600) 50%, var(--blue-500) 100%);
+  color: var(--white);
+  padding: 18px 16px;
+}
+
+/* 黄色主按钮 */
+.btn-primary {
+  background: linear-gradient(135deg, var(--yellow-500), var(--yellow-400));
+  color: var(--blue-900);
+  border: none;
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-primary:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 16px rgba(230, 160, 0, 0.4);
+}
+
+/* 白色卡片 */
+.card-white {
+  background: var(--white);
+  border-radius: 12px;
+  padding: 14px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  transition: all 0.3s;
+}
+
+.card-white:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+}
+
+/* 商品卡片 */
+.product-card {
+  background: var(--white);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  transition: all 0.3s;
+  cursor: pointer;
+}
+
+.product-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+}
+
+.product-card-img {
+  height: 120px;
+  background: var(--blue-50);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
+  overflow: hidden;
+  transition: transform 0.3s;
+}
+
+.product-card:hover .product-card-img {
+  transform: scale(1.05);
+}
+
+.product-card-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.product-card-body {
+  padding: 10px;
+}
+
+.product-card-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.4;
+}
+
+.product-card-price {
+  font-size: 18px;
+  font-weight: bold;
+  color: var(--blue-500);
+  margin-top: 6px;
+}
+
+.product-card-meta {
+  font-size: 10px;
+  color: var(--text-hint);
+  margin-top: 4px;
+}
+
+/* 标签 */
+.tag {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+}
+
+.tag-blue {
+  background: var(--blue-100);
+  color: var(--blue-500);
+}
+
+.tag-yellow {
+  background: var(--yellow-100);
+  color: var(--yellow-600);
+}
+
+/* AI功能区卡片 */
+.ai-card {
+  background: linear-gradient(135deg, var(--blue-50), var(--yellow-50));
+  border: 1px solid var(--blue-100);
+  border-radius: 12px;
+  padding: 14px;
+  transition: all 0.3s;
+  cursor: pointer;
+}
+
+.ai-card:hover {
+  border-color: var(--yellow-500);
+  box-shadow: 0 4px 16px rgba(230, 160, 0, 0.15);
+}
+
+/* 分类图标按钮 */
+.category-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: var(--white);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  transition: all 0.25s;
+  cursor: pointer;
+  font-size: 10px;
+  color: var(--text-secondary);
+}
+
+.category-chip:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  color: var(--blue-500);
+}
+
+.category-chip .cat-icon {
+  font-size: 24px;
+  margin-bottom: 4px;
+}
+
+/* 输入框 */
+.input-field {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  font-size: 13px;
+  background: var(--white);
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.input-field:focus {
+  border-color: var(--yellow-500);
+}
+
+/* ============================================================
+   场景3：匹配页面特殊组件
+   ============================================================ */
+.match-input-area {
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 12px;
+  transition: border-color 0.3s;
+}
+
+.match-input-area.focused {
+  border-color: var(--yellow-500);
+}
+
+.match-example-tag {
+  display: inline-block;
+  background: var(--blue-50);
+  color: var(--blue-500);
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin: 3px;
+}
+
+.match-example-tag:hover {
+  background: var(--blue-100);
+  transform: scale(1.05);
+}
+
+/* AI分析动画区 */
+.ai-analyze-area {
+  background: linear-gradient(135deg, var(--blue-900), var(--blue-700));
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  color: var(--white);
+}
+
+.ai-brain-icon {
+  font-size: 48px;
+  animation: brainPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes brainPulse {
+  0%, 100% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.1); opacity: 1; }
+}
+
+.ai-analyze-text {
+  font-size: 13px;
+  margin-top: 10px;
+  color: rgba(255,255,255,0.8);
+}
+
+/* 匹配结果卡片 */
+.match-result-card {
+  background: var(--white);
+  border-radius: 12px;
+  padding: 14px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  border-left: 3px solid var(--success);
+}
+
+.match-score-ring {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: conic-gradient(var(--success) 0%, var(--success) var(--score), var(--border) var(--score));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 14px;
+  color: var(--success);
+}
+
+/* ============================================================
+   场景5：发布页面特殊组件
+   ============================================================ */
+.publish-step {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.step-dot {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.step-dot.active {
+  background: var(--yellow-500);
+  color: var(--blue-900);
+}
+
+.step-dot.inactive {
+  background: var(--border);
+  color: var(--text-hint);
+}
+
+/* 发布预览卡片 */
+.preview-card {
+  background: var(--white);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+}
+
+/* 价格可视化 */
+.price-bar-container {
+  position: relative;
+  height: 24px;
+  background: linear-gradient(90deg, #22C55E 0%, #F59E0B 50%, #EF4444 100%);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.price-indicator {
+  position: absolute;
+  top: -4px;
+  width: 4px;
+  height: 32px;
+  background: var(--white);
+  border: 2px solid var(--blue-500);
+  border-radius: 2px;
+  transition: left 0.5s;
+}
+
+/* 成交概率环形 */
+.ring-chart {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background: conic-gradient(var(--success) 0%, var(--success) 0%, var(--border) 0%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.ring-chart::after {
+  content: '';
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: var(--white);
+  position: absolute;
+}
+
+.ring-chart-val {
+  position: relative;
+  z-index: 1;
+  font-weight: bold;
+  color: var(--success);
+  font-size: 16px;
+}
+
+/* ============================================================
+   场景6：卖家页面特殊组件
+   ============================================================ */
+.stat-card {
+  background: var(--white);
+  border-radius: 10px;
+  padding: 12px 8px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.stat-card .stat-num {
+  font-size: 22px;
+  font-weight: bold;
+  color: var(--blue-500);
+}
+
+.stat-card .stat-label {
+  font-size: 10px;
+  color: var(--text-hint);
+  margin-top: 2px;
+}
+
+/* 快捷回复面板 */
+.quick-reply-panel {
+  background: var(--white);
+  border-radius: 12px;
+  padding: 14px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+}
+
+.quick-reply-btn {
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  font-size: 12px;
+  text-align: left;
+  cursor: pointer;
+  margin-bottom: 6px;
+  transition: all 0.2s;
+}
+
+.quick-reply-btn:hover {
+  border-color: var(--yellow-500);
+  background: var(--yellow-50);
+}
+
+/* 键盘提示 */
+.keyboard-hint {
+  position: fixed;
+  bottom: 70px;
+  right: 16px;
+  color: rgba(255,255,255,0.4);
+  font-size: 11px;
+  z-index: 50;
+  pointer-events: none;
+}
+</style>
+</head>
+<body>
+
+<!-- 模拟光标 -->
+<div class="sim-cursor" id="simCursor"></div>
+
+<!-- 提示文字 -->
+<div class="hint-box" id="hintBox"></div>
+
+<!-- Toast通知 -->
+<div class="toast" id="toast"></div>
+
+<!-- 键盘提示 -->
+<div class="keyboard-hint">空格=暂停 | →=下一幕 | ←=上一幕 | R=重播</div>
+
+<!-- ============================================================
+   主演示容器
+   ============================================================ -->
+<div class="demo-wrapper" id="demoWrapper">
+
+  <!-- ========== 场景1：启动加载 ========== -->
+  <div class="scene scene-launch active" id="scene-launch">
+    <div class="launch-address-bar" id="launchAddrBar">
+      <span style="color:#EF4444;font-size:14px;">●</span>
+      <span style="color:#F59E0B;font-size:14px;">●</span>
+      <span style="color:#22C55E;font-size:14px;">●</span>
+      <span class="launch-url">🏫 campustrade.ai</span>
+    </div>
+    <div class="launch-ring" id="launchRing"></div>
+    <div class="launch-logo-area" id="launchLogoArea">
+      <span class="launch-logo-icon">📚↔️</span>
+      <div class="launch-logo-text">校易配</div>
+      <div class="launch-slogan">校园二手智能交易平台</div>
+    </div>
+    <div class="launch-status" id="launchStatus">正在启动智能交易系统...</div>
+    <div class="launch-progress-wrap" id="launchProgressWrap">
+      <div class="launch-progress-fill" id="launchProgressFill"></div>
+    </div>
+  </div>
+
+  <!-- ========== 场景2：首页浏览 ========== -->
+  <div class="scene" id="scene-home">
+    <div class="phone-frame" id="homePhoneFrame">
+      <div class="phone-status-bar">
+        <span>9:41</span>
+        <span>📶 🔋 85%</span>
+      </div>
+      <div class="phone-content" id="homeScrollContent">
+        <!-- Hero区 -->
+        <div class="hero-gradient">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+            <span style="font-size:22px;">📚↔️</span>
+            <div>
+              <div style="font-weight:bold;font-size:16px;">校易配</div>
+              <div style="font-size:10px;color:rgba(255,255,255,0.6);">校园二手智能交易</div>
+            </div>
+          </div>
+          <div style="font-size:22px;font-weight:bold;margin-top:16px;">让校园闲置，</div>
+          <div style="font-size:22px;font-weight:bold;">找到新主人</div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.7);margin-top:6px;">
+            AI智能发布 · 精准匹配推荐 · 透明价格建议
+          </div>
+          <!-- 搜索框 -->
+          <div style="background:var(--white);border-radius:8px;padding:10px 14px;margin-top:14px;display:flex;align-items:center;gap:8px;color:var(--text-hint);font-size:12px;">
+            🔍 搜索校园二手好物...
+          </div>
+        </div>
+
+        <!-- 分类区 -->
+        <div style="padding:12px 14px;">
+          <div style="font-weight:bold;font-size:14px;margin-bottom:10px;">📂 商品分类</div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;" id="homeCategories">
+            <div class="category-chip" data-cat="教材"><span class="cat-icon">📚</span>教材</div>
+            <div class="category-chip" data-cat="数码"><span class="cat-icon">💻</span>数码</div>
+            <div class="category-chip" data-cat="生活"><span class="cat-icon">💡</span>生活</div>
+            <div class="category-chip" data-cat="运动"><span class="cat-icon">⚽</span>运动</div>
+          </div>
+        </div>
+
+        <!-- AI功能区 -->
+        <div style="padding:0 14px 12px;">
+          <div style="font-weight:bold;font-size:14px;margin-bottom:10px;">🤖 AI智能功能</div>
+          <div style="display:flex;gap:10px;">
+            <div class="ai-card" style="flex:1;" id="homeMatchCard">
+              <div style="font-size:28px;">🎯</div>
+              <div style="font-weight:bold;font-size:13px;margin-top:6px;">智能匹配</div>
+              <div style="font-size:10px;color:var(--text-secondary);margin-top:2px;">AI精准推荐</div>
+              <div style="margin-top:8px;font-size:11px;color:var(--yellow-600);" class="home-go-btn">去体验 →</div>
+            </div>
+            <div class="ai-card" style="flex:1;" id="homePublishCard">
+              <div style="font-size:28px;">✨</div>
+              <div style="font-weight:bold;font-size:13px;margin-top:6px;">智能发布</div>
+              <div style="font-size:10px;color:var(--text-secondary);margin-top:2px;">AI辅助发布</div>
+              <div style="margin-top:8px;font-size:11px;color:var(--yellow-600);" class="home-go-btn">去体验 →</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 推荐商品 -->
+        <div style="padding:0 14px 12px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+            <span style="font-weight:bold;font-size:14px;">🔥 为你推荐</span>
+            <span style="font-size:11px;color:var(--blue-500);cursor:pointer;" id="homeViewAll">查看全部 →</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;" id="homeProducts">
+            <!-- JS动态填充 -->
+          </div>
+        </div>
+
+        <!-- 数据看板 -->
+        <div style="padding:0 14px 16px;">
+          <div style="font-weight:bold;font-size:14px;margin-bottom:10px;">📊 平台数据</div>
+          <div style="display:flex;gap:10px;">
+            <div class="stat-card" style="flex:1;"><div class="stat-num" id="homeStat1">0</div><div class="stat-label">在售商品</div></div>
+            <div class="stat-card" style="flex:1;"><div class="stat-num" id="homeStat2">0</div><div class="stat-label">成功交易</div></div>
+            <div class="stat-card" style="flex:1;"><div class="stat-num" id="homeStat3">0</div><div class="stat-label">活跃用户</div></div>
+          </div>
+        </div>
+      </div>
+      <!-- 底部导航 -->
+      <div class="phone-bottom-nav">
+        <div class="nav-item active" data-nav="0"><span class="nav-icon">🏠</span>首页</div>
+        <div class="nav-item" data-nav="1"><span class="nav-icon">🛍️</span>市场</div>
+        <div class="nav-item" data-nav="2"><span class="nav-icon">✨</span>发布</div>
+        <div class="nav-item" data-nav="3"><span class="nav-icon">🎯</span>匹配</div>
+        <div class="nav-item" data-nav="4"><span class="nav-icon">📊</span>卖家</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 场景3：智能匹配 ========== -->
+  <div class="scene" id="scene-match">
+    <div class="phone-frame" id="matchPhoneFrame">
+      <div class="phone-status-bar">
+        <span>9:42</span>
+        <span>📶 🔋 83%</span>
+      </div>
+      <div class="phone-content" id="matchScrollContent">
+        <!-- 需求输入区 -->
+        <div class="hero-gradient">
+          <div style="font-weight:bold;font-size:16px;">🎯 告诉AI你想要什么</div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.7);margin-top:4px;">用自然语言描述需求，AI为你精准匹配</div>
+
+          <div class="match-input-area" id="matchInputCard" style="margin-top:12px;">
+            <div style="font-size:11px;color:var(--text-secondary);margin-bottom:8px;">
+              🤖 你好！告诉我你想买什么
+            </div>
+            <!-- 示例标签 -->
+            <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px;" id="matchExamples">
+              <span class="match-example-tag" data-text="管理学教材，预算30元以内">管理学教材<br>预算30元以内</span>
+              <span class="match-example-tag" data-text="护眼台灯九成新，北区优先">护眼台灯九成新<br>北区优先</span>
+              <span class="match-example-tag" data-text="蓝牙耳机，预算100左右">蓝牙耳机<br>预算100左右</span>
+            </div>
+            <!-- 输入框 -->
+            <div style="background:var(--bg);border-radius:8px;padding:10px;min-height:80px;font-size:13px;color:var(--text-primary);" id="matchInputField" contenteditable="false">
+              <span style="color:var(--text-hint);" id="matchPlaceholder">在这里输入你的需求...</span>
+            </div>
+            <!-- 匹配按钮 -->
+            <div class="btn-primary" style="width:100%;justify-content:center;margin-top:10px;" id="matchStartBtn">
+              🎯 开始匹配
+            </div>
+          </div>
+        </div>
+
+        <!-- AI分析动画区（初始隐藏） -->
+        <div class="ai-analyze-area" id="matchAiAnalyze" style="display:none;margin:14px;">
+          <div class="ai-brain-icon">🧠</div>
+          <div class="ai-analyze-text" id="matchAnalyzeText">正在解析需求...</div>
+          <div style="height:4px;background:rgba(255,255,255,0.2);border-radius:2px;margin-top:12px;overflow:hidden;">
+            <div style="height:100%;background:linear-gradient(90deg,var(--yellow-500),var(--success));border-radius:2px;width:0%;" id="matchAnalyzeProgress"></div>
+          </div>
+        </div>
+
+        <!-- 匹配结果区（初始隐藏） -->
+        <div id="matchResultsArea" style="display:none;padding:14px;">
+          <div style="font-weight:bold;font-size:15px;margin-bottom:4px;" id="matchResultTitle">找到 3 件匹配商品</div>
+          <!-- 需求解析标签 -->
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;" id="matchParseTags">
+            <span class="tag tag-blue">📚 品类：教材</span>
+            <span class="tag tag-blue">💰 预算：≤30元</span>
+            <span class="tag tag-blue">📍 位置：北区</span>
+            <span class="tag tag-yellow">⭐ 成色：不限</span>
+          </div>
+          <!-- 结果卡片列表 -->
+          <div id="matchResultCards" style="display:flex;flex-direction:column;gap:10px;"></div>
+          <!-- 底部操作 -->
+          <div style="display:flex;gap:10px;margin-top:14px;">
+            <div class="btn-primary" style="flex:1;justify-content:center;font-size:12px;background:var(--blue-100);color:var(--blue-500);border:1px solid var(--blue-200);" id="matchModifyBtn">✏️ 修改需求</div>
+            <div style="flex:1;text-align:center;font-size:11px;color:var(--blue-500);cursor:pointer;padding:10px;" id="matchBrowseAll">浏览全部商品 →</div>
+          </div>
+        </div>
+      </div>
+      <div class="phone-bottom-nav">
+        <div class="nav-item" data-nav="0"><span class="nav-icon">🏠</span>首页</div>
+        <div class="nav-item" data-nav="1"><span class="nav-icon">🛍️</span>市场</div>
+        <div class="nav-item" data-nav="2"><span class="nav-icon">✨</span>发布</div>
+        <div class="nav-item active" data-nav="3"><span class="nav-icon">🎯</span>匹配</div>
+        <div class="nav-item" data-nav="4"><span class="nav-icon">📊</span>卖家</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 场景4：商品详情 ========== -->
+  <div class="scene" id="scene-detail">
+    <div class="phone-frame" id="detailPhoneFrame">
+      <div class="phone-status-bar">
+        <span>9:43</span>
+        <span>📶 🔋 82%</span>
+      </div>
+      <div class="phone-content" id="detailScrollContent">
+        <!-- 商品大图 -->
+        <div style="background:var(--blue-50);height:200px;display:flex;align-items:center;justify-content:center;font-size:64px;cursor:pointer;" id="detailMainImage">
+          📕
+        </div>
+
+        <!-- 缩略图行 -->
+        <div style="display:flex;gap:6px;padding:8px 14px;background:var(--white);" id="detailThumbnails">
+          <div style="width:48px;height:48px;background:var(--blue-50);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;border:2px solid var(--yellow-500);" data-img="📕">📕</div>
+          <div style="width:48px;height:48px;background:var(--blue-50);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;border:2px solid transparent;" data-img="📖">📖</div>
+          <div style="width:48px;height:48px;background:var(--blue-50);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;border:2px solid transparent;" data-img="📝">📝</div>
+        </div>
+
+        <!-- 商品信息 -->
+        <div style="padding:14px;">
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;" id="detailTags">
+            <span class="tag tag-blue">教材</span>
+            <span class="tag tag-yellow">九成新</span>
+          </div>
+          <div style="font-size:18px;font-weight:bold;color:var(--text-primary);" id="detailTitle">
+            管理学原理 第7版 | 有重点标注
+          </div>
+          <div class="tag tag-blue" style="margin-top:4px;">🤖 此商品信息由AI辅助生成</div>
+
+          <!-- 卖点标签 -->
+          <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:8px;" id="detailSellTags">
+            <span class="tag tag-yellow">重点标注</span>
+            <span class="tag tag-yellow">考试必备</span>
+            <span class="tag tag-yellow">笔记详细</span>
+          </div>
+
+          <!-- 价格 -->
+          <div style="display:flex;align-items:baseline;gap:8px;margin-top:14px;">
+            <span style="font-size:26px;font-weight:bold;color:var(--blue-500);">¥25</span>
+            <span style="font-size:13px;color:var(--text-hint);text-decoration:line-through;">¥58</span>
+            <span class="tag tag-yellow">省57%</span>
+          </div>
+
+          <!-- 商品描述 -->
+          <div style="margin-top:12px;font-size:12px;color:var(--text-secondary);line-height:1.6;">
+            <span id="detailDescShort">管理学原理教材第7版，内有重点标注和考试笔记...</span>
+            <span style="color:var(--blue-500);cursor:pointer;font-size:11px;" id="detailExpandDesc">展开全文</span>
+            <div id="detailDescFull" style="display:none;margin-top:4px;">
+              管理学原理教材第7版，内有重点标注和考试笔记。期末考试必备，包含各章节重点整理、课后习题答案。保护良好，无缺页，无涂鸦（除笔记外）。
+            </div>
+          </div>
+
+          <!-- 商品详情信息 -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:12px;font-size:11px;color:var(--text-secondary);">
+            <div>📦 成色：九成新</div>
+            <div>⏱ 使用：半年内</div>
+            <div>📍 地点：北区3号楼</div>
+            <div>👤 卖家：理工小王子</div>
+          </div>
+
+          <!-- 收藏按钮 -->
+          <div style="display:flex;justify-content:center;margin-top:14px;">
+            <div class="btn-primary" style="background:transparent;border:1.5px solid var(--yellow-500);color:var(--yellow-600);padding:8px 20px;" id="detailFavBtn">
+              ♡ 收藏商品
+            </div>
+          </div>
+
+          <!-- AI问答区 -->
+          <div style="margin-top:14px;">
+            <div style="font-weight:bold;font-size:13px;margin-bottom:8px;">🤖 AI智能问答</div>
+            <div class="card-white" style="padding:10px;margin-bottom:8px;cursor:pointer;" data-qa="0" id="detailQa0">
+              <div style="display:flex;justify-content:space-between;align-items:center;">
+                <span style="font-size:12px;color:var(--text-primary);">Q: 还在吗？</span>
+                <span style="font-size:10px;color:var(--text-hint);">展开 ▼</span>
+              </div>
+              <div style="display:none;margin-top:8px;padding-top:8px;border-top:1px solid var(--border);" class="qa-answer">
+                <div style="font-size:11px;color:var(--text-secondary);line-height:1.5;" class="qa-answer-text"></div>
+                <div class="btn-primary" style="font-size:10px;padding:4px 10px;margin-top:6px;justify-content:center;" data-action="copy">📋 复制回复</div>
+              </div>
+            </div>
+            <div class="card-white" style="padding:10px;margin-bottom:8px;cursor:pointer;" data-qa="1" id="detailQa1">
+              <div style="display:flex;justify-content:space-between;align-items:center;">
+                <span style="font-size:12px;color:var(--text-primary);">Q: 能便宜点吗？</span>
+                <span style="font-size:10px;color:var(--text-hint);">展开 ▼</span>
+              </div>
+              <div style="display:none;margin-top:8px;padding-top:8px;border-top:1px solid var(--border);" class="qa-answer">
+                <div style="font-size:11px;color:var(--text-secondary);line-height:1.5;" class="qa-answer-text"></div>
+                <div class="btn-primary" style="font-size:10px;padding:4px 10px;margin-top:6px;justify-content:center;" data-action="copy">📋 复制回复</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 联系卖家 -->
+          <div class="btn-primary" style="width:100%;justify-content:center;margin-top:10px;padding:12px;" id="detailContactBtn">
+            💬 联系卖家
+          </div>
+        </div>
+
+        <!-- 联系面板模态框（初始隐藏） -->
+        <div id="detailContactModal" style="display:none;position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:50;align-items:center;justify-content:center;">
+          <div class="card-white" style="width:280px;text-align:center;">
+            <div style="font-weight:bold;font-size:15px;margin-bottom:10px;">📱 联系卖家</div>
+            <div style="width:100px;height:100px;background:var(--bg);border-radius:8px;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-size:40px;">🤖</div>
+            <div style="font-size:11px;color:var(--text-secondary);margin-bottom:6px;">微信号：campus_trade_001</div>
+            <div class="btn-primary" style="font-size:11px;padding:6px 16px;margin:0 auto;display:inline-flex;" id="detailCopyContact">📋 复制联系方式</div>
+            <div style="font-size:10px;color:var(--text-hint);margin-top:8px;cursor:pointer;" id="detailCloseModal">关闭</div>
+          </div>
+        </div>
+      </div>
+      <div class="phone-bottom-nav">
+        <div class="nav-item" data-nav="0"><span class="nav-icon">🏠</span>首页</div>
+        <div class="nav-item" data-nav="1"><span class="nav-icon">🛍️</span>市场</div>
+        <div class="nav-item" data-nav="2"><span class="nav-icon">✨</span>发布</div>
+        <div class="nav-item" data-nav="3"><span class="nav-icon">🎯</span>匹配</div>
+        <div class="nav-item active" data-nav="4"><span class="nav-icon">📊</span>卖家</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 场景5：智能发布 ========== -->
+  <div class="scene" id="scene-publish">
+    <div class="phone-frame" id="publishPhoneFrame">
+      <div class="phone-status-bar">
+        <span>9:44</span>
+        <span>📶 🔋 80%</span>
+      </div>
+      <div class="phone-content" id="publishScrollContent">
+        <!-- 标题 -->
+        <div class="hero-gradient" style="text-align:center;">
+          <div style="font-weight:bold;font-size:16px;">✨ AI 智能发布</div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.7);margin-top:2px;">用AI轻松发布你的闲置好物</div>
+        </div>
+
+        <!-- 步骤指示器 -->
+        <div style="background:var(--white);padding:10px 14px;display:flex;align-items:center;justify-content:center;gap:6px;">
+          <span class="step-dot active">1</span><span style="font-size:10px;color:var(--text-hint);">→</span>
+          <span class="step-dot inactive">2</span><span style="font-size:10px;color:var(--text-hint);">→</span>
+          <span class="step-dot inactive">3</span>
+        </div>
+
+        <!-- 表单区域 -->
+        <div style="padding:12px 14px;" id="publishFormArea">
+          <!-- 商品类别 -->
+          <div style="font-weight:bold;font-size:13px;margin-bottom:6px;">商品类别</div>
+          <div style="display:flex;gap:8px;margin-bottom:12px;" id="publishCategoryGrid">
+            <div class="category-chip" data-cat="教材" id="publishCatBook"><span class="cat-icon">📚</span>教材</div>
+            <div class="category-chip" data-cat="数码"><span class="cat-icon">💻</span>数码</div>
+            <div class="category-chip" data-cat="生活"><span class="cat-icon">💡</span>生活</div>
+            <div class="category-chip" data-cat="运动"><span class="cat-icon">⚽</span>运动</div>
+          </div>
+
+          <!-- 商品名称 -->
+          <div style="font-weight:bold;font-size:13px;margin-bottom:6px;">商品名称</div>
+          <input class="input-field" id="publishTitle" placeholder="请输入商品名称" readonly style="margin-bottom:12px;">
+
+          <!-- 价格行 -->
+          <div style="display:flex;gap:10px;margin-bottom:12px;">
+            <div style="flex:1;">
+              <div style="font-weight:bold;font-size:13px;margin-bottom:6px;">原价 (¥)</div>
+              <input class="input-field" id="publishOrigPrice" placeholder="0" readonly>
+            </div>
+            <div style="flex:1;">
+              <div style="font-weight:bold;font-size:13px;margin-bottom:6px;">期望售价 (¥)</div>
+              <input class="input-field" id="publishPrice" placeholder="0" readonly>
+            </div>
+          </div>
+          <div class="btn-primary" style="font-size:10px;padding:4px 10px;margin-bottom:12px;" id="publishAiPriceBtn">🤖 获取AI建议</div>
+
+          <!-- 成色和使用时长 -->
+          <div style="font-weight:bold;font-size:13px;margin-bottom:6px;">成色</div>
+          <div style="display:flex;gap:6px;margin-bottom:12px;" id="publishConditionOpts">
+            <span class="match-example-tag" data-val="全新">全新</span>
+            <span class="match-example-tag" data-val="九成新">九成新</span>
+            <span class="match-example-tag" data-val="八成新">八成新</span>
+            <span class="match-example-tag" data-val="六成新">六成新</span>
+          </div>
+
+          <div style="font-weight:bold;font-size:13px;margin-bottom:6px;">使用时长</div>
+          <div style="display:flex;gap:6px;margin-bottom:12px;" id="publishUsageOpts">
+            <span class="match-example-tag" data-val="半年内">半年内</span>
+            <span class="match-example-tag" data-val="1年内">1年内</span>
+            <span class="match-example-tag" data-val="1-2年">1-2年</span>
+            <span class="match-example-tag" data-val="2年以上">2年以上</span>
+          </div>
+
+          <!-- 交易地点 -->
+          <div style="font-weight:bold;font-size:13px;margin-bottom:6px;">交易地点</div>
+          <div style="display:flex;gap:6px;margin-bottom:6px;" id="publishLocationTags">
+            <span class="match-example-tag" data-val="南区宿舍">南区宿舍</span>
+            <span class="match-example-tag" data-val="北区宿舍">北区宿舍</span>
+            <span class="match-example-tag" data-val="图书馆">图书馆</span>
+          </div>
+          <input class="input-field" id="publishLocation" placeholder="或手动输入地点" readonly style="margin-bottom:12px;">
+
+          <!-- 补充说明 -->
+          <div style="font-weight:bold;font-size:13px;margin-bottom:6px;">补充说明</div>
+          <textarea class="input-field" id="publishDesc" placeholder="描述商品详情、使用情况等..." readonly style="height:60px;resize:none;margin-bottom:14px;"></textarea>
+
+          <!-- AI生成按钮 -->
+          <div class="btn-primary" style="width:100%;justify-content:center;padding:12px;font-size:14px;" id="publishAiGenBtn">
+            🤖 AI生成商品信息
+          </div>
+        </div>
+
+        <!-- AI动画区（初始隐藏） -->
+        <div class="ai-analyze-area" id="publishAiArea" style="display:none;margin:14px;">
+          <div class="ai-brain-icon">🧠</div>
+          <div class="ai-analyze-text" id="publishAiText">分析商品类别...</div>
+          <div style="height:4px;background:rgba(255,255,255,0.2);border-radius:2px;margin-top:12px;overflow:hidden;">
+            <div style="height:100%;background:linear-gradient(90deg,var(--yellow-500),var(--success));border-radius:2px;width:0%;" id="publishAiProgress"></div>
+          </div>
+        </div>
+
+        <!-- 预览区（初始隐藏） -->
+        <div id="publishPreviewArea" style="display:none;padding:14px;">
+          <div style="font-weight:bold;font-size:14px;margin-bottom:10px;">✨ AI生成结果</div>
+          <div class="preview-card" id="publishPreviewCard">
+            <div style="height:100px;background:var(--blue-50);display:flex;align-items:center;justify-content:center;font-size:40px;">📚</div>
+            <div style="padding:10px;">
+              <div style="display:flex;gap:4px;margin-bottom:4px;">
+                <span class="tag tag-blue">教材</span>
+                <span class="tag tag-yellow">九成新</span>
+              </div>
+              <div style="font-weight:bold;font-size:13px;margin-bottom:4px;" id="publishPreviewTitle">管理学原理教材 第7版</div>
+              <div style="font-size:11px;color:var(--text-secondary);margin-bottom:4px;" id="publishPreviewDesc">有重点标注，考试必备</div>
+              <div style="display:flex;align-items:baseline;gap:6px;">
+                <span style="font-size:18px;font-weight:bold;color:var(--blue-500);">¥25</span>
+                <span style="font-size:11px;color:var(--text-hint);text-decoration:line-through;">¥58</span>
+              </div>
+              <!-- 编辑按钮 -->
+              <div style="display:flex;gap:6px;margin-top:8px;">
+                <div class="btn-primary" style="font-size:10px;padding:4px 10px;background:var(--blue-100);color:var(--blue-500);border:1px solid var(--blue-200);" id="publishEditBtn">✏️ 编辑</div>
+                <div class="btn-primary" style="font-size:10px;padding:4px 10px;background:var(--blue-100);color:var(--blue-500);border:1px solid var(--blue-200);" id="publishRegenBtn">🔄 重新生成</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 价格可视化 -->
+          <div style="margin-top:10px;font-size:11px;color:var(--text-secondary);">💰 价格评估</div>
+          <div style="font-size:10px;color:var(--text-hint);display:flex;justify-content:space-between;margin-bottom:2px;">
+            <span>偏低</span><span>合理</span><span>偏高</span>
+          </div>
+          <div class="price-bar-container" style="position:relative;">
+            <div class="price-indicator" id="publishPriceIndicator" style="left:50%;"></div>
+          </div>
+
+          <!-- 成交概率 -->
+          <div style="display:flex;align-items:center;gap:10px;margin-top:10px;">
+            <div class="ring-chart" id="publishRingChart">
+              <span class="ring-chart-val" id="publishRingVal">0%</span>
+            </div>
+            <div>
+              <div style="font-weight:bold;font-size:13px;">预估成交概率</div>
+              <div style="font-size:10px;color:var(--text-secondary);">基于同类商品大数据分析</div>
+            </div>
+          </div>
+
+          <!-- 发布按钮 -->
+          <div class="btn-primary" style="width:100%;justify-content:center;padding:12px;margin-top:12px;" id="publishFinalBtn">
+            🚀 直接发布
+          </div>
+        </div>
+      </div>
+      <div class="phone-bottom-nav">
+        <div class="nav-item" data-nav="0"><span class="nav-icon">🏠</span>首页</div>
+        <div class="nav-item" data-nav="1"><span class="nav-icon">🛍️</span>市场</div>
+        <div class="nav-item active" data-nav="2"><span class="nav-icon">✨</span>发布</div>
+        <div class="nav-item" data-nav="3"><span class="nav-icon">🎯</span>匹配</div>
+        <div class="nav-item" data-nav="4"><span class="nav-icon">📊</span>卖家</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 场景6：卖家助手 ========== -->
+  <div class="scene" id="scene-seller">
+    <div class="phone-frame" id="sellerPhoneFrame">
+      <div class="phone-status-bar">
+        <span>9:45</span>
+        <span>📶 🔋 79%</span>
+      </div>
+      <div class="phone-content" id="sellerScrollContent">
+        <!-- 标题 -->
+        <div class="hero-gradient" style="text-align:center;">
+          <div style="font-weight:bold;font-size:16px;">📊 卖家助手</div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.7);margin-top:2px;">管理你的商品与交易</div>
+        </div>
+
+        <!-- 数据概览 -->
+        <div style="padding:12px 14px;display:flex;gap:8px;">
+          <div class="stat-card" style="flex:1;">
+            <div style="font-size:20px;">📦</div>
+            <div class="stat-num" id="sellerStat1">0</div>
+            <div class="stat-label">在售商品</div>
+          </div>
+          <div class="stat-card" style="flex:1;">
+            <div style="font-size:20px;">👁️</div>
+            <div class="stat-num" id="sellerStat2">0</div>
+            <div class="stat-label">今日浏览</div>
+          </div>
+          <div class="stat-card" style="flex:1;">
+            <div style="font-size:20px;">💬</div>
+            <div class="stat-num" style="color:var(--error);" id="sellerStat3">0</div>
+            <div class="stat-label">待回复咨询</div>
+          </div>
+          <div class="stat-card" style="flex:1;">
+            <div style="font-size:20px;">✅</div>
+            <div class="stat-num" id="sellerStat4">0</div>
+            <div class="stat-label">累计成交</div>
+          </div>
+        </div>
+
+        <!-- 我的商品 -->
+        <div style="padding:0 14px;">
+          <div style="font-weight:bold;font-size:13px;margin-bottom:8px;">📦 我的商品</div>
+          <div class="card-white" id="sellerProductItem" style="cursor:pointer;">
+            <div style="display:flex;gap:10px;align-items:center;">
+              <div style="width:50px;height:50px;background:var(--blue-50);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:24px;">📚</div>
+              <div style="flex:1;">
+                <div style="font-size:12px;font-weight:600;">管理学原理教材 第7版</div>
+                <div style="font-size:10px;color:var(--text-hint);">¥25 · 九成新 · 北区</div>
+              </div>
+              <span style="font-size:10px;color:var(--text-hint);">展开 ▼</span>
+            </div>
+            <!-- 展开的性能数据（初始隐藏） -->
+            <div id="sellerProductDetail" style="display:none;margin-top:8px;padding-top:8px;border-top:1px solid var(--border);">
+              <div style="font-size:11px;margin-bottom:4px;">👁️ 浏览量: <span style="color:var(--blue-500);">128</span></div>
+              <div style="height:4px;background:var(--border);border-radius:2px;margin-bottom:6px;overflow:hidden;">
+                <div style="height:100%;background:var(--blue-500);border-radius:2px;width:0%;" id="sellerViewBar"></div>
+              </div>
+              <div style="font-size:11px;margin-bottom:4px;">💬 咨询率: <span style="color:var(--yellow-600);">3.9%</span></div>
+              <div style="height:4px;background:var(--border);border-radius:2px;margin-bottom:6px;overflow:hidden;">
+                <div style="height:100%;background:var(--yellow-500);border-radius:2px;width:0%;" id="sellerInquiryBar"></div>
+              </div>
+              <div style="font-size:11px;margin-bottom:4px;">⭐ 收藏: <span style="color:var(--success);">3</span></div>
+              <div style="height:4px;background:var(--border);border-radius:2px;margin-bottom:8px;overflow:hidden;">
+                <div style="height:100%;background:var(--success);border-radius:2px;width:0%;" id="sellerFavBar"></div>
+              </div>
+              <div style="background:var(--yellow-50);padding:8px;border-radius:6px;font-size:10px;color:var(--yellow-600);" id="sellerAiTip">
+                💡 AI建议：加载中...
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 发布新商品 -->
+        <div style="padding:12px 14px;">
+          <div class="btn-primary" style="width:100%;justify-content:center;" id="sellerNewProductBtn">
+            ✨ 发布新商品
+          </div>
+        </div>
+
+        <!-- 快捷回复工具 -->
+        <div style="padding:0 14px 12px;">
+          <div style="font-weight:bold;font-size:13px;margin-bottom:8px;">🛠️ 智能工具</div>
+          <div class="ai-card" style="margin-bottom:8px;cursor:pointer;" id="sellerQuickReplyCard">
+            <div style="font-size:22px;">💬</div>
+            <div style="font-weight:bold;font-size:12px;margin-top:4px;">快捷回复</div>
+            <div style="font-size:10px;color:var(--text-secondary);">AI一键生成回复</div>
+          </div>
+          <!-- 快捷回复面板（初始隐藏） -->
+          <div class="quick-reply-panel" id="sellerQuickReplyPanel" style="display:none;margin-bottom:8px;">
+            <div style="font-weight:bold;font-size:12px;margin-bottom:8px;">常见问题</div>
+            <div class="quick-reply-btn" data-q="还在吗？">Q: 还在吗？</div>
+            <div class="quick-reply-btn" data-q="能便宜点吗？">Q: 能便宜点吗？</div>
+            <div class="quick-reply-btn" data-q="在哪里取货？">Q: 在哪里取货？</div>
+            <div class="quick-reply-btn" data-q="支持当面验货吗？">Q: 支持当面验货吗？</div>
+            <!-- AI回复展示 -->
+            <div id="sellerQuickReplyAnswer" style="display:none;background:var(--blue-50);padding:8px;border-radius:6px;font-size:10px;color:var(--text-primary);margin-top:6px;line-height:1.4;"></div>
+          </div>
+
+          <div class="ai-card" style="cursor:pointer;" id="sellerPriceCard">
+            <div style="font-size:22px;">💰</div>
+            <div style="font-weight:bold;font-size:12px;margin-top:4px;">价格优化建议</div>
+            <div style="font-size:10px;color:var(--text-secondary);">智能定价分析</div>
+          </div>
+          <!-- 价格建议展示（初始隐藏） -->
+          <div id="sellerPriceAdvice" style="display:none;background:var(--yellow-50);padding:10px;border-radius:8px;margin-top:6px;font-size:11px;color:var(--yellow-600);line-height:1.5;">
+            💡 <b>价格优化建议：</b><br>
+            同类商品均价 ¥22，建议调整价格至 ¥22 以提高竞争力。当前定价 ¥25 略高于市场均价 12%。
+          </div>
+        </div>
+      </div>
+      <div class="phone-bottom-nav">
+        <div class="nav-item" data-nav="0"><span class="nav-icon">🏠</span>首页</div>
+        <div class="nav-item" data-nav="1"><span class="nav-icon">🛍️</span>市场</div>
+        <div class="nav-item" data-nav="2"><span class="nav-icon">✨</span>发布</div>
+        <div class="nav-item" data-nav="3"><span class="nav-icon">🎯</span>匹配</div>
+        <div class="nav-item active" data-nav="4"><span class="nav-icon">📊</span>卖家</div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /demo-wrapper -->
+
+<!-- ============================================================
+   控制面板
+   ============================================================ -->
+<div class="control-panel" style="position:fixed;bottom:0;left:0;width:100%;height:60px;background:rgba(10,31,68,0.92);backdrop-filter:blur(10px);display:flex;align-items:center;padding:0 16px;gap:10px;z-index:1000;">
+  <button class="ctrl-btn" id="btnPlay" title="播放/暂停">▶</button>
+  <button class="ctrl-btn" id="btnStop" title="停止/重播">⏹</button>
+  <div class="progress-area" style="flex:1;display:flex;align-items:center;gap:10px;">
+    <div class="progress-bar-wrap" id="progressWrap" style="flex:1;height:8px;background:rgba(255,255,255,0.15);border-radius:4px;cursor:pointer;">
+      <div class="progress-bar-fill" id="progressFill" style="height:100%;background:linear-gradient(90deg, #4A85E8, #F5B800);border-radius:4px;width:0%;"></div>
+    </div>
+    <span class="progress-time" id="progressTime" style="color:rgba(255,255,255,0.7);font-size:12px;min-width:60px;text-align:right;">0s / 105s</span>
+  </div>
+  <div class="chapter-btns" style="display:flex;gap:4px;">
+    <button class="chapter-btn active" data-scene="0">1启动</button>
+    <button class="chapter-btn" data-scene="1">2首页</button>
+    <button class="chapter-btn" data-scene="2">3匹配</button>
+    <button class="chapter-btn" data-scene="3">4详情</button>
+    <button class="chapter-btn" data-scene="4">5发布</button>
+    <button class="chapter-btn" data-scene="5">6卖家</button>
+  </div>
+  <button class="speed-btn" id="speedBtn" title="播放速度"><span id="speedLabel">1x</span></button>
+</div>
+
+<!-- ============================================================
+   JavaScript：Mock数据 + GSAP动画 + 控制器
+   ============================================================ -->
+<script>
+/* ============================================================
+   1. Mock数据
+   ============================================================ */
+const MOCK_PRODUCTS = [
+  {
+    id: 'p1', title: '管理学原理教材 第7版', emoji: '📚',
+    category: '📚 教材', catKey: '教材',
+    originalPrice: 58, currentPrice: 25,
+    condition: '九成新', usage: '半年内',
+    location: '北区宿舍', locationDetail: '北区3号楼',
+    tags: ['重点标注', '考试必备', '笔记详细'],
+    imageUrl: 'https://picsum.photos/400/250?random=1',
+    seller: { name: '理工小王子', rating: 5.0, sales: 12 },
+    views: 128, inquiries: 5, favorites: 3,
+    matchScore: 96,
+    reasons: [
+      { icon: '✅', text: '价格符合预算（25元 ≤ 30元）' },
+      { icon: '📍', text: '位置便利（北区，距离你200米）' },
+      { icon: '⭐', text: '成色较好（九成新，使用半年）' },
+      { icon: '👤', text: '卖家信用高（好评率100%）' }
+    ]
+  },
+  {
+    id: 'p2', title: '蓝牙耳机无线降噪版', emoji: '🎧',
+    category: '💻 数码', catKey: '数码',
+    originalPrice: 199, currentPrice: 88,
+    condition: '八成新', usage: '1年内',
+    location: '南区宿舍',
+    seller: { name: '数码控阿杰', rating: 4.8, sales: 8 },
+    views: 210, inquiries: 12, favorites: 7,
+    matchScore: 88,
+    reasons: [
+      { icon: '✅', text: '价格合理（88元，低于市场均价）' },
+      { icon: '🔊', text: '降噪功能完好，音质优秀' },
+      { icon: '👤', text: '卖家好评率96%' }
+    ]
+  },
+  {
+    id: 'p3', title: '九成新护眼台灯|宿舍学习必备', emoji: '💡',
+    category: '💡 生活', catKey: '生活',
+    originalPrice: 89, currentPrice: 45,
+    condition: '九成新', usage: '半年内',
+    location: '北区3号楼',
+    seller: { name: '理工小王子', rating: 5.0, sales: 12 },
+    views: 156, inquiries: 8, favorites: 4,
+    matchScore: 82,
+    reasons: [
+      { icon: '✅', text: '护眼功能完好，亮度可调' },
+      { icon: '📍', text: '北区面交方便' },
+      { icon: '⭐', text: '性价比高（45元/原价89元）' }
+    ]
+  }
+];
+
+const MOCK_QA = [
+  { q: '还在吗？', a: '还在的，同学！随时可以联系交易，支持北区宿舍区面交~' },
+  { q: '能便宜点吗？', a: '诚心要的话可以适当优惠，您的心理价位是多少呢？我觉得20-22之间比较合适~' },
+  { q: '在哪里取货？', a: '可以在北区3号楼楼下或者图书馆门口面交，时间灵活可商量~' },
+  { q: '支持当面验货吗？', a: '当然支持！建议当面验货确认无误后再付款，双方都放心。教材可以翻看检查笔记内容。' },
+  { q: '有发票/购买记录吗？', a: '有的，购买记录和发票都保留着，交易时可以一并提供给您查看~' },
+  { q: '可以预留吗？', a: '可以预留3天，需要您先付10元定金（可退），这样我先把商品下架~' }
+];
+
+/* ============================================================
+   2. 工具函数
+   ============================================================ */
+
+// Toast显示
+function showToast(msg, duration = 2000) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  clearTimeout(toast._timeout);
+  toast._timeout = setTimeout(() => toast.classList.remove('show'), duration);
+}
+
+// 提示文字显示
+function showHint(text) {
+  const hint = document.getElementById('hintBox');
+  hint.textContent = text;
+  hint.classList.add('active');
+}
+
+function hideHint() {
+  document.getElementById('hintBox').classList.remove('active');
+}
+
+/* ============================================================
+   3. 光标控制器
+   ============================================================ */
+class CursorController {
+  constructor() {
+    this.el = document.getElementById('simCursor');
+    this.isClicking = false;
+  }
+
+  moveTo(target, duration = 0.8) {
+    if (typeof target === 'string') target = document.querySelector(target);
+    if (!target) return gsap.timeline();
+
+    const demoWrapper = document.getElementById('demoWrapper');
+    const wrapperRect = demoWrapper.getBoundingClientRect();
+    const targetRect = target.getBoundingClientRect();
+
+    const x = targetRect.left + targetRect.width / 2;
+    const y = targetRect.top + targetRect.height / 2;
+
+    return gsap.to(this.el, {
+      x, y,
+      duration,
+      ease: 'power2.inOut'
+    });
+  }
+
+  click(target, options = {}) {
+    const { moveDuration = 0.7, pauseBefore = 0.15, pauseAfter = 0.3 } = options;
+    const tl = gsap.timeline();
+
+    tl.add(this.moveTo(target, moveDuration))
+      .to({}, { duration: pauseBefore })
+      .call(() => this.showClickEffect())
+      .to({}, { duration: pauseAfter });
+
+    return tl;
+  }
+
+  showClickEffect() {
+    this.el.classList.add('click');
+    const ripple = document.createElement('div');
+    ripple.className = 'cursor-ripple';
+    this.el.appendChild(ripple);
+    setTimeout(() => ripple.remove(), 600);
+    setTimeout(() => this.el.classList.remove('click'), 200);
+  }
+}
+
+/* ============================================================
+   4. 输入模拟器
+   ============================================================ */
+class InputSimulator {
+  static typeText(inputEl, text, speed = 50) {
+    if (typeof inputEl === 'string') inputEl = document.querySelector(inputEl);
+    return new Promise(resolve => {
+      if (!inputEl) { resolve(); return; }
+      inputEl.value = '';
+      let i = 0;
+      const timer = setInterval(() => {
+        inputEl.value += text[i];
+        inputEl.dispatchEvent(new Event('input', { bubbles: true }));
+        i++;
+        if (i >= text.length) {
+          clearInterval(timer);
+          resolve();
+        }
+      }, speed);
+    });
+  }
+
+  static setContent(el, text, speed = 50) {
+    if (typeof el === 'string') el = document.querySelector(el);
+    return new Promise(resolve => {
+      if (!el) { resolve(); return; }
+      el.textContent = '';
+      let i = 0;
+      const timer = setInterval(() => {
+        el.textContent += text[i];
+        i++;
+        if (i >= text.length) {
+          clearInterval(timer);
+          resolve();
+        }
+      }, speed);
+    });
+  }
+}
+
+/* ============================================================
+   5. 场景切换器
+   ============================================================ */
+class SceneSwitcher {
+  constructor() {
+    this.scenes = ['launch', 'home', 'match', 'detail', 'publish', 'seller'];
+    this.current = 'launch';
+  }
+
+  switchTo(targetScene) {
+    if (this.current === targetScene) return gsap.timeline(); // 避免重复切换
+
+    const currentEl = document.getElementById('scene-' + this.current);
+    const targetEl = document.getElementById('scene-' + targetScene);
+
+    const tl = gsap.timeline();
+
+    if (currentEl && currentEl !== targetEl) {
+      tl.to(currentEl, {
+        opacity: 0,
+        duration: 0.3,
+        onComplete: () => currentEl.classList.remove('active')
+      });
+    }
+
+    tl.set(targetEl, { display: 'block', opacity: 0 }, 0)
+      .call(() => targetEl.classList.add('active'))
+      .to(targetEl, { opacity: 1, duration: 0.4, ease: 'power2.out' });
+
+    this.current = targetScene;
+    return tl;
+  }
+}
+
+/* ============================================================
+   6. 播放控制器
+   ============================================================ */
+class PlaybackController {
+  constructor(mainTimeline) {
+    this.tl = mainTimeline;
+    this.isPlaying = false;
+    this.speed = 1;
+    this.totalDuration = 105; // 总时长秒数
+  }
+
+  play() {
+    this.tl.play();
+    this.isPlaying = true;
+    document.getElementById('btnPlay').classList.add('active');
+  }
+
+  pause() {
+    this.tl.pause();
+    this.isPlaying = false;
+    document.getElementById('btnPlay').classList.remove('active');
+  }
+
+  stop() {
+    this.tl.pause();
+    this.tl.seek(0);
+    this.isPlaying = false;
+    document.getElementById('btnPlay').classList.remove('active');
+    updateChapterHighlight(0);
+    switchToScene('launch');
+  }
+
+  jumpToScene(sceneIndex) {
+    this.tl.pause();
+    const labels = ['launch-start', 'home-start', 'match-start', 'detail-start', 'publish-start', 'seller-start'];
+    this.tl.seek(labels[sceneIndex]);
+    this.tl.play();
+    this.isPlaying = true;
+  }
+
+  setSpeed(speed) {
+    this.speed = speed;
+    this.tl.timeScale(speed);
+    document.getElementById('speedLabel').textContent = speed + 'x';
+  }
+}
+
+/* ============================================================
+   7. 全局变量初始化
+   ============================================================ */
+let cursor, playback, sceneSwitcher;
+let masterTL;
+let currentSceneIdx = 0;
+
+// 缩放适配
+function resizeDemo() {
+  const wrapper = document.getElementById('demoWrapper');
+  const scaleX = window.innerWidth / 1280;
+  const scaleY = window.innerHeight / 720;
+  const scale = Math.min(scaleX, scaleY, 1);
+  wrapper.style.transform = `translate(-50%, -50%) scale(${scale})`;
+  wrapper.style.left = '50%';
+  wrapper.style.top = '50%';
+  wrapper.style.position = 'fixed';
+}
+
+window.addEventListener('resize', resizeDemo);
+window.addEventListener('load', resizeDemo);
+
+// 初始化首页商品卡片
+function initHomeProducts() {
+  const container = document.getElementById('homeProducts');
+  const products = [MOCK_PRODUCTS[2], MOCK_PRODUCTS[1]]; // 台灯、耳机
+  container.innerHTML = products.map(p => `
+    <div class="product-card" data-pid="${p.id}">
+      <div class="product-card-img">
+        <img src="${p.imageUrl}" alt="${p.title}" onerror="this.parentElement.innerHTML='<span style=font-size:40px>${p.emoji}</span>'">
+      </div>
+      <div class="product-card-body">
+        <div class="product-card-title">${p.title}</div>
+        <div class="product-card-price">¥${p.currentPrice}</div>
+        <div class="product-card-meta">${p.condition} · ${p.location}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// 更新章节高亮
+function updateChapterHighlight(idx) {
+  document.querySelectorAll('.chapter-btn').forEach((btn, i) => {
+    btn.classList.toggle('active', i === idx);
+  });
+}
+
+// 场景切换的快捷函数
+function switchToScene(name) {
+  const sceneNames = ['launch', 'home', 'match', 'detail', 'publish', 'seller'];
+  const idx = sceneNames.indexOf(name);
+  currentSceneIdx = idx;
+  updateChapterHighlight(idx);
+  sceneSwitcher.switchTo(name);
+}
+
+/* ============================================================
+   8. GSAP 主时间轴构建
+   ============================================================ */
+function buildMasterTimeline() {
+  masterTL = gsap.timeline({ paused: true });
+
+  const launchAddrBar = document.getElementById('launchAddrBar');
+  const launchLogoArea = document.getElementById('launchLogoArea');
+  const launchRing = document.getElementById('launchRing');
+  const launchStatus = document.getElementById('launchStatus');
+  const launchProgressWrap = document.getElementById('launchProgressWrap');
+  const launchProgressFill = document.getElementById('launchProgressFill');
+
+  // ===== 场景1：启动加载 (0-8s) =====
+  masterTL.addLabel('launch-start', 0);
+
+  masterTL.to(launchAddrBar, { opacity: 1, duration: 0.4 }, 0.5)
+    .to(launchLogoArea, { opacity: 1, scale: 1, duration: 0.5 }, 1.0)
+    .to(launchRing, { opacity: 0.3, duration: 0.4 }, 1.5)
+    .call(() => showHint('🚀 正在启动校易配智能交易系统...'), [], 1.5)
+    .to(launchStatus, { opacity: 1, duration: 0.3 }, 1.5)
+    .call(() => InputSimulator.setContent(launchStatus, '正在启动智能交易系统...', 80), [], 1.8)
+    .to(launchProgressWrap, { opacity: 1, duration: 0.3 }, 2.0)
+    .to(launchProgressFill, { width: '30%', duration: 2, ease: 'power1.inOut' }, 2.0)
+    .call(() => {
+      launchStatus.textContent = '加载智能匹配引擎...';
+      showHint('⚙️ 初始化AI引擎模块...');
+    }, [], 4.0)
+    .to(launchProgressFill, { width: '70%', duration: 2, ease: 'power1.inOut' }, 4.0)
+    .call(() => {
+      launchStatus.textContent = '准备就绪';
+      showHint('✅ 系统就绪，即将进入首页');
+    }, [], 6.0)
+    .to(launchProgressFill, { width: '100%', duration: 1.5, ease: 'power1.inOut' }, 6.0)
+    .call(() => switchToScene('home'), [], 7.5)
+    .to('#scene-launch', { opacity: 0, duration: 0.4 }, 7.5)
+    .addLabel('launch-end', 8);
+
+  // ===== 场景2：首页浏览 (8-20s) =====
+  masterTL.addLabel('home-start', 8);
+  // 显示首页
+  masterTL.call(() => {
+    switchToScene('home');
+    initHomeProducts();
+  }, [], 8);
+
+  // 光标动画序列
+  // 8.0s - 光标出现
+  masterTL.set('#simCursor', { opacity: 1 }, 8)
+    // 移动到智能匹配卡片
+    .call(() => showHint('👆 浏览首页，发现AI智能匹配功能'), [], 8.2)
+    .add(cursor.moveTo('#homeMatchCard', 0.7), 8.5)
+    .call(() => {
+      document.getElementById('homeMatchCard').style.borderColor = 'var(--yellow-500)';
+      showHint('🤖 AI帮你精准匹配心仪商品');
+    }, [], 9.2)
+    .to({}, { duration: 0.5 }, 9.2)
+    .call(() => document.getElementById('homeMatchCard').style.borderColor = ''), 9.7
+
+  // 移动到分类区教材图标
+  masterTL.add(cursor.moveTo('#homeCategories .category-chip[data-cat="教材"]', 0.6), 10.0)
+    .call(() => {
+      const el = document.querySelector('#homeCategories .category-chip[data-cat="教材"]');
+      if (el) el.style.transform = 'scale(1.1)';
+      showHint('📚 教材分类：128件在售');
+    }, [], 10.6)
+    .to({}, { duration: 0.5 }, 10.6)
+    .call(() => {
+      const el = document.querySelector('#homeCategories .category-chip[data-cat="教材"]');
+      if (el) el.style.transform = '';
+    }, [], 11.1)
+
+  // 移动到商品卡片1（台灯）
+  masterTL.add(cursor.click('#homeProducts .product-card:first-child', { moveDuration: 0.5 }), 11.3)
+    .call(() => {
+      showHint('💡 悬停商品卡片，查看简要信息');
+      const card = document.querySelector('#homeProducts .product-card:first-child');
+      if (card) card.style.transform = 'translateY(-3px)';
+    }, [], 11.8)
+    .to({}, { duration: 0.6 }, 11.8)
+    .call(() => {
+      const card = document.querySelector('#homeProducts .product-card:first-child');
+      if (card) card.style.transform = '';
+    }, [], 12.4)
+
+  // 滚动展示AI功能区
+  masterTL.call(() => {
+    const content = document.getElementById('homeScrollContent');
+    content.scrollTo({ top: 200, behavior: 'smooth' });
+    showHint('📜 向下滚动，发现更多AI智能功能');
+  }, [], 12.8)
+    .to({}, { duration: 1.5 }, 12.8)
+
+  // 点击"去体验"（智能发布）
+  masterTL.add(cursor.click('.ai-card:last-child .home-go-btn', { moveDuration: 0.5, pauseAfter: 0.2 }), 14.5)
+    .call(() => {
+      showHint('✨ 点击"去体验"，探索AI智能发布功能');
+    }, [], 15.0)
+    .to({}, { duration: 0.8 }, 15.0)
+
+  // 滚动到推荐商品区
+  masterTL.call(() => {
+    document.getElementById('homeScrollContent').scrollTo({ top: 400, behavior: 'smooth' });
+  }, [], 15.5)
+    .to({}, { duration: 1.2 }, 15.5)
+
+  // 点击"查看全部"
+  masterTL.call(() => showHint('🔍 查看全部商品列表'), [], 17.0)
+    .add(cursor.click('#homeViewAll', { moveDuration: 0.5 }), 17.0)
+    .to({}, { duration: 0.6 }, 17.5)
+
+  // 数据看板数字滚动动画
+  masterTL.call(() => {
+    showHint('📊 平台数据概览实时更新');
+  }, [], 18.5)
+    .to({ val: 0 }, {
+      val: 2580,
+      duration: 1,
+      onUpdate: function() {
+        document.getElementById('homeStat1').textContent = Math.round(this.targets()[0].val);
+      }
+    }, 18.5)
+    .to({ val: 0 }, {
+      val: 1200,
+      duration: 1,
+      onUpdate: function() {
+        document.getElementById('homeStat2').textContent = Math.round(this.targets()[0].val);
+      }
+    }, 18.8)
+    .to({ val: 0 }, {
+      val: 860,
+      duration: 1,
+      onUpdate: function() {
+        document.getElementById('homeStat3').textContent = Math.round(this.targets()[0].val);
+      }
+    }, 19.1);
+
+  masterTL.addLabel('home-end', 20);
+
+  // ===== 场景3：智能匹配核心流程 (20-45s) =====
+  masterTL.addLabel('match-start', 20);
+
+  masterTL.call(() => {
+    switchToScene('match');
+    showHint('🎯 进入智能匹配 - AI帮你找到最合适的商品');
+  }, [], 20);
+
+  // 光标移动到输入框
+  masterTL.call(() => showHint('📍 点击输入框，开始描述你的需求'), [], 21)
+    .add(cursor.click('#matchInputField', { moveDuration: 0.6 }), 21)
+    .call(() => {
+      document.getElementById('matchInputCard').classList.add('focused');
+      document.getElementById('matchPlaceholder').textContent = '';
+    }, [], 21.6)
+
+  // 逐字输入主需求
+  masterTL.call(async () => {
+    const field = document.getElementById('matchInputField');
+    const placeholder = document.getElementById('matchPlaceholder');
+    if (placeholder) placeholder.textContent = '';
+    await InputSimulator.setContent(field, '我想买一本管理学教材', 50);
+  }, [], 22)
+    .to({}, { duration: 1.8 }, 22)
+
+  // 点击示例标签
+  masterTL.call(() => showHint('🏷️ 点击示例标签，AI自动填充需求'), [], 24)
+    .add(cursor.click('.match-example-tag[data-text*="管理学"]', { moveDuration: 0.5 }), 24)
+    .call(async () => {
+      const field = document.getElementById('matchInputField');
+      field.textContent = '我想买一本管理学教材，预算30元以内';
+      showHint('💰 AI已自动添加预算条件');
+    }, [], 24.5)
+    .to({}, { duration: 0.8 }, 24.5)
+
+  // 光标点击"开始匹配"按钮
+  masterTL.call(() => showHint('🎯 点击"开始匹配"，AI启动智能推荐引擎'), [], 26)
+    .add(cursor.click('#matchStartBtn', { moveDuration: 0.6 }), 26)
+    .call(() => {
+      document.getElementById('matchStartBtn').textContent = '⏳ 匹配中...';
+      document.getElementById('matchStartBtn').style.opacity = '0.7';
+      // 显示AI分析动画区
+      document.getElementById('matchAiAnalyze').style.display = 'block';
+      document.getElementById('matchInputCard').style.opacity = '0.5';
+    }, [], 26.6)
+
+  // AI分析动画
+  masterTL.call(() => {
+    showHint('🧠 AI正在分析你的需求...');
+    document.getElementById('matchAnalyzeText').textContent = '正在解析需求...';
+  }, [], 27)
+    .call(() => document.getElementById('matchAnalyzeText').textContent = '识别品类：教材', [], 28)
+    .call(() => document.getElementById('matchAnalyzeText').textContent = '匹配预算范围...', [], 29)
+    .call(() => document.getElementById('matchAnalyzeText').textContent = '筛选北区商品...', [], 30)
+    .call(() => document.getElementById('matchAnalyzeText').textContent = '计算匹配度...', [], 31)
+    .to('#matchAnalyzeProgress', {
+      width: '100%',
+      duration: 2,
+      ease: 'power1.inOut'
+    }, 30)
+
+  // 显示结果
+  masterTL.call(() => {
+    showHint('✅ 找到3件匹配商品！');
+    document.getElementById('matchAiAnalyze').style.display = 'none';
+    const resultsArea = document.getElementById('matchResultsArea');
+    resultsArea.style.display = 'block';
+
+    // 填充结果卡片
+    const cardsContainer = document.getElementById('matchResultCards');
+    cardsContainer.innerHTML = MOCK_PRODUCTS.map((p, i) => `
+      <div class="match-result-card" id="matchCard${i}" style="opacity:0;transform:translateX(30px);">
+        <div style="display:flex;gap:12px;align-items:flex-start;">
+          <div style="width:60px;height:60px;background:var(--blue-50);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0;">${p.emoji}</div>
+          <div style="flex:1;">
+            <div style="font-weight:bold;font-size:13px;margin-bottom:2px;">${p.title}</div>
+            <div style="font-size:18px;font-weight:bold;color:var(--blue-500);">¥${p.currentPrice} <span style="font-size:11px;color:var(--text-hint);text-decoration:line-through;">¥${p.originalPrice}</span></div>
+            <div style="font-size:10px;color:var(--text-secondary);margin-top:2px;">${p.condition} · ${p.location}</div>
+          </div>
+          <div style="text-align:center;">
+            <div style="font-size:22px;font-weight:bold;color:var(--success);">${p.matchScore}%</div>
+            <div style="font-size:9px;color:var(--text-hint);">匹配度</div>
+          </div>
+        </div>
+        <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);" id="matchReasons${i}">
+          ${p.reasons.map(r => `<div style="font-size:10px;color:var(--text-secondary);margin-bottom:2px;opacity:0;">${r.icon} ${r.text}</div>`).join('')}
+        </div>
+        <div class="btn-primary" style="font-size:10px;padding:4px 10px;margin-top:6px;display:inline-flex;" id="matchDetailBtn${i}">查看详情 →</div>
+      </div>
+    `).join('');
+  }, [], 34);
+
+  // 卡片动画
+  masterTL.call(() => {
+    gsap.to('#matchCard0', { opacity: 1, x: 0, duration: 0.5 });
+  }, [], 35)
+    .call(() => {
+      const reasons = document.querySelectorAll('#matchReasons0 div');
+      gsap.to(reasons, { opacity: 1, stagger: 0.2, duration: 0.3 });
+    }, [], 35.5)
+    .call(() => {
+      gsap.to('#matchCard1', { opacity: 1, x: 0, duration: 0.5 });
+    }, [], 37)
+    .call(() => {
+      gsap.to('#matchCard2', { opacity: 1, x: 0, duration: 0.5 });
+    }, [], 38.5)
+
+  // 点击查看详情
+  masterTL.call(() => showHint('🔍 点击"查看详情"，了解商品完整信息'), [], 40.5)
+    .add(cursor.click('#matchDetailBtn0', { moveDuration: 0.5 }), 40.5)
+    .to({}, { duration: 0.6 }, 41);
+
+  // 浏览全部商品
+  masterTL.call(() => showHint('📋 浏览全部匹配商品'), [], 43)
+    .add(cursor.click('#matchBrowseAll', { moveDuration: 0.5 }), 43)
+    .to({}, { duration: 0.5 }, 43.5);
+
+  masterTL.addLabel('match-end', 45);
+
+  // ===== 场景4：商品详情 (45-60s) =====
+  masterTL.addLabel('detail-start', 45);
+
+  masterTL.call(() => {
+    switchToScene('detail');
+    showHint('📋 进入商品详情页 - 查看完整商品信息');
+    // 初始化问答区回答
+    document.querySelectorAll('#detailScrollContent .qa-answer-text').forEach((el, i) => {
+      if (MOCK_QA[i]) el.textContent = MOCK_QA[i].a;
+    });
+  }, [], 45);
+
+  // 点击主图放大
+  masterTL.call(() => showHint('🖼️ 点击商品图片查看大图'), [], 46)
+    .add(cursor.click('#detailMainImage', { moveDuration: 0.5 }), 46)
+    .call(() => {
+      document.getElementById('detailMainImage').style.fontSize = '100px';
+      document.getElementById('detailMainImage').style.transition = 'font-size 0.3s';
+    }, [], 46.5)
+    .to({}, { duration: 0.5 }, 46.5)
+    .call(() => {
+      document.getElementById('detailMainImage').style.fontSize = '64px';
+    }, [], 47)
+
+  // 切换缩略图
+  masterTL.call(() => showHint('📷 点击缩略图切换商品图片'), [], 47.8)
+    .add(cursor.click('#detailThumbnails > div:nth-child(2)', { moveDuration: 0.5 }), 47.8)
+    .call(() => {
+      document.getElementById('detailMainImage').textContent = '📖';
+      document.querySelectorAll('#detailThumbnails > div').forEach(d => d.style.borderColor = 'transparent');
+      document.querySelector('#detailThumbnails > div:nth-child(2)').style.borderColor = 'var(--yellow-500)';
+    }, [], 48.3)
+    .to({}, { duration: 0.4 }, 48.3)
+
+  // 点击展开全文
+  masterTL.call(() => showHint('📖 点击"展开全文"查看完整描述'), [], 49)
+    .add(cursor.click('#detailExpandDesc', { moveDuration: 0.5 }), 49)
+    .call(() => {
+      document.getElementById('detailDescFull').style.display = 'block';
+      document.getElementById('detailExpandDesc').textContent = '收起';
+    }, [], 49.5)
+
+  // 收藏
+  masterTL.call(() => showHint('❤️ 点击收藏，保存心仪商品'), [], 50.5)
+    .add(cursor.click('#detailFavBtn', { moveDuration: 0.5 }), 50.5)
+    .call(() => {
+      const btn = document.getElementById('detailFavBtn');
+      btn.innerHTML = '♥ 已收藏';
+      btn.style.color = 'var(--error)';
+      btn.style.borderColor = 'var(--error)';
+      showToast('❤️ 已收藏');
+    }, [], 51)
+    .to({}, { duration: 0.8 }, 51)
+
+  // 点击AI问答1
+  masterTL.call(() => showHint('💬 查看AI智能问答 - 点击"还在吗？"'), [], 52)
+    .add(cursor.click('#detailQa0', { moveDuration: 0.5 }), 52)
+    .call(() => {
+      document.querySelector('#detailQa0 .qa-answer').style.display = 'block';
+    }, [], 52.5)
+    .to({}, { duration: 0.6 }, 52.5)
+
+  // 复制回复
+  masterTL.call(() => showHint('📋 点击"复制回复"，快速获取议价话术'), [], 53.3)
+    .add(cursor.click('#detailQa0 [data-action="copy"]', { moveDuration: 0.4 }), 53.3)
+    .call(() => {
+      const btn = document.querySelector('#detailQa0 [data-action="copy"]');
+      btn.textContent = '✅ 已复制';
+      showToast('📋 已复制到剪贴板');
+      setTimeout(() => { btn.textContent = '📋 复制回复'; }, 2000);
+    }, [], 53.7)
+    .to({}, { duration: 0.5 }, 53.7)
+
+  // 联系卖家
+  masterTL.call(() => showHint('💬 点击"联系卖家"，查看联系方式'), [], 55)
+    .add(cursor.click('#detailContactBtn', { moveDuration: 0.5 }), 55)
+    .call(() => {
+      document.getElementById('detailContactModal').style.display = 'flex';
+    }, [], 55.5)
+    .to({}, { duration: 1.5 }, 55.5)
+
+  // 关闭联系面板
+  masterTL.call(() => showHint('关闭弹窗，继续浏览'), [], 57.5)
+    .add(cursor.click('#detailCloseModal', { moveDuration: 0.4 }), 57.5)
+    .call(() => {
+      document.getElementById('detailContactModal').style.display = 'none';
+    }, [], 57.9)
+    .to({}, { duration: 0.5 }, 57.9);
+
+  masterTL.addLabel('detail-end', 60);
+
+  // ===== 场景5：智能发布核心流程 (60-90s) =====
+  masterTL.addLabel('publish-start', 60);
+
+  masterTL.call(() => {
+    switchToScene('publish');
+    showHint('✨ 进入智能发布 - AI帮你一键生成商品信息');
+  }, [], 60);
+
+  // 选择商品类别
+  masterTL.call(() => showHint('📚 选择商品类别：教材'), [], 61.5)
+    .add(cursor.click('#publishCatBook', { moveDuration: 0.5 }), 61.5)
+    .call(() => {
+      document.getElementById('publishCatBook').style.border = '2px solid var(--yellow-500)';
+      document.getElementById('publishCatBook').style.background = 'var(--yellow-50)';
+    }, [], 62)
+    .to({}, { duration: 0.4 }, 62)
+
+  // 输入商品名称
+  masterTL.call(() => showHint('⌨️ 输入商品名称'), [], 63)
+    .add(cursor.click('#publishTitle', { moveDuration: 0.4 }), 63)
+    .call(async () => {
+      await InputSimulator.typeText('#publishTitle', '管理学原理教材 第7版', 50);
+    }, [], 63.4)
+    .to({}, { duration: 1.8 }, 63.4)
+
+  // 输入价格
+  masterTL.call(() => showHint('💰 输入原价和期望售价'), [], 65.8)
+    .add(cursor.click('#publishOrigPrice', { moveDuration: 0.4 }), 65.8)
+    .call(async () => {
+      await InputSimulator.typeText('#publishOrigPrice', '58', 60);
+    }, [], 66.2)
+    .add(cursor.click('#publishPrice', { moveDuration: 0.4 }), 67)
+    .call(async () => {
+      await InputSimulator.typeText('#publishPrice', '25', 60);
+    }, [], 67.4)
+
+  // AI建议价格
+  masterTL.call(() => showHint('🤖 点击获取AI价格建议'), [], 68.5)
+    .add(cursor.click('#publishAiPriceBtn', { moveDuration: 0.4 }), 68.5)
+    .call(() => {
+      document.getElementById('publishAiPriceBtn').textContent = '⏳ 分析中...';
+      setTimeout(() => {
+        document.getElementById('publishAiPriceBtn').textContent = '🤖 AI建议：¥20-¥30';
+        document.getElementById('publishPrice').value = '25';
+        showToast('🤖 AI建议价格区间：¥20-¥30');
+      }, 800);
+    }, [], 68.9)
+    .to({}, { duration: 0.8 }, 68.9)
+
+  // 选择成色
+  masterTL.call(() => showHint('⭐ 选择商品成色'), [], 70)
+    .add(cursor.click('#publishConditionOpts span[data-val="八成新"]', { moveDuration: 0.4 }), 70)
+    .call(() => {
+      document.querySelectorAll('#publishConditionOpts span').forEach(s => s.style.background = '');
+      document.querySelector('#publishConditionOpts span[data-val="八成新"]').style.background = 'var(--yellow-500)';
+      document.querySelector('#publishConditionOpts span[data-val="八成新"]').style.color = 'var(--white)';
+    }, [], 70.4)
+
+  // 选择使用时长
+  masterTL.call(() => showHint('⏱ 选择使用时长'), [], 71)
+    .add(cursor.click('#publishUsageOpts span[data-val="1年内"]', { moveDuration: 0.4 }), 71)
+    .call(() => {
+      document.querySelectorAll('#publishUsageOpts span').forEach(s => s.style.background = '');
+      document.querySelector('#publishUsageOpts span[data-val="1年内"]').style.background = 'var(--yellow-500)';
+      document.querySelector('#publishUsageOpts span[data-val="1年内"]').style.color = 'var(--white)';
+    }, [], 71.4)
+
+  // 选择交易地点
+  masterTL.call(() => showHint('📍 选择交易地点'), [], 72)
+    .add(cursor.click('#publishLocationTags span[data-val="南区宿舍"]', { moveDuration: 0.4 }), 72)
+    .call(() => {
+      document.getElementById('publishLocation').value = '南区宿舍';
+    }, [], 72.4)
+
+  // 输入补充说明
+  masterTL.call(() => showHint('📝 输入补充说明'), [], 73)
+    .add(cursor.click('#publishDesc', { moveDuration: 0.4 }), 73)
+    .call(async () => {
+      await InputSimulator.typeText('#publishDesc', '有重点标注，考试必备', 50);
+    }, [], 73.4)
+    .to({}, { duration: 1.5 }, 73.4)
+
+  // 点击AI生成
+  masterTL.call(() => showHint('🤖 点击"AI生成商品信息"按钮'), [], 75.5)
+    .add(cursor.click('#publishAiGenBtn', { moveDuration: 0.5 }), 75.5)
+    .call(() => {
+      document.getElementById('publishAiGenBtn').textContent = '⏳ AI生成中...';
+      document.getElementById('publishAiGenBtn').style.opacity = '0.7';
+      document.getElementById('publishFormArea').style.opacity = '0.5';
+      document.getElementById('publishFormArea').style.pointerEvents = 'none';
+      document.getElementById('publishAiArea').style.display = 'block';
+    }, [], 76)
+
+  // AI生成动画
+  masterTL.call(() => {
+    document.getElementById('publishAiText').textContent = '分析商品类别：教材...';
+    showHint('🧠 AI正在分析商品信息...');
+  }, [], 76.5)
+    .call(() => { document.getElementById('publishAiText').textContent = '评估市场价格...'; }, [], 77.5)
+    .call(() => { document.getElementById('publishAiText').textContent = '生成卖点标签...'; }, [], 78.5)
+    .call(() => { document.getElementById('publishAiText').textContent = '优化商品描述...'; }, [], 79.5)
+    .to('#publishAiProgress', { width: '100%', duration: 2, ease: 'power1.inOut' }, 77.5);
+
+  // 显示AI生成结果
+  masterTL.call(() => {
+    showHint('✅ AI生成完成！查看预览');
+    document.getElementById('publishAiArea').style.display = 'none';
+    document.getElementById('publishPreviewArea').style.display = 'block';
+  }, [], 81)
+
+  // 价格可视化动画
+  masterTL.to('#publishPriceIndicator', { left: '55%', duration: 0.8 }, 82)
+    // 成交概率环形图
+    .to({ val: 0 }, {
+      val: 85,
+      duration: 1,
+      onUpdate: function() {
+        const v = Math.round(this.targets()[0].val);
+        document.getElementById('publishRingVal').textContent = v + '%';
+        document.getElementById('publishRingChart').style.background =
+          `conic-gradient(var(--success) 0%, var(--success) ${v}%, var(--border) ${v}%)`;
+      }
+    }, 82.5);
+
+  // 编辑标题
+  masterTL.call(() => showHint('✏️ 点击编辑，微调AI生成的标题'), [], 84)
+    .add(cursor.click('#publishEditBtn', { moveDuration: 0.4 }), 84)
+    .call(() => {
+      const titleEl = document.getElementById('publishPreviewTitle');
+      titleEl.textContent = '管理学原理教材 第7版 | 笔记详细';
+      showToast('✏️ 标题已更新');
+    }, [], 84.4)
+
+  // 发布
+  masterTL.call(() => showHint('🚀 点击"直接发布"，商品即刻上架'), [], 86)
+    .add(cursor.click('#publishFinalBtn', { moveDuration: 0.5 }), 86)
+    .call(() => {
+      showToast('🚀 发布成功！商品已上架');
+      showHint('🎉 发布成功！即将跳转到卖家助手页面');
+    }, [], 86.5)
+    .to({}, { duration: 1.5 }, 86.5);
+
+  masterTL.addLabel('publish-end', 90);
+
+  // ===== 场景6：卖家助手 (90-105s) =====
+  masterTL.addLabel('seller-start', 90);
+
+  masterTL.call(() => {
+    switchToScene('seller');
+    showHint('📊 卖家助手 - 管理你的商品与交易');
+  }, [], 90);
+
+  // 数据数字滚动
+  masterTL.call(() => showHint('📈 数据概览实时更新'), [], 91)
+    .to({ val: 0 }, {
+      val: 1,
+      duration: 0.8,
+      onUpdate: function() {
+        document.getElementById('sellerStat1').textContent = Math.round(this.targets()[0].val);
+      }
+    }, 91)
+    .to({ val: 0 }, {
+      val: 128,
+      duration: 0.8,
+      onUpdate: function() {
+        document.getElementById('sellerStat2').textContent = Math.round(this.targets()[0].val);
+      }
+    }, 91.3)
+    .to({ val: 0 }, {
+      val: 5,
+      duration: 0.8,
+      onUpdate: function() {
+        document.getElementById('sellerStat3').textContent = Math.round(this.targets()[0].val);
+      }
+    }, 91.6)
+    .to({ val: 0 }, {
+      val: 8,
+      duration: 0.8,
+      onUpdate: function() {
+        document.getElementById('sellerStat4').textContent = Math.round(this.targets()[0].val);
+      }
+    }, 91.9);
+
+  // 展开商品详情
+  masterTL.call(() => showHint('📦 点击展开商品表现数据'), [], 93)
+    .add(cursor.click('#sellerProductItem', { moveDuration: 0.5 }), 93)
+    .call(() => {
+      document.getElementById('sellerProductDetail').style.display = 'block';
+      gsap.to('#sellerViewBar', { width: '65%', duration: 0.5 });
+      gsap.to('#sellerInquiryBar', { width: '30%', duration: 0.5 });
+      gsap.to('#sellerFavBar', { width: '15%', duration: 0.5 });
+      document.getElementById('sellerAiTip').textContent = '💡 AI建议：咨询率偏低，建议优化价格至¥22，预计咨询率可提升至5.2%';
+    }, [], 93.5)
+    .to({}, { duration: 1.5 }, 93.5)
+
+  // 发布新商品
+  masterTL.call(() => showHint('✨ "发布新商品"按钮（展示，不重复演示）'), [], 96)
+    .add(cursor.moveTo('#sellerNewProductBtn', 0.5), 96)
+    .to({}, { duration: 1 }, 96.5)
+
+  // 快捷回复
+  masterTL.call(() => showHint('💬 点击"快捷回复"工具'), [], 98)
+    .add(cursor.click('#sellerQuickReplyCard', { moveDuration: 0.5 }), 98)
+    .call(() => {
+      document.getElementById('sellerQuickReplyPanel').style.display = 'block';
+    }, [], 98.5)
+    .to({}, { duration: 0.5 }, 98.5)
+
+  // 点击"还在吗？"
+  masterTL.call(() => showHint('🤖 AI一键生成常用问答回复'), [], 99.5)
+    .add(cursor.click('#sellerQuickReplyPanel .quick-reply-btn[data-q="还在吗？"]', { moveDuration: 0.4 }), 99.5)
+    .call(() => {
+      const answer = document.getElementById('sellerQuickReplyAnswer');
+      answer.style.display = 'block';
+      answer.textContent = '✅ AI回复：还在的，同学！随时可以联系交易，支持北区宿舍区面交~';
+    }, [], 99.9)
+
+  // 价格优化
+  masterTL.call(() => showHint('💰 查看AI价格优化建议'), [], 102)
+    .add(cursor.click('#sellerPriceCard', { moveDuration: 0.5 }), 102)
+    .call(() => {
+      document.getElementById('sellerPriceAdvice').style.display = 'block';
+    }, [], 102.5)
+    .to({}, { duration: 1 }, 102.5)
+
+  // 结束
+  masterTL.call(() => {
+    showHint('🎉 演示完成！感谢观看校易配交互动画Demo');
+    showToast('🎉 动画演示结束 — 感谢观看！');
+  }, [], 104.5);
+
+  masterTL.addLabel('seller-end', 105);
+
+  // 更新进度条
+  masterTL.eventCallback('onUpdate', () => {
+    const progress = Math.min(masterTL.progress() * 100, 100);
+    document.getElementById('progressFill').style.width = progress + '%';
+    const currentTime = masterTL.time();
+    document.getElementById('progressTime').textContent =
+      Math.floor(currentTime) + 's / ' + Math.floor(masterTL.totalDuration()) + 's';
+  });
+
+  return masterTL;
+}
+
+/* ============================================================
+   9. 页面初始化
+   ============================================================ */
+document.addEventListener('DOMContentLoaded', () => {
+  // 初始化Lucide图标
+  if (typeof lucide !== 'undefined') {
+    lucide.createIcons();
+  }
+
+  // 缩放适配
+  resizeDemo();
+
+  // 创建控制器实例
+  cursor = new CursorController();
+  sceneSwitcher = new SceneSwitcher();
+
+  // 构建主时间轴
+  masterTL = buildMasterTimeline();
+
+  // 创建播放控制器
+  playback = new PlaybackController(masterTL);
+
+  // 默认隐藏光标（场景1开始时不需要）
+  document.getElementById('simCursor').style.opacity = '0';
+
+  // ===== 控制面板事件绑定 =====
+  document.getElementById('btnPlay').addEventListener('click', () => {
+    if (playback.isPlaying) {
+      playback.pause();
+      showHint('⏸ 已暂停 - 点击播放继续');
+    } else {
+      playback.play();
+      hideHint();
+    }
+  });
+
+  document.getElementById('btnStop').addEventListener('click', () => {
+    playback.stop();
+    document.getElementById('simCursor').style.opacity = '0';
+    showHint('⏹ 已重置 - 点击播放重新开始');
+  });
+
+  // 速度切换
+  document.getElementById('speedBtn').addEventListener('click', () => {
+    if (playback.speed === 1) {
+      playback.setSpeed(1.5);
+    } else if (playback.speed === 1.5) {
+      playback.setSpeed(2);
+    } else {
+      playback.setSpeed(1);
+    }
+  });
+
+  // 进度条点击
+  document.getElementById('progressWrap').addEventListener('click', (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const ratio = (e.clientX - rect.left) / rect.width;
+    masterTL.pause();
+    masterTL.progress(ratio);
+    playback.isPlaying = false;
+    document.getElementById('btnPlay').classList.remove('active');
+    showHint('📍 已跳转到指定位置');
+  });
+
+  // 章节跳转按钮
+  document.querySelectorAll('.chapter-btn').forEach((btn, i) => {
+    btn.addEventListener('click', () => {
+      playback.jumpToScene(i);
+    });
+  });
+
+  // ===== 键盘快捷键 =====
+  document.addEventListener('keydown', (e) => {
+    switch(e.code) {
+      case 'Space':
+        e.preventDefault();
+        if (playback.isPlaying) {
+          playback.pause();
+          showHint('⏸ 已暂停');
+        } else {
+          playback.play();
+          hideHint();
+        }
+        break;
+      case 'ArrowRight':
+        e.preventDefault();
+        if (currentSceneIdx < 5) {
+          playback.jumpToScene(currentSceneIdx + 1);
+          showHint('→ 切换到下一场景');
+        }
+        break;
+      case 'ArrowLeft':
+        e.preventDefault();
+        if (currentSceneIdx > 0) {
+          playback.jumpToScene(currentSceneIdx - 1);
+          showHint('← 切换到上一场景');
+        }
+        break;
+      case 'KeyR':
+        e.preventDefault();
+        playback.stop();
+        document.getElementById('simCursor').style.opacity = '0';
+        showHint('🔄 已重置 - 点击播放重新开始');
+        break;
+    }
+  });
+
+  // ===== 自动开始播放 =====
+  setTimeout(() => {
+    playback.play();
+    showHint('🎬 动画演示开始 | 空格暂停 | →←切换');
+    setTimeout(hideHint, 3000);
+  }, 500);
+
+  console.log('🚀 校易配 - 交互式动画演示Demo 初始化完成');
+  console.log('   📋 6幕场景：启动 → 首页 → 匹配 → 详情 → 发布 → 卖家');
+  console.log('   ⌨️  快捷键：空格=暂停 | →=下一幕 | ←=上一幕 | R=重播');
+  console.log('   ⏱ 总时长：≈105秒');
+});
+</script>
+
+</body>
+</html>
