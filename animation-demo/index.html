@@ -146,28 +146,106 @@ body {
 }
 
 /* ============================================================
-   提示文字
+   双侧字幕气泡系统
    ============================================================ */
-.hint-box {
-  position: fixed;
-  bottom: 90px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: var(--blue-900);
-  color: var(--white);
-  padding: 10px 22px;
-  border-radius: 8px;
-  font-size: 14px;
-  opacity: 0;
-  transition: opacity 0.3s;
+.subtitle-bubble {
+  position: absolute;
+  max-width: 360px;
+  padding: 14px 20px;
+  border-radius: 18px;
+  font-size: 17px;
+  line-height: 1.65;
   z-index: 100;
-  white-space: nowrap;
   pointer-events: none;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+  opacity: 0;
+  transition: opacity 0.5s ease, transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 6px 28px rgba(0,0,0,0.18);
+  text-align: left;
+  word-break: break-word;
 }
 
-.hint-box.active {
+/* 左侧气泡 - 蓝色调 */
+.subtitle-left {
+  left: 28px;
+  top: 45%;
+  transform: translateY(-50%) translateX(-36px);
+  background: linear-gradient(135deg, #F0F6FF 0%, #FFFFFF 100%);
+  border: 2px solid var(--blue-200);
+  border-radius: 18px 18px 18px 6px;
+  color: var(--blue-900);
+}
+.subtitle-left::after {
+  content: '';
+  position: absolute;
+  right: -10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-top: 9px solid transparent;
+  border-bottom: 9px solid transparent;
+  border-left: 11px solid var(--blue-200);
+}
+.subtitle-left.active {
   opacity: 1;
+  transform: translateY(-50%) translateX(0);
+}
+
+/* 右侧气泡 - 黄色调 */
+.subtitle-right {
+  right: 28px;
+  top: 45%;
+  transform: translateY(-50%) translateX(36px);
+  background: linear-gradient(135deg, #FFF9E6 0%, #FFFFFF 100%);
+  border: 2px solid var(--yellow-200);
+  border-radius: 18px 18px 6px 18px;
+  color: var(--blue-900);
+}
+.subtitle-right::after {
+  content: '';
+  position: absolute;
+  left: -10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-top: 9px solid transparent;
+  border-bottom: 9px solid transparent;
+  border-right: 11px solid var(--yellow-200);
+}
+.subtitle-right.active {
+  opacity: 1;
+  transform: translateY(-50%) translateX(0);
+}
+
+/* 字幕内关键信息高亮 */
+.subtitle-bubble .sub-key {
+  display: inline;
+  font-weight: 800;
+  font-size: 19px;
+  color: var(--blue-600);
+  background: linear-gradient(180deg, transparent 60%, var(--yellow-200) 60%);
+  padding: 0 3px;
+  white-space: nowrap;
+}
+.subtitle-right .sub-key {
+  color: var(--yellow-600);
+  background: linear-gradient(180deg, transparent 60%, var(--blue-100) 60%);
+}
+
+/* 字幕脉冲高亮动画 */
+@keyframes subPulse {
+  0%, 100% { box-shadow: 0 6px 28px rgba(0,0,0,0.18); }
+  50% { box-shadow: 0 6px 36px rgba(32, 97, 202, 0.3); }
+}
+
+.subtitle-bubble.pulse {
+  animation: subPulse 2s ease-in-out infinite;
+}
+
+/* 旧hint兼容 - 已废弃，保留占位 */
+.hint-box {
+  display: none;
 }
 
 /* ============================================================
@@ -911,8 +989,8 @@ body {
 <!-- 模拟光标 -->
 <div class="sim-cursor" id="simCursor"></div>
 
-<!-- 提示文字 -->
-<div class="hint-box" id="hintBox"></div>
+<!-- 提示文字（旧版，已隐藏） -->
+<div class="hint-box" id="hintBox" style="display:none;"></div>
 
 <!-- Toast通知 -->
 <div class="toast" id="toast"></div>
@@ -924,6 +1002,10 @@ body {
    主演示容器
    ============================================================ -->
 <div class="demo-wrapper" id="demoWrapper">
+
+  <!-- 双侧字幕气泡 -->
+  <div class="subtitle-bubble subtitle-left" id="subtitleLeft"></div>
+  <div class="subtitle-bubble subtitle-right" id="subtitleRight"></div>
 
   <!-- ========== 场景1：启动加载 ========== -->
   <div class="scene scene-launch active" id="scene-launch">
@@ -1606,15 +1688,71 @@ function showToast(msg, duration = 2000) {
   toast._timeout = setTimeout(() => toast.classList.remove('show'), duration);
 }
 
-// 提示文字显示
-function showHint(text) {
-  const hint = document.getElementById('hintBox');
-  hint.textContent = text;
-  hint.classList.add('active');
+// 双侧字幕控制器
+class SubtitleController {
+  constructor() {
+    this.leftEl = document.getElementById('subtitleLeft');
+    this.rightEl = document.getElementById('subtitleRight');
+    this.currentSide = null;
+    this._timer = null;
+  }
+
+  /**
+   * 显示字幕气泡
+   * @param {string} text - 字幕文本，用 **文字** 标记关键信息（将被加粗放大）
+   * @param {object} options - { side: 'left'|'right', duration: 毫秒, pulse: 是否脉冲动画 }
+   */
+  show(text, options = {}) {
+    const { side, duration = 4000, pulse = false } = options;
+    // 自动交替：未指定side时与上次相反
+    const targetSide = side || (this.currentSide === 'left' ? 'right' : 'left');
+    this.currentSide = targetSide;
+
+    const el = targetSide === 'left' ? this.leftEl : this.rightEl;
+    const otherEl = targetSide === 'left' ? this.rightEl : this.leftEl;
+
+    // 隐藏另一侧
+    otherEl.classList.remove('active', 'pulse');
+    otherEl.innerHTML = '';
+
+    // 解析文本中的 **keyword** 标记，替换为加粗高亮
+    const parsedHTML = text.replace(/\*\*(.+?)\*\*/g, '<span class="sub-key">$1</span>');
+
+    // 设置内容和类名
+    el.innerHTML = parsedHTML;
+    el.classList.toggle('pulse', pulse);
+    el.classList.add('active');
+
+    // 自动隐藏
+    clearTimeout(this._timer);
+    this._timer = setTimeout(() => {
+      el.classList.remove('active', 'pulse');
+    }, duration);
+
+    return { el, side: targetSide };
+  }
+
+  /** 隐藏所有字幕 */
+  hide() {
+    this.leftEl.classList.remove('active', 'pulse');
+    this.rightEl.classList.remove('active', 'pulse');
+    this.leftEl.innerHTML = '';
+    this.rightEl.innerHTML = '';
+    clearTimeout(this._timer);
+  }
+}
+
+// 全局字幕控制器实例
+let subtitleCtrl;
+
+// 兼容旧代码的快捷函数
+function showHint(text, duration = 4000) {
+  if (!subtitleCtrl) subtitleCtrl = new SubtitleController();
+  subtitleCtrl.show(text, { duration });
 }
 
 function hideHint() {
-  document.getElementById('hintBox').classList.remove('active');
+  if (subtitleCtrl) subtitleCtrl.hide();
 }
 
 /* ============================================================
@@ -1862,19 +2000,19 @@ function buildMasterTimeline() {
   masterTL.to(launchAddrBar, { opacity: 1, duration: 0.4 }, 0.5)
     .to(launchLogoArea, { opacity: 1, scale: 1, duration: 0.5 }, 1.0)
     .to(launchRing, { opacity: 0.3, duration: 0.4 }, 1.5)
-    .call(() => showHint('🚀 正在启动校易配智能交易系统...'), [], 1.5)
+    .call(() => subtitleCtrl.show('🚀 正在启动**校易配**智能交易系统', { side: 'left', duration: 3000 }), [], 1.5)
     .to(launchStatus, { opacity: 1, duration: 0.3 }, 1.5)
     .call(() => InputSimulator.setContent(launchStatus, '正在启动智能交易系统...', 80), [], 1.8)
     .to(launchProgressWrap, { opacity: 1, duration: 0.3 }, 2.0)
     .to(launchProgressFill, { width: '30%', duration: 2, ease: 'power1.inOut' }, 2.0)
     .call(() => {
       launchStatus.textContent = '加载智能匹配引擎...';
-      showHint('⚙️ 初始化AI引擎模块...');
+      subtitleCtrl.show('⚙️ 初始化**AI引擎模块**', { side: 'right', duration: 3000 });
     }, [], 4.0)
     .to(launchProgressFill, { width: '70%', duration: 2, ease: 'power1.inOut' }, 4.0)
     .call(() => {
       launchStatus.textContent = '准备就绪';
-      showHint('✅ 系统就绪，即将进入首页');
+      subtitleCtrl.show('✅ **系统就绪**，即将进入首页', { side: 'left', duration: 2500, pulse: true });
     }, [], 6.0)
     .to(launchProgressFill, { width: '100%', duration: 1.5, ease: 'power1.inOut' }, 6.0)
     .call(() => switchToScene('home'), [], 7.5)
@@ -1893,11 +2031,11 @@ function buildMasterTimeline() {
   // 8.0s - 光标出现
   masterTL.set('#simCursor', { opacity: 1 }, 8)
     // 移动到智能匹配卡片
-    .call(() => showHint('👆 浏览首页，发现AI智能匹配功能'), [], 8.2)
+    .call(() => subtitleCtrl.show('👆 浏览首页，发现**AI智能匹配**功能', { side: 'left', duration: 3500 }), [], 8.2)
     .add(cursor.moveTo('#homeMatchCard', 0.7), 8.5)
     .call(() => {
       document.getElementById('homeMatchCard').style.borderColor = 'var(--yellow-500)';
-      showHint('🤖 AI帮你精准匹配心仪商品');
+      subtitleCtrl.show('🤖 AI帮你**精准匹配**心仪商品', { side: 'right', duration: 3500 });
     }, [], 9.2)
     .to({}, { duration: 0.5 }, 9.2)
     .call(() => document.getElementById('homeMatchCard').style.borderColor = ''), 9.7
@@ -1907,7 +2045,7 @@ function buildMasterTimeline() {
     .call(() => {
       const el = document.querySelector('#homeCategories .category-chip[data-cat="教材"]');
       if (el) el.style.transform = 'scale(1.1)';
-      showHint('📚 教材分类：128件在售');
+      subtitleCtrl.show('📚 教材分类：**128件**在售', { side: 'left', duration: 3000 });
     }, [], 10.6)
     .to({}, { duration: 0.5 }, 10.6)
     .call(() => {
@@ -1918,7 +2056,7 @@ function buildMasterTimeline() {
   // 移动到商品卡片1（台灯）
   masterTL.add(cursor.click('#homeProducts .product-card:first-child', { moveDuration: 0.5 }), 11.3)
     .call(() => {
-      showHint('💡 悬停商品卡片，查看简要信息');
+      subtitleCtrl.show('💡 **悬停**商品卡片，查看简要信息', { side: 'right', duration: 3500 });
       const card = document.querySelector('#homeProducts .product-card:first-child');
       if (card) card.style.transform = 'translateY(-3px)';
     }, [], 11.8)
@@ -1932,14 +2070,14 @@ function buildMasterTimeline() {
   masterTL.call(() => {
     const content = document.getElementById('homeScrollContent');
     content.scrollTo({ top: 200, behavior: 'smooth' });
-    showHint('📜 向下滚动，发现更多AI智能功能');
+    subtitleCtrl.show('📜 向下滚动，发现更多**AI智能功能**', { side: 'left', duration: 4000 });
   }, [], 12.8)
     .to({}, { duration: 1.5 }, 12.8)
 
   // 点击"去体验"（智能发布）
   masterTL.add(cursor.click('.ai-card:last-child .home-go-btn', { moveDuration: 0.5, pauseAfter: 0.2 }), 14.5)
     .call(() => {
-      showHint('✨ 点击"去体验"，探索AI智能发布功能');
+      subtitleCtrl.show('✨ 点击"去体验"，探索**AI智能发布**功能', { side: 'right', duration: 3500 });
     }, [], 15.0)
     .to({}, { duration: 0.8 }, 15.0)
 
@@ -1950,13 +2088,13 @@ function buildMasterTimeline() {
     .to({}, { duration: 1.2 }, 15.5)
 
   // 点击"查看全部"
-  masterTL.call(() => showHint('🔍 查看全部商品列表'), [], 17.0)
+  masterTL.call(() => subtitleCtrl.show('🔍 查看**全部商品**列表', { side: 'left', duration: 3000 }), [], 17.0)
     .add(cursor.click('#homeViewAll', { moveDuration: 0.5 }), 17.0)
     .to({}, { duration: 0.6 }, 17.5)
 
   // 数据看板数字滚动动画
   masterTL.call(() => {
-    showHint('📊 平台数据概览实时更新');
+    subtitleCtrl.show('📊 **平台数据**概览实时更新', { side: 'right', duration: 3500 });
   }, [], 18.5)
     .to({ val: 0 }, {
       val: 2580,
@@ -1987,11 +2125,11 @@ function buildMasterTimeline() {
 
   masterTL.call(() => {
     switchToScene('match');
-    showHint('🎯 进入智能匹配 - AI帮你找到最合适的商品');
+    subtitleCtrl.show('🎯 进入智能匹配 - AI帮你找到**最合适的商品**', { side: 'left', duration: 4000, pulse: true });
   }, [], 20);
 
   // 光标移动到输入框
-  masterTL.call(() => showHint('📍 点击输入框，开始描述你的需求'), [], 21)
+  masterTL.call(() => subtitleCtrl.show('📍 点击输入框，开始**描述你的需求**', { side: 'right', duration: 3500 }), [], 21)
     .add(cursor.click('#matchInputField', { moveDuration: 0.6 }), 21)
     .call(() => {
       document.getElementById('matchInputCard').classList.add('focused');
@@ -2008,17 +2146,17 @@ function buildMasterTimeline() {
     .to({}, { duration: 1.8 }, 22)
 
   // 点击示例标签
-  masterTL.call(() => showHint('🏷️ 点击示例标签，AI自动填充需求'), [], 24)
+  masterTL.call(() => subtitleCtrl.show('🏷️ 点击示例标签，**AI自动填充**需求', { side: 'left', duration: 3500 }), [], 24)
     .add(cursor.click('.match-example-tag[data-text*="管理学"]', { moveDuration: 0.5 }), 24)
     .call(async () => {
       const field = document.getElementById('matchInputField');
       field.textContent = '我想买一本管理学教材，预算30元以内';
-      showHint('💰 AI已自动添加预算条件');
+      subtitleCtrl.show('💰 AI已自动添加**预算条件**', { side: 'right', duration: 3000 });
     }, [], 24.5)
     .to({}, { duration: 0.8 }, 24.5)
 
   // 光标点击"开始匹配"按钮
-  masterTL.call(() => showHint('🎯 点击"开始匹配"，AI启动智能推荐引擎'), [], 26)
+  masterTL.call(() => subtitleCtrl.show('🎯 点击"开始匹配"，AI启动**智能推荐引擎**', { side: 'left', duration: 3500 }), [], 26)
     .add(cursor.click('#matchStartBtn', { moveDuration: 0.6 }), 26)
     .call(() => {
       document.getElementById('matchStartBtn').textContent = '⏳ 匹配中...';
@@ -2030,7 +2168,7 @@ function buildMasterTimeline() {
 
   // AI分析动画
   masterTL.call(() => {
-    showHint('🧠 AI正在分析你的需求...');
+    subtitleCtrl.show('🧠 **AI正在分析**你的需求...', { side: 'right', duration: 5000, pulse: true });
     document.getElementById('matchAnalyzeText').textContent = '正在解析需求...';
   }, [], 27)
     .call(() => document.getElementById('matchAnalyzeText').textContent = '识别品类：教材', [], 28)
@@ -2045,7 +2183,7 @@ function buildMasterTimeline() {
 
   // 显示结果
   masterTL.call(() => {
-    showHint('✅ 找到3件匹配商品！');
+    subtitleCtrl.show('✅ 找到**3件**匹配商品！', { side: 'left', duration: 4000 });
     document.getElementById('matchAiAnalyze').style.display = 'none';
     const resultsArea = document.getElementById('matchResultsArea');
     resultsArea.style.display = 'block';
@@ -2090,12 +2228,12 @@ function buildMasterTimeline() {
     }, [], 38.5)
 
   // 点击查看详情
-  masterTL.call(() => showHint('🔍 点击"查看详情"，了解商品完整信息'), [], 40.5)
+  masterTL.call(() => subtitleCtrl.show('🔍 点击"查看详情"，了解**完整信息**', { side: 'right', duration: 4000 }), [], 40.5)
     .add(cursor.click('#matchDetailBtn0', { moveDuration: 0.5 }), 40.5)
     .to({}, { duration: 0.6 }, 41);
 
   // 浏览全部商品
-  masterTL.call(() => showHint('📋 浏览全部匹配商品'), [], 43)
+  masterTL.call(() => subtitleCtrl.show('📋 浏览**全部匹配商品**', { side: 'left', duration: 3000 }), [], 43)
     .add(cursor.click('#matchBrowseAll', { moveDuration: 0.5 }), 43)
     .to({}, { duration: 0.5 }, 43.5);
 
@@ -2106,7 +2244,7 @@ function buildMasterTimeline() {
 
   masterTL.call(() => {
     switchToScene('detail');
-    showHint('📋 进入商品详情页 - 查看完整商品信息');
+    subtitleCtrl.show('📋 进入商品详情页 - 查看**完整商品信息**', { side: 'right', duration: 4000, pulse: true });
     // 初始化问答区回答
     document.querySelectorAll('#detailScrollContent .qa-answer-text').forEach((el, i) => {
       if (MOCK_QA[i]) el.textContent = MOCK_QA[i].a;
@@ -2114,7 +2252,7 @@ function buildMasterTimeline() {
   }, [], 45);
 
   // 点击主图放大
-  masterTL.call(() => showHint('🖼️ 点击商品图片查看大图'), [], 46)
+  masterTL.call(() => subtitleCtrl.show('🖼️ 点击商品图片**查看大图**', { side: 'left', duration: 3500 }), [], 46)
     .add(cursor.click('#detailMainImage', { moveDuration: 0.5 }), 46)
     .call(() => {
       document.getElementById('detailMainImage').style.fontSize = '100px';
@@ -2126,7 +2264,7 @@ function buildMasterTimeline() {
     }, [], 47)
 
   // 切换缩略图
-  masterTL.call(() => showHint('📷 点击缩略图切换商品图片'), [], 47.8)
+  masterTL.call(() => subtitleCtrl.show('📷 点击缩略图**切换图片**', { side: 'right', duration: 3000 }), [], 47.8)
     .add(cursor.click('#detailThumbnails > div:nth-child(2)', { moveDuration: 0.5 }), 47.8)
     .call(() => {
       document.getElementById('detailMainImage').textContent = '📖';
@@ -2136,7 +2274,7 @@ function buildMasterTimeline() {
     .to({}, { duration: 0.4 }, 48.3)
 
   // 点击展开全文
-  masterTL.call(() => showHint('📖 点击"展开全文"查看完整描述'), [], 49)
+  masterTL.call(() => subtitleCtrl.show('📖 点击"展开全文"查看**完整描述**', { side: 'left', duration: 3500 }), [], 49)
     .add(cursor.click('#detailExpandDesc', { moveDuration: 0.5 }), 49)
     .call(() => {
       document.getElementById('detailDescFull').style.display = 'block';
@@ -2144,7 +2282,7 @@ function buildMasterTimeline() {
     }, [], 49.5)
 
   // 收藏
-  masterTL.call(() => showHint('❤️ 点击收藏，保存心仪商品'), [], 50.5)
+  masterTL.call(() => subtitleCtrl.show('❤️ 点击收藏，保存**心仪商品**', { side: 'right', duration: 3500 }), [], 50.5)
     .add(cursor.click('#detailFavBtn', { moveDuration: 0.5 }), 50.5)
     .call(() => {
       const btn = document.getElementById('detailFavBtn');
@@ -2156,7 +2294,7 @@ function buildMasterTimeline() {
     .to({}, { duration: 0.8 }, 51)
 
   // 点击AI问答1
-  masterTL.call(() => showHint('💬 查看AI智能问答 - 点击"还在吗？"'), [], 52)
+  masterTL.call(() => subtitleCtrl.show('💬 查看**AI智能问答** - 点击"还在吗？"', { side: 'left', duration: 4000 }), [], 52)
     .add(cursor.click('#detailQa0', { moveDuration: 0.5 }), 52)
     .call(() => {
       document.querySelector('#detailQa0 .qa-answer').style.display = 'block';
@@ -2164,7 +2302,7 @@ function buildMasterTimeline() {
     .to({}, { duration: 0.6 }, 52.5)
 
   // 复制回复
-  masterTL.call(() => showHint('📋 点击"复制回复"，快速获取议价话术'), [], 53.3)
+  masterTL.call(() => subtitleCtrl.show('📋 点击复制，获取**议价话术**', { side: 'right', duration: 3500 }), [], 53.3)
     .add(cursor.click('#detailQa0 [data-action="copy"]', { moveDuration: 0.4 }), 53.3)
     .call(() => {
       const btn = document.querySelector('#detailQa0 [data-action="copy"]');
@@ -2175,7 +2313,7 @@ function buildMasterTimeline() {
     .to({}, { duration: 0.5 }, 53.7)
 
   // 联系卖家
-  masterTL.call(() => showHint('💬 点击"联系卖家"，查看联系方式'), [], 55)
+  masterTL.call(() => subtitleCtrl.show('💬 点击"联系卖家"', { side: 'left', duration: 4000 }), [], 55)
     .add(cursor.click('#detailContactBtn', { moveDuration: 0.5 }), 55)
     .call(() => {
       document.getElementById('detailContactModal').style.display = 'flex';
@@ -2183,7 +2321,7 @@ function buildMasterTimeline() {
     .to({}, { duration: 1.5 }, 55.5)
 
   // 关闭联系面板
-  masterTL.call(() => showHint('关闭弹窗，继续浏览'), [], 57.5)
+  masterTL.call(() => subtitleCtrl.show('关闭弹窗，继续浏览', { side: 'right', duration: 3000 }), [], 57.5)
     .add(cursor.click('#detailCloseModal', { moveDuration: 0.4 }), 57.5)
     .call(() => {
       document.getElementById('detailContactModal').style.display = 'none';
@@ -2197,11 +2335,11 @@ function buildMasterTimeline() {
 
   masterTL.call(() => {
     switchToScene('publish');
-    showHint('✨ 进入智能发布 - AI帮你一键生成商品信息');
+    subtitleCtrl.show('✨ 进入智能发布 - **AI一键生成**商品信息', { side: 'left', duration: 4000, pulse: true });
   }, [], 60);
 
   // 选择商品类别
-  masterTL.call(() => showHint('📚 选择商品类别：教材'), [], 61.5)
+  masterTL.call(() => subtitleCtrl.show('📚 选择商品类别：**教材**', { side: 'right', duration: 3000 }), [], 61.5)
     .add(cursor.click('#publishCatBook', { moveDuration: 0.5 }), 61.5)
     .call(() => {
       document.getElementById('publishCatBook').style.border = '2px solid var(--yellow-500)';
@@ -2210,7 +2348,7 @@ function buildMasterTimeline() {
     .to({}, { duration: 0.4 }, 62)
 
   // 输入商品名称
-  masterTL.call(() => showHint('⌨️ 输入商品名称'), [], 63)
+  masterTL.call(() => subtitleCtrl.show('⌨️ 输入**商品名称**', { side: 'left', duration: 4000 }), [], 63)
     .add(cursor.click('#publishTitle', { moveDuration: 0.4 }), 63)
     .call(async () => {
       await InputSimulator.typeText('#publishTitle', '管理学原理教材 第7版', 50);
@@ -2218,7 +2356,7 @@ function buildMasterTimeline() {
     .to({}, { duration: 1.8 }, 63.4)
 
   // 输入价格
-  masterTL.call(() => showHint('💰 输入原价和期望售价'), [], 65.8)
+  masterTL.call(() => subtitleCtrl.show('💰 输入原价和**期望售价**', { side: 'right', duration: 4000 }), [], 65.8)
     .add(cursor.click('#publishOrigPrice', { moveDuration: 0.4 }), 65.8)
     .call(async () => {
       await InputSimulator.typeText('#publishOrigPrice', '58', 60);
@@ -2229,7 +2367,7 @@ function buildMasterTimeline() {
     }, [], 67.4)
 
   // AI建议价格
-  masterTL.call(() => showHint('🤖 点击获取AI价格建议'), [], 68.5)
+  masterTL.call(() => subtitleCtrl.show('🤖 点击获取**AI价格建议**', { side: 'left', duration: 3500 }), [], 68.5)
     .add(cursor.click('#publishAiPriceBtn', { moveDuration: 0.4 }), 68.5)
     .call(() => {
       document.getElementById('publishAiPriceBtn').textContent = '⏳ 分析中...';
@@ -2242,7 +2380,7 @@ function buildMasterTimeline() {
     .to({}, { duration: 0.8 }, 68.9)
 
   // 选择成色
-  masterTL.call(() => showHint('⭐ 选择商品成色'), [], 70)
+  masterTL.call(() => subtitleCtrl.show('⭐ 选择**商品成色**', { side: 'right', duration: 3000 }), [], 70)
     .add(cursor.click('#publishConditionOpts span[data-val="八成新"]', { moveDuration: 0.4 }), 70)
     .call(() => {
       document.querySelectorAll('#publishConditionOpts span').forEach(s => s.style.background = '');
@@ -2251,7 +2389,7 @@ function buildMasterTimeline() {
     }, [], 70.4)
 
   // 选择使用时长
-  masterTL.call(() => showHint('⏱ 选择使用时长'), [], 71)
+  masterTL.call(() => subtitleCtrl.show('⏱ 选择**使用时长**', { side: 'left', duration: 3000 }), [], 71)
     .add(cursor.click('#publishUsageOpts span[data-val="1年内"]', { moveDuration: 0.4 }), 71)
     .call(() => {
       document.querySelectorAll('#publishUsageOpts span').forEach(s => s.style.background = '');
@@ -2260,14 +2398,14 @@ function buildMasterTimeline() {
     }, [], 71.4)
 
   // 选择交易地点
-  masterTL.call(() => showHint('📍 选择交易地点'), [], 72)
+  masterTL.call(() => subtitleCtrl.show('📍 选择**交易地点**', { side: 'right', duration: 3000 }), [], 72)
     .add(cursor.click('#publishLocationTags span[data-val="南区宿舍"]', { moveDuration: 0.4 }), 72)
     .call(() => {
       document.getElementById('publishLocation').value = '南区宿舍';
     }, [], 72.4)
 
   // 输入补充说明
-  masterTL.call(() => showHint('📝 输入补充说明'), [], 73)
+  masterTL.call(() => subtitleCtrl.show('📝 输入**补充说明**', { side: 'left', duration: 4000 }), [], 73)
     .add(cursor.click('#publishDesc', { moveDuration: 0.4 }), 73)
     .call(async () => {
       await InputSimulator.typeText('#publishDesc', '有重点标注，考试必备', 50);
@@ -2275,7 +2413,7 @@ function buildMasterTimeline() {
     .to({}, { duration: 1.5 }, 73.4)
 
   // 点击AI生成
-  masterTL.call(() => showHint('🤖 点击"AI生成商品信息"按钮'), [], 75.5)
+  masterTL.call(() => subtitleCtrl.show('🤖 点击"**AI生成商品信息**"按钮', { side: 'right', duration: 3500 }), [], 75.5)
     .add(cursor.click('#publishAiGenBtn', { moveDuration: 0.5 }), 75.5)
     .call(() => {
       document.getElementById('publishAiGenBtn').textContent = '⏳ AI生成中...';
@@ -2288,7 +2426,7 @@ function buildMasterTimeline() {
   // AI生成动画
   masterTL.call(() => {
     document.getElementById('publishAiText').textContent = '分析商品类别：教材...';
-    showHint('🧠 AI正在分析商品信息...');
+    subtitleCtrl.show('🧠 **AI正在分析**商品信息...', { side: 'left', duration: 5000, pulse: true });
   }, [], 76.5)
     .call(() => { document.getElementById('publishAiText').textContent = '评估市场价格...'; }, [], 77.5)
     .call(() => { document.getElementById('publishAiText').textContent = '生成卖点标签...'; }, [], 78.5)
@@ -2297,7 +2435,7 @@ function buildMasterTimeline() {
 
   // 显示AI生成结果
   masterTL.call(() => {
-    showHint('✅ AI生成完成！查看预览');
+    subtitleCtrl.show('✅ **AI生成完成**！查看预览', { side: 'right', duration: 4000 });
     document.getElementById('publishAiArea').style.display = 'none';
     document.getElementById('publishPreviewArea').style.display = 'block';
   }, [], 81)
@@ -2317,7 +2455,7 @@ function buildMasterTimeline() {
     }, 82.5);
 
   // 编辑标题
-  masterTL.call(() => showHint('✏️ 点击编辑，微调AI生成的标题'), [], 84)
+  masterTL.call(() => subtitleCtrl.show('✏️ 点击编辑，**微调标题**', { side: 'left', duration: 3500 }), [], 84)
     .add(cursor.click('#publishEditBtn', { moveDuration: 0.4 }), 84)
     .call(() => {
       const titleEl = document.getElementById('publishPreviewTitle');
@@ -2326,11 +2464,11 @@ function buildMasterTimeline() {
     }, [], 84.4)
 
   // 发布
-  masterTL.call(() => showHint('🚀 点击"直接发布"，商品即刻上架'), [], 86)
+  masterTL.call(() => subtitleCtrl.show('🚀 点击"直接发布"，商品**即刻上架**', { side: 'right', duration: 3500 }), [], 86)
     .add(cursor.click('#publishFinalBtn', { moveDuration: 0.5 }), 86)
     .call(() => {
       showToast('🚀 发布成功！商品已上架');
-      showHint('🎉 发布成功！即将跳转到卖家助手页面');
+      subtitleCtrl.show('🎉 **发布成功**！即将跳转到卖家助手页面', { side: 'left', duration: 3000, pulse: true });
     }, [], 86.5)
     .to({}, { duration: 1.5 }, 86.5);
 
@@ -2341,11 +2479,11 @@ function buildMasterTimeline() {
 
   masterTL.call(() => {
     switchToScene('seller');
-    showHint('📊 卖家助手 - 管理你的商品与交易');
+    subtitleCtrl.show('📊 卖家助手 - **管理你的商品与交易**', { side: 'right', duration: 4000, pulse: true });
   }, [], 90);
 
   // 数据数字滚动
-  masterTL.call(() => showHint('📈 数据概览实时更新'), [], 91)
+  masterTL.call(() => subtitleCtrl.show('📈 **数据概览**实时更新', { side: 'left', duration: 4000 }), [], 91)
     .to({ val: 0 }, {
       val: 1,
       duration: 0.8,
@@ -2376,7 +2514,7 @@ function buildMasterTimeline() {
     }, 91.9);
 
   // 展开商品详情
-  masterTL.call(() => showHint('📦 点击展开商品表现数据'), [], 93)
+  masterTL.call(() => subtitleCtrl.show('📦 点击展开**商品表现数据**', { side: 'right', duration: 4000 }), [], 93)
     .add(cursor.click('#sellerProductItem', { moveDuration: 0.5 }), 93)
     .call(() => {
       document.getElementById('sellerProductDetail').style.display = 'block';
@@ -2388,12 +2526,12 @@ function buildMasterTimeline() {
     .to({}, { duration: 1.5 }, 93.5)
 
   // 发布新商品
-  masterTL.call(() => showHint('✨ "发布新商品"按钮（展示，不重复演示）'), [], 96)
+  masterTL.call(() => subtitleCtrl.show('✨ "发布新商品"按钮', { side: 'left', duration: 3500 }), [], 96)
     .add(cursor.moveTo('#sellerNewProductBtn', 0.5), 96)
     .to({}, { duration: 1 }, 96.5)
 
   // 快捷回复
-  masterTL.call(() => showHint('💬 点击"快捷回复"工具'), [], 98)
+  masterTL.call(() => subtitleCtrl.show('💬 点击**快捷回复**工具', { side: 'right', duration: 3500 }), [], 98)
     .add(cursor.click('#sellerQuickReplyCard', { moveDuration: 0.5 }), 98)
     .call(() => {
       document.getElementById('sellerQuickReplyPanel').style.display = 'block';
@@ -2401,7 +2539,7 @@ function buildMasterTimeline() {
     .to({}, { duration: 0.5 }, 98.5)
 
   // 点击"还在吗？"
-  masterTL.call(() => showHint('🤖 AI一键生成常用问答回复'), [], 99.5)
+  masterTL.call(() => subtitleCtrl.show('🤖 AI一键生成**常用问答**回复', { side: 'left', duration: 4000 }), [], 99.5)
     .add(cursor.click('#sellerQuickReplyPanel .quick-reply-btn[data-q="还在吗？"]', { moveDuration: 0.4 }), 99.5)
     .call(() => {
       const answer = document.getElementById('sellerQuickReplyAnswer');
@@ -2410,7 +2548,7 @@ function buildMasterTimeline() {
     }, [], 99.9)
 
   // 价格优化
-  masterTL.call(() => showHint('💰 查看AI价格优化建议'), [], 102)
+  masterTL.call(() => subtitleCtrl.show('💰 查看**AI价格优化**建议', { side: 'right', duration: 4000 }), [], 102)
     .add(cursor.click('#sellerPriceCard', { moveDuration: 0.5 }), 102)
     .call(() => {
       document.getElementById('sellerPriceAdvice').style.display = 'block';
@@ -2419,7 +2557,7 @@ function buildMasterTimeline() {
 
   // 结束
   masterTL.call(() => {
-    showHint('🎉 演示完成！感谢观看校易配交互动画Demo');
+    subtitleCtrl.show('🎉 **演示完成**！感谢观看校易配交互动画Demo', { side: 'left', duration: 5000, pulse: true });
     showToast('🎉 动画演示结束 — 感谢观看！');
   }, [], 104.5);
 
@@ -2452,6 +2590,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // 创建控制器实例
   cursor = new CursorController();
   sceneSwitcher = new SceneSwitcher();
+  subtitleCtrl = new SubtitleController();
 
   // 构建主时间轴
   masterTL = buildMasterTimeline();
@@ -2466,17 +2605,17 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btnPlay').addEventListener('click', () => {
     if (playback.isPlaying) {
       playback.pause();
-      showHint('⏸ 已暂停 - 点击播放继续');
+      subtitleCtrl.show('⏸ **已暂停** - 点击播放继续', { side: 'right', duration: 2500 });
     } else {
       playback.play();
-      hideHint();
+      subtitleCtrl.hide();
     }
   });
 
   document.getElementById('btnStop').addEventListener('click', () => {
     playback.stop();
     document.getElementById('simCursor').style.opacity = '0';
-    showHint('⏹ 已重置 - 点击播放重新开始');
+    subtitleCtrl.show('⏹ **已重置** - 点击播放重新开始', { side: 'left', duration: 3000 });
   });
 
   // 速度切换
@@ -2498,7 +2637,7 @@ document.addEventListener('DOMContentLoaded', () => {
     masterTL.progress(ratio);
     playback.isPlaying = false;
     document.getElementById('btnPlay').classList.remove('active');
-    showHint('📍 已跳转到指定位置');
+    subtitleCtrl.show('📍 已**跳转**到指定位置', { side: 'right', duration: 2500 });
   });
 
   // 章节跳转按钮
@@ -2515,31 +2654,31 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         if (playback.isPlaying) {
           playback.pause();
-          showHint('⏸ 已暂停');
+          subtitleCtrl.show('⏸ **已暂停**', { side: 'right', duration: 2000 });
         } else {
           playback.play();
-          hideHint();
+          subtitleCtrl.hide();
         }
         break;
       case 'ArrowRight':
         e.preventDefault();
         if (currentSceneIdx < 5) {
           playback.jumpToScene(currentSceneIdx + 1);
-          showHint('→ 切换到下一场景');
+          subtitleCtrl.show('→ 切换到**下一场景**', { side: 'left', duration: 2000 });
         }
         break;
       case 'ArrowLeft':
         e.preventDefault();
         if (currentSceneIdx > 0) {
           playback.jumpToScene(currentSceneIdx - 1);
-          showHint('← 切换到上一场景');
+          subtitleCtrl.show('← 切换到**上一场景**', { side: 'right', duration: 2000 });
         }
         break;
       case 'KeyR':
         e.preventDefault();
         playback.stop();
         document.getElementById('simCursor').style.opacity = '0';
-        showHint('🔄 已重置 - 点击播放重新开始');
+        subtitleCtrl.show('🔄 **已重置** - 点击播放重新开始', { side: 'left', duration: 3000 });
         break;
     }
   });
@@ -2547,8 +2686,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // ===== 自动开始播放 =====
   setTimeout(() => {
     playback.play();
-    showHint('🎬 动画演示开始 | 空格暂停 | →←切换');
-    setTimeout(hideHint, 3000);
+    subtitleCtrl.show('🎬 **动画演示开始** | 空格暂停 | →←切换', { side: 'left', duration: 4000 });
+    setTimeout(() => subtitleCtrl.hide(), 4000);
   }, 500);
 
   console.log('🚀 校易配 - 交互式动画演示Demo 初始化完成');
