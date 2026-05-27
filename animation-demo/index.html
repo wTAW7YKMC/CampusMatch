@@ -95,6 +95,7 @@ body {
   display: none;
   overflow-y: auto;
   overflow-x: hidden;
+  will-change: opacity;
 }
 
 .scene.active {
@@ -146,101 +147,224 @@ body {
 }
 
 /* ============================================================
-   双侧字幕气泡系统
+   增强字幕气泡系统 - 大尺寸 + 多动画模式 + 位置灵活
    ============================================================ */
 .subtitle-bubble {
   position: absolute;
-  max-width: 360px;
-  padding: 14px 20px;
-  border-radius: 18px;
-  font-size: 17px;
-  line-height: 1.65;
+  max-width: 480px;
+  padding: 18px 26px;
+  border-radius: 20px;
+  font-size: 22px;
+  line-height: 1.6;
   z-index: 100;
   pointer-events: none;
   opacity: 0;
-  transition: opacity 0.5s ease, transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
-  box-shadow: 0 6px 28px rgba(0,0,0,0.18);
+  box-shadow: 0 8px 36px rgba(0,0,0,0.22);
   text-align: left;
   word-break: break-word;
+  will-change: transform, opacity;
 }
 
 /* 左侧气泡 - 蓝色调 */
 .subtitle-left {
   left: 28px;
   top: 45%;
-  transform: translateY(-50%) translateX(-36px);
   background: linear-gradient(135deg, #F0F6FF 0%, #FFFFFF 100%);
-  border: 2px solid var(--blue-200);
-  border-radius: 18px 18px 18px 6px;
+  border: 2.5px solid var(--blue-200);
+  border-radius: 20px 20px 20px 6px;
   color: var(--blue-900);
 }
 .subtitle-left::after {
   content: '';
   position: absolute;
-  right: -10px;
+  right: -12px;
   top: 50%;
   transform: translateY(-50%);
-  width: 0;
-  height: 0;
-  border-top: 9px solid transparent;
-  border-bottom: 9px solid transparent;
-  border-left: 11px solid var(--blue-200);
-}
-.subtitle-left.active {
-  opacity: 1;
-  transform: translateY(-50%) translateX(0);
+  width: 0; height: 0;
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent;
+  border-left: 13px solid var(--blue-200);
 }
 
 /* 右侧气泡 - 黄色调 */
 .subtitle-right {
   right: 28px;
   top: 45%;
-  transform: translateY(-50%) translateX(36px);
   background: linear-gradient(135deg, #FFF9E6 0%, #FFFFFF 100%);
-  border: 2px solid var(--yellow-200);
-  border-radius: 18px 18px 6px 18px;
+  border: 2.5px solid var(--yellow-200);
+  border-radius: 20px 20px 6px 20px;
   color: var(--blue-900);
 }
 .subtitle-right::after {
   content: '';
   position: absolute;
-  left: -10px;
+  left: -12px;
   top: 50%;
   transform: translateY(-50%);
-  width: 0;
-  height: 0;
-  border-top: 9px solid transparent;
-  border-bottom: 9px solid transparent;
-  border-right: 11px solid var(--yellow-200);
-}
-.subtitle-right.active {
-  opacity: 1;
-  transform: translateY(-50%) translateX(0);
+  width: 0; height: 0;
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent;
+  border-right: 13px solid var(--yellow-200);
 }
 
-/* 字幕内关键信息高亮 */
+/* 居中大字幕 - 用于核心提示 */
+.subtitle-center {
+  left: 50%;
+  top: 50%;
+  max-width: 560px;
+  font-size: 26px;
+  font-weight: 700;
+  text-align: center;
+  background: linear-gradient(135deg, var(--blue-900), rgba(10,31,68,0.92));
+  color: var(--white);
+  border: 2.5px solid var(--yellow-500);
+  border-radius: 18px;
+  box-shadow: 0 12px 48px rgba(10,31,68,0.5), 0 0 40px rgba(245,184,0,0.2);
+}
+
+/* 顶部大字幕 - 用于大标题强调 */
+.subtitle-top {
+  left: 50%;
+  top: 18px;
+  max-width: 620px;
+  font-size: 24px;
+  font-weight: 700;
+  text-align: center;
+  background: linear-gradient(135deg, var(--yellow-500), var(--yellow-400));
+  color: var(--blue-900);
+  border-radius: 14px;
+  box-shadow: 0 8px 32px rgba(230,160,0,0.4);
+}
+
+/* 关键信息高亮 - 更大更醒目 */
 .subtitle-bubble .sub-key {
   display: inline;
-  font-weight: 800;
-  font-size: 19px;
+  font-weight: 900;
+  font-size: 1.15em;
   color: var(--blue-600);
-  background: linear-gradient(180deg, transparent 60%, var(--yellow-200) 60%);
-  padding: 0 3px;
+  background: linear-gradient(180deg, transparent 58%, var(--yellow-200) 58%);
+  padding: 0 4px;
   white-space: nowrap;
 }
-.subtitle-right .sub-key {
+.subtitle-right .sub-key,
+.subtitle-center .sub-key,
+.subtitle-top .sub-key {
   color: var(--yellow-600);
-  background: linear-gradient(180deg, transparent 60%, var(--blue-100) 60%);
+  background: linear-gradient(180deg, transparent 58%, var(--blue-100) 58%);
+}
+.subtitle-center .sub-key,
+.subtitle-top .sub-key {
+  font-size: 1.2em;
+  color: var(--white);
+  background: linear-gradient(180deg, transparent 58%, rgba(245,184,0,0.4) 58%);
 }
 
-/* 字幕脉冲高亮动画 */
-@keyframes subPulse {
-  0%, 100% { box-shadow: 0 6px 28px rgba(0,0,0,0.18); }
-  50% { box-shadow: 0 6px 36px rgba(32, 97, 202, 0.3); }
+/* ---- 字幕入场/退场动画模式 ---- */
+
+/* 1. 滑入 + 弹性回弹（默认） */
+.subtitle-bubble.slide-in {
+  animation: slideInBounce 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+@keyframes slideInBounce {
+  0% { opacity: 0; transform: translateX(-40px) translateY(-50%) scale(0.9); }
+  60% { opacity: 1; transform: translateX(6px) translateY(-50%) scale(1.02); }
+  100% { opacity: 1; transform: translateX(0) translateY(-50%) scale(1); }
+}
+.subtitle-right.slide-in {
+  animation-name: slideInBounceRight;
+}
+@keyframes slideInBounceRight {
+  0% { opacity: 0; transform: translateX(40px) translateY(-50%) scale(0.9); }
+  60% { opacity: 1; transform: translateX(-6px) translateY(-50%) scale(1.02); }
+  100% { opacity: 1; transform: translateX(0) translateY(-50%) scale(1); }
+}
+.subtitle-center.slide-in,
+.subtitle-top.slide-in {
+  animation-name: slideInCenter;
+}
+@keyframes slideInCenter {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8) translateY(20px); }
+  60% { opacity: 1; transform: translate(-50%, -50%) scale(1.04) translateY(-3px); }
+  100% { opacity: 1; transform: translate(-50%, -50%) scale(1) translateY(0); }
+}
+.subtitle-top.slide-in {
+  animation-name: slideInTop;
+}
+@keyframes slideInTop {
+  0% { opacity: 0; transform: translate(-50%, -30px) scale(0.9); }
+  60% { opacity: 1; transform: translate(-50%, 3px) scale(1.02); }
+  100% { opacity: 1; transform: translate(-50%, 0) scale(1); }
 }
 
+/* 2. 从中心放大弹出 */
+.subtitle-bubble.pop-in {
+  animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+@keyframes popIn {
+  0% { opacity: 0; transform: scale(0.3); }
+  100% { opacity: 1; transform: scale(1); }
+}
+.subtitle-center.pop-in {
+  animation-name: popInCenter;
+}
+@keyframes popInCenter {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.3); }
+  100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+.subtitle-top.pop-in {
+  animation-name: popInTop;
+}
+@keyframes popInTop {
+  0% { opacity: 0; transform: translate(-50%, 0) scale(0.3); }
+  100% { opacity: 1; transform: translate(-50%, 0) scale(1); }
+}
+
+/* 3. 溶解/淡出退场 */
+.subtitle-bubble.fade-out {
+  animation: dissolveOut 0.45s ease forwards;
+}
+@keyframes dissolveOut {
+  0% { opacity: 1; transform: scale(1); filter: blur(0); }
+  100% { opacity: 0; transform: scale(1.05); filter: blur(4px); }
+}
+
+/* 4. 脉冲呼吸 */
 .subtitle-bubble.pulse {
-  animation: subPulse 2s ease-in-out infinite;
+  animation: subPulse 2.2s ease-in-out infinite;
+}
+@keyframes subPulse {
+  0%, 100% { box-shadow: 0 8px 36px rgba(0,0,0,0.22); }
+  50% { box-shadow: 0 8px 48px rgba(32,97,202,0.4), 0 0 28px rgba(245,184,0,0.25); }
+}
+
+/* 5. 摇晃抖动 - 吸引注意 */
+.subtitle-bubble.shake {
+  animation: subShake 0.5s ease-in-out;
+}
+@keyframes subShake {
+  0%, 100% { transform: translateX(0); }
+  15% { transform: translateX(-8px); }
+  30% { transform: translateX(8px); }
+  45% { transform: translateX(-5px); }
+  60% { transform: translateX(5px); }
+  75% { transform: translateX(-2px); }
+  90% { transform: translateX(2px); }
+}
+
+/* 6. 逐字打字效果 - 通过JS控制字符动画 */
+.subtitle-bubble .char {
+  display: inline-block;
+  opacity: 0;
+  animation: charAppear 0.15s ease forwards;
+}
+@keyframes charAppear {
+  0% { opacity: 0; transform: translateY(8px) scale(0.8); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* 字幕active状态的默认显示 */
+.subtitle-bubble.active {
+  opacity: 1;
 }
 
 /* ============================================================
@@ -315,6 +439,188 @@ body {
 
 .card-emerge {
   animation: cardPopIn 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) forwards !important;
+}
+
+/* ============================================================
+   突破手机框 - 飞出画面的核心元素
+   ============================================================ */
+
+/* 突破元素容器 - 从手机框飞出到外层空间 */
+.breakout-element {
+  position: fixed;
+  z-index: 500;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+/* 匹配度大数字飞出 */
+.breakout-score {
+  font-size: 64px;
+  font-weight: 900;
+  background: linear-gradient(135deg, var(--yellow-500), var(--success));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 4px 16px rgba(34,197,94,0.5));
+}
+
+/* AI图标飞出 */
+.breakout-ai-icon {
+  font-size: 72px;
+  filter: drop-shadow(0 0 24px rgba(32,97,202,0.6));
+}
+
+/* 标签飞出 - 关键卖点 */
+.breakout-tag {
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--blue-900);
+  background: linear-gradient(135deg, var(--yellow-400), var(--yellow-300));
+  box-shadow: 0 4px 20px rgba(230,160,0,0.5);
+  white-space: nowrap;
+}
+
+/* 粒子背景 - 用于突破瞬间的装饰 */
+.breakout-particle {
+  position: fixed;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  z-index: 499;
+  pointer-events: none;
+  animation: particleBurst 0.8s ease-out forwards;
+}
+
+@keyframes particleBurst {
+  0% { transform: translate(0, 0) scale(1); opacity: 1; }
+  100% { transform: translate(var(--px), var(--py)) scale(0); opacity: 0; }
+}
+
+/* ============================================================
+   PPT风格多样化动画关键帧
+   ============================================================ */
+
+/* 1. 百叶窗入场 - 横向条纹依次展开 */
+@keyframes blindsIn {
+  0% { clip-path: inset(0 100% 0 0); opacity: 0; }
+  100% { clip-path: inset(0 0 0 0); opacity: 1; }
+}
+@keyframes blindsInH {
+  0% { clip-path: inset(100% 0 0 0); opacity: 0; }
+  100% { clip-path: inset(0 0 0 0); opacity: 1; }
+}
+@keyframes blindsInCenter {
+  0% { clip-path: inset(0 50% 0 50%); opacity: 0; }
+  100% { clip-path: inset(0 0 0 0); opacity: 1; }
+}
+
+.anim-blinds {
+  animation: blindsIn 0.6s ease-out forwards;
+}
+.anim-blinds-h {
+  animation: blindsInH 0.6s ease-out forwards;
+}
+.anim-blinds-center {
+  animation: blindsInCenter 0.6s ease-out forwards;
+}
+
+/* 2. 溶解/淡入 */
+@keyframes dissolveIn {
+  0% { opacity: 0; filter: blur(12px) saturate(0); transform: scale(1.08); }
+  100% { opacity: 1; filter: blur(0) saturate(1); transform: scale(1); }
+}
+
+.anim-dissolve {
+  animation: dissolveIn 0.65s ease-out forwards;
+}
+
+/* 3. 弹性缩放 - 夸张弹性 */
+@keyframes bounceScale {
+  0% { transform: scale(0); opacity: 0; }
+  40% { transform: scale(1.15); opacity: 1; }
+  65% { transform: scale(0.92); }
+  85% { transform: scale(1.03); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.anim-bounce {
+  animation: bounceScale 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* 4. 旋转入场 - 3D翻转 */
+@keyframes flipIn {
+  0% { transform: perspective(600px) rotateY(-90deg); opacity: 0; }
+  60% { transform: perspective(600px) rotateY(10deg); opacity: 1; }
+  100% { transform: perspective(600px) rotateY(0); opacity: 1; }
+}
+@keyframes flipInUp {
+  0% { transform: perspective(600px) rotateX(90deg); opacity: 0; }
+  60% { transform: perspective(600px) rotateX(-10deg); opacity: 1; }
+  100% { transform: perspective(600px) rotateX(0); opacity: 1; }
+}
+
+.anim-flip {
+  animation: flipIn 0.6s ease-out forwards;
+}
+.anim-flip-up {
+  animation: flipInUp 0.6s ease-out forwards;
+}
+
+/* 5. 旋转弹出 */
+@keyframes spinIn {
+  0% { transform: rotate(-180deg) scale(0); opacity: 0; }
+  80% { transform: rotate(10deg) scale(1.05); opacity: 1; }
+  100% { transform: rotate(0) scale(1); opacity: 1; }
+}
+
+.anim-spin {
+  animation: spinIn 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* 6. 闪光划过 - 光泽带横穿 */
+@keyframes shimmerSweep {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+.anim-shimmer {
+  background: linear-gradient(110deg, 
+    transparent 30%, 
+    rgba(255,255,255,0.6) 40%, 
+    rgba(255,255,255,0.8) 50%, 
+    rgba(255,255,255,0.6) 60%, 
+    transparent 70%
+  );
+  background-size: 200% 100%;
+  background-position: -200% center;
+  background-repeat: no-repeat;
+  animation: shimmerSweep 1.2s ease-in-out forwards;
+}
+
+/* 7. 上升浮现 */
+@keyframes floatUpIn {
+  0% { transform: translateY(30px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+.anim-float-up {
+  animation: floatUpIn 0.5s ease-out forwards;
+}
+
+/* 8. 波纹扩散 - 同心圆放大 */
+@keyframes rippleExpand {
+  0% { transform: scale(0); opacity: 1; border-width: 4px; }
+  100% { transform: scale(2.5); opacity: 0; border-width: 1px; }
+}
+
+.anim-ripple-ring {
+  position: absolute;
+  border: 3px solid var(--yellow-500);
+  border-radius: 50%;
+  animation: rippleExpand 1s ease-out forwards;
+  pointer-events: none;
 }
 
 /* 数值跳动动画 - 统计数字变化时 */
@@ -704,6 +1010,7 @@ body {
   padding: 14px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.06);
   transition: all 0.3s;
+  will-change: transform;
 }
 
 .card-white:hover {
@@ -1786,49 +2093,144 @@ class SubtitleController {
     this.rightEl = document.getElementById('subtitleRight');
     this.currentSide = null;
     this._timer = null;
+    // 动态创建居中和顶部字幕元素
+    this._createExtraElements();
+  }
+
+  _createExtraElements() {
+    const wrapper = document.getElementById('demoWrapper');
+    if (!document.getElementById('subtitleCenter')) {
+      const centerEl = document.createElement('div');
+      centerEl.className = 'subtitle-bubble subtitle-center';
+      centerEl.id = 'subtitleCenter';
+      wrapper.appendChild(centerEl);
+      this.centerEl = centerEl;
+    } else {
+      this.centerEl = document.getElementById('subtitleCenter');
+    }
+    if (!document.getElementById('subtitleTop')) {
+      const topEl = document.createElement('div');
+      topEl.className = 'subtitle-bubble subtitle-top';
+      topEl.id = 'subtitleTop';
+      wrapper.appendChild(topEl);
+      this.topEl = topEl;
+    } else {
+      this.topEl = document.getElementById('subtitleTop');
+    }
   }
 
   /**
-   * 显示字幕气泡
-   * @param {string} text - 字幕文本，用 **文字** 标记关键信息（将被加粗放大）
-   * @param {object} options - { side: 'left'|'right', duration: 毫秒, pulse: 是否脉冲动画 }
+   * 显示字幕气泡（增强版）
+   * @param {string} text - 字幕文本，**text** 标记关键信息
+   * @param {object} options
+   *   - side: 'left'|'right'|'center'|'top'
+   *   - duration: 显示毫秒
+   *   - anim: 'slide'|'pop'|'typewriter' - 入场动画类型
+   *   - exitAnim: 'fade'|'none' - 退场动画
+   *   - pulse: 是否脉冲动画
+   *   - shake: 是否摇晃
    */
   show(text, options = {}) {
-    const { side, duration = 4000, pulse = false } = options;
-    // 自动交替：未指定side时与上次相反
+    const { 
+      side, 
+      duration = 4000, 
+      anim = 'slide',
+      exitAnim = 'fade',
+      pulse = false,
+      shake = false 
+    } = options;
+    
     const targetSide = side || (this.currentSide === 'left' ? 'right' : 'left');
     this.currentSide = targetSide;
 
-    const el = targetSide === 'left' ? this.leftEl : this.rightEl;
-    const otherEl = targetSide === 'left' ? this.rightEl : this.leftEl;
+    let el;
+    if (targetSide === 'center') {
+      el = this.centerEl;
+    } else if (targetSide === 'top') {
+      el = this.topEl;
+    } else {
+      el = targetSide === 'left' ? this.leftEl : this.rightEl;
+    }
 
-    // 隐藏另一侧
-    otherEl.classList.remove('active', 'pulse');
-    otherEl.innerHTML = '';
+    // 隐藏所有其他字幕
+    [this.leftEl, this.rightEl, this.centerEl, this.topEl].forEach(other => {
+      if (other !== el) {
+        other.classList.remove('active', 'pulse', 'shake', 'slide-in', 'pop-in', 'fade-out');
+        other.style.animation = '';
+        other.innerHTML = '';
+      }
+    });
 
-    // 解析文本中的 **keyword** 标记，替换为加粗高亮
+    // 解析 **keyword** 标记
     const parsedHTML = text.replace(/\*\*(.+?)\*\*/g, '<span class="sub-key">$1</span>');
 
-    // 设置内容和类名
+    // 清除之前的动画类
+    el.classList.remove('active', 'pulse', 'shake', 'slide-in', 'pop-in', 'fade-out');
+    el.style.animation = '';
+
+    // 设置内容并显示
     el.innerHTML = parsedHTML;
-    el.classList.toggle('pulse', pulse);
     el.classList.add('active');
+
+    // 根据模式应用入场动画
+    if (anim === 'pop') {
+      el.classList.add('pop-in');
+    } else if (anim === 'typewriter') {
+      // 逐字动画
+      this._typewriterEffect(el);
+    } else {
+      el.classList.add('slide-in');
+    }
+
+    if (pulse) el.classList.add('pulse');
+    if (shake) {
+      el.classList.add('shake');
+      // shake结束后移除
+      setTimeout(() => el.classList.remove('shake'), 550);
+    }
 
     // 自动隐藏
     clearTimeout(this._timer);
     this._timer = setTimeout(() => {
-      el.classList.remove('active', 'pulse');
+      if (exitAnim === 'fade') {
+        el.classList.add('fade-out');
+        setTimeout(() => {
+          el.classList.remove('active', 'pulse', 'shake', 'slide-in', 'pop-in', 'fade-out');
+          el.style.animation = '';
+          el.innerHTML = '';
+        }, 450);
+      } else {
+        el.classList.remove('active', 'pulse', 'shake', 'slide-in', 'pop-in');
+        el.style.animation = '';
+        el.innerHTML = '';
+      }
     }, duration);
 
     return { el, side: targetSide };
   }
 
+  /** 逐字打字效果 */
+  _typewriterEffect(el) {
+    const text = el.textContent;
+    el.textContent = '';
+    el.style.opacity = '1';
+    
+    [...text].forEach((char, i) => {
+      const span = document.createElement('span');
+      span.className = 'char';
+      span.textContent = char;
+      span.style.animationDelay = (i * 0.04) + 's';
+      el.appendChild(span);
+    });
+  }
+
   /** 隐藏所有字幕 */
   hide() {
-    this.leftEl.classList.remove('active', 'pulse');
-    this.rightEl.classList.remove('active', 'pulse');
-    this.leftEl.innerHTML = '';
-    this.rightEl.innerHTML = '';
+    [this.leftEl, this.rightEl, this.centerEl, this.topEl].forEach(el => {
+      el.classList.remove('active', 'pulse', 'shake', 'slide-in', 'pop-in', 'fade-out');
+      el.style.animation = '';
+      el.innerHTML = '';
+    });
     clearTimeout(this._timer);
   }
 }
@@ -1909,6 +2311,147 @@ function showHint(text, duration = 4000) {
 function hideHint() {
   if (subtitleCtrl) subtitleCtrl.hide();
 }
+
+/* ============================================================
+   突破手机框效果工具 - 元素飞出画面
+   ============================================================ */
+const BreakoutEffects = {
+  /**
+   * 让元素从手机框内飞出到外层空间
+   * @param {Element} sourceEl - 手机框内的源元素
+   * @param {object} options
+   *   - type: 'score'|'ai-icon'|'tag'|'custom'
+   *   - text: 显示文字（type='score'/'tag'/'custom'时）
+   *   - emoji: emoji（type='ai-icon'时）
+   *   - toX/toY: 飞出目标位置（相对于demo-wrapper中心），默认随机偏移
+   *   - scale: 最终缩放
+   *   - duration: 动画时长
+   */
+  flyOut(sourceEl, options = {}) {
+    const {
+      type = 'score',
+      text = '',
+      emoji = '🧠',
+      toX, toY,
+      scale = 1.3,
+      duration = 1.2
+    } = options;
+
+    const wrapper = document.getElementById('demoWrapper');
+    const wrapperRect = wrapper.getBoundingClientRect();
+    const sourceRect = sourceEl.getBoundingClientRect();
+
+    // 计算源元素中心相对于wrapper的位置
+    const startX = sourceRect.left + sourceRect.width / 2;
+    const startY = sourceRect.top + sourceRect.height / 2;
+
+    // 目标位置
+    const targetX = toX || (wrapperRect.left + wrapperRect.width * 0.5 + (Math.random() - 0.5) * 200);
+    const targetY = toY || (wrapperRect.top + wrapperRect.height * 0.3 + (Math.random() - 0.5) * 100);
+
+    // 创建飞出元素
+    const el = document.createElement('div');
+    el.className = 'breakout-element';
+    el.style.left = startX + 'px';
+    el.style.top = startY + 'px';
+
+    if (type === 'score') {
+      el.className += ' breakout-score';
+      el.textContent = text;
+    } else if (type === 'ai-icon') {
+      el.className += ' breakout-ai-icon';
+      el.textContent = emoji;
+    } else if (type === 'tag') {
+      el.className += ' breakout-tag';
+      el.textContent = text;
+    } else {
+      el.textContent = text;
+      el.style.fontSize = '36px';
+      el.style.fontWeight = 'bold';
+      el.style.color = 'var(--yellow-500)';
+      el.style.textShadow = '0 4px 20px rgba(230,160,0,0.5)';
+    }
+
+    document.body.appendChild(el);
+
+    // 生成粒子
+    this._spawnParticles(startX, startY, 12);
+
+    // GSAP动画
+    const tl = gsap.timeline({
+      onComplete: () => {
+        el.remove();
+      }
+    });
+
+    tl.to(el, {
+      left: targetX,
+      top: targetY,
+      scale: scale,
+      duration: duration * 0.5,
+      ease: 'power3.out'
+    })
+    .to(el, {
+      scale: scale * 0.9,
+      duration: duration * 0.2,
+      ease: 'power1.in'
+    })
+    .to(el, {
+      opacity: 0,
+      scale: scale * 0.7,
+      duration: duration * 0.3,
+      ease: 'power2.in'
+    });
+
+    return tl;
+  },
+
+  /** 生成爆发粒子 */
+  _spawnParticles(x, y, count) {
+    const colors = ['#E6A000', '#2061CA', '#22C55E', '#F5B800', '#4A85E8'];
+    for (let i = 0; i < count; i++) {
+      const particle = document.createElement('div');
+      particle.className = 'breakout-particle';
+      particle.style.left = x + 'px';
+      particle.style.top = y + 'px';
+      particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+      const angle = (Math.PI * 2 * i) / count;
+      const distance = 40 + Math.random() * 80;
+      particle.style.setProperty('--px', Math.cos(angle) * distance + 'px');
+      particle.style.setProperty('--py', Math.sin(angle) * distance + 'px');
+      document.body.appendChild(particle);
+      setTimeout(() => particle.remove(), 900);
+    }
+  },
+
+  /** 对手机框内的元素创建波纹扩散环 */
+  rippleAt(sourceEl, count = 3) {
+    const rect = sourceEl.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+
+    for (let i = 0; i < count; i++) {
+      const ring = document.createElement('div');
+      ring.className = 'anim-ripple-ring';
+      ring.style.left = cx + 'px';
+      ring.style.top = cy + 'px';
+      ring.style.width = (rect.width * 0.5) + 'px';
+      ring.style.height = (rect.width * 0.5) + 'px';
+      ring.style.transform = 'translate(-50%, -50%)';
+      ring.style.animationDelay = (i * 0.2) + 's';
+      document.body.appendChild(ring);
+      setTimeout(() => ring.remove(), 1400);
+    }
+  },
+
+  /** 对元素应用临时动画class */
+  animate(el, animClass, duration = 700) {
+    if (typeof el === 'string') el = document.querySelector(el);
+    if (!el) return;
+    el.classList.add(animClass);
+    setTimeout(() => el.classList.remove(animClass), duration);
+  }
+};
 
 /* ============================================================
    3. 光标控制器
@@ -2041,7 +2584,7 @@ class PlaybackController {
     this.tl = mainTimeline;
     this.isPlaying = false;
     this.speed = 1;
-    this.totalDuration = 66; // 总时长秒数（精简后）
+    this.totalDuration = 68; // 总时长秒数
   }
 
   play() {
@@ -2154,9 +2697,12 @@ function buildMasterTimeline() {
 
   masterTL.to(launchAddrBar, { opacity: 1, duration: 0.4 }, 0.5)
     .to(launchLogoArea, { opacity: 1, scale: 1, duration: 0.5 }, 1.0)
+    .call(() => {
+      BreakoutEffects.animate(launchLogoArea, 'anim-bounce');
+    }, [], 1.0)
     .to(launchRing, { opacity: 0.3, duration: 0.4 }, 1.5)
     .call(() => {
-      subtitleCtrl.show('🚀 **校易配**智能交易系统', { side: 'left', duration: 2500 });
+      subtitleCtrl.show('🚀 **校易配**智能交易系统', { side: 'left', duration: 2500, anim: 'pop' });
       VisualEmphasis.apply(launchLogoArea, 'spotlight');
     }, [], 1.5)
     .to(launchStatus, { opacity: 1, duration: 0.3 }, 1.5)
@@ -2171,9 +2717,10 @@ function buildMasterTimeline() {
     }, [], 4.0)
     .to(launchProgressFill, { width: '70%', duration: 2, ease: 'power1.inOut' }, 4.0)
     .call(() => {
-      launchStatus.textContent = '准备就绪';
-      subtitleCtrl.show('✅ **系统就绪**', { side: 'left', duration: 2000, pulse: true });
+      launchStatus.textContent = '准备就绪 ✅';
+      subtitleCtrl.show('✅ **系统就绪**', { side: 'center', duration: 2000, anim: 'pop', pulse: true });
       VisualEmphasis.apply(launchProgressWrap, 'reset');
+      BreakoutEffects.animate(launchLogoArea, 'anim-shimmer');
     }, [], 6.0)
     .to(launchProgressFill, { width: '100%', duration: 1.5, ease: 'power1.inOut' }, 6.0)
     .call(() => switchToScene('home'), [], 7.5)
@@ -2186,136 +2733,179 @@ function buildMasterTimeline() {
     switchToScene('home');
     initHomeProducts();
     VisualEmphasis.focusPhone('home');
+    // 标题区百叶窗入场
+    const heroEl = document.querySelector('#homeScrollContent .hero-gradient');
+    if (heroEl) BreakoutEffects.animate(heroEl, 'anim-blinds-h');
   }, [], 8);
 
   masterTL.set('#simCursor', { opacity: 1 }, 8)
     // 移动到智能匹配卡片 - 聚焦缩放
-    .call(() => subtitleCtrl.show('👆 发现**AI智能匹配**', { side: 'left', duration: 2200 }), [], 8.2)
+    .call(() => subtitleCtrl.show('👆 发现**AI智能匹配**', { side: 'top', duration: 2200, anim: 'pop' }), [], 8.2)
     .add(cursor.moveTo('#homeMatchCard', 0.7), 8.5)
     .call(() => {
       VisualEmphasis.apply('#homeMatchCard', 'spotlight');
+      BreakoutEffects.animate('#homeMatchCard', 'anim-shimmer');
       subtitleCtrl.show('🤖 **精准匹配**心仪商品', { side: 'right', duration: 2500 });
     }, [], 9.2)
     .to({}, { duration: 0.4 }, 9.2)
     .call(() => VisualEmphasis.apply('#homeMatchCard', 'reset'), [], 9.6)
 
+  // 分类卡片弹性入场
+  .call(() => {
+    const cats = document.querySelectorAll('#homeCategories .category-chip');
+    gsap.fromTo(cats, 
+      { opacity: 0, scale: 0.5, rotateY: 90 }, 
+      { opacity: 1, scale: 1, rotateY: 0, duration: 0.5, stagger: 0.1, ease: 'back.out(1.7)' }
+    );
+    subtitleCtrl.show('📂 丰富**商品分类**', { side: 'left', duration: 2000 });
+  }, [], 9.8)
+
   // 移动到分类区教材图标
-  .add(cursor.moveTo('#homeCategories .category-chip[data-cat="教材"]', 0.6), 10.0)
+  .add(cursor.moveTo('#homeCategories .category-chip[data-cat="教材"]', 0.6), 10.5)
     .call(() => {
       VisualEmphasis.apply('#homeCategories .category-chip[data-cat="教材"]', 'spotlight');
-      subtitleCtrl.show('📚 教材分类：**128件**在售', { side: 'left', duration: 2200 });
-    }, [], 10.6)
-    .to({}, { duration: 0.4 }, 10.6)
-    .call(() => VisualEmphasis.apply('#homeCategories .category-chip[data-cat="教材"]', 'reset'), [], 11.0)
+      BreakoutEffects.rippleAt(document.querySelector('#homeCategories .category-chip[data-cat="教材"]'));
+      subtitleCtrl.show('📚 教材分类：**128件**在售', { side: 'left', duration: 2200, shake: true });
+    }, [], 11.1)
+    .to({}, { duration: 0.4 }, 11.1)
+    .call(() => VisualEmphasis.apply('#homeCategories .category-chip[data-cat="教材"]', 'reset'), [], 11.5)
+
+  // 商品卡片溶解入场
+  .call(() => {
+    const cards = document.querySelectorAll('#homeProducts .product-card');
+    gsap.fromTo(cards,
+      { opacity: 0, scale: 1.08, filter: 'blur(8px)' },
+      { opacity: 1, scale: 1, filter: 'blur(0)', duration: 0.6, stagger: 0.15, ease: 'power2.out' }
+    );
+  }, [], 11.6)
 
   // 移动到商品卡片
-  .add(cursor.click('#homeProducts .product-card:first-child', { moveDuration: 0.5 }), 11.3)
+  .add(cursor.click('#homeProducts .product-card:first-child', { moveDuration: 0.5 }), 12)
     .call(() => {
       subtitleCtrl.show('💡 **悬停卡片**查看信息', { side: 'right', duration: 2200 });
       const card = document.querySelector('#homeProducts .product-card:first-child');
       if (card) { card.style.transform = 'translateY(-3px)'; card.style.boxShadow = '0 0 20px rgba(245,184,0,0.3)'; }
-    }, [], 11.8)
-    .to({}, { duration: 0.5 }, 11.8)
+    }, [], 12.5)
+    .to({}, { duration: 0.5 }, 12.5)
     .call(() => {
       const card = document.querySelector('#homeProducts .product-card:first-child');
       if (card) { card.style.transform = ''; card.style.boxShadow = ''; }
-    }, [], 12.3)
+    }, [], 13)
 
   // 滚动展示AI功能区
   .call(() => {
     document.getElementById('homeScrollContent').scrollTo({ top: 200, behavior: 'smooth' });
     subtitleCtrl.show('📜 **AI智能功能**一览', { side: 'left', duration: 2200 });
-  }, [], 12.8)
-    .to({}, { duration: 1.5 }, 12.8)
+  }, [], 13.5)
+    .to({}, { duration: 1.5 }, 13.5)
 
   // 点击"去体验"智能发布
-  .add(cursor.click('.ai-card:last-child .home-go-btn', { moveDuration: 0.5, pauseAfter: 0.2 }), 14.5)
+  .add(cursor.click('.ai-card:last-child .home-go-btn', { moveDuration: 0.5, pauseAfter: 0.2 }), 15.5)
     .call(() => {
       VisualEmphasis.apply('.ai-card:last-child', 'spotlight');
+      BreakoutEffects.animate('.ai-card:last-child', 'anim-flip');
       subtitleCtrl.show('✨ **AI智能发布**', { side: 'right', duration: 2200 });
-    }, [], 15.0)
-    .to({}, { duration: 0.6 }, 15.0)
-    .call(() => VisualEmphasis.apply('.ai-card:last-child', 'reset'), [], 15.6)
+    }, [], 16)
+    .to({}, { duration: 0.6 }, 16)
+    .call(() => VisualEmphasis.apply('.ai-card:last-child', 'reset'), [], 16.6)
 
   // 滚动到推荐商品区
   .call(() => {
     document.getElementById('homeScrollContent').scrollTo({ top: 400, behavior: 'smooth' });
-  }, [], 16.0)
-    .to({}, { duration: 1.0 }, 16.0)
+  }, [], 17)
+    .to({}, { duration: 1.0 }, 17)
 
-  // 数据看板数字滚动
-  .call(() => subtitleCtrl.show('📊 **平台数据**实时更新', { side: 'left', duration: 2200 }), [], 17.2)
-    .to({ val: 0 }, { val: 2580, duration: 0.8, onUpdate: function() { document.getElementById('homeStat1').textContent = Math.round(this.targets()[0].val); } }, 17.2)
-    .to({ val: 0 }, { val: 1200, duration: 0.8, onUpdate: function() { document.getElementById('homeStat2').textContent = Math.round(this.targets()[0].val); } }, 17.5)
-    .to({ val: 0 }, { val: 860, duration: 0.8, onUpdate: function() { document.getElementById('homeStat3').textContent = Math.round(this.targets()[0].val); } }, 17.8);
+  // 数据看板数字滚动 - 溶解浮现
+  .call(() => {
+    subtitleCtrl.show('📊 **平台数据**实时更新', { side: 'center', duration: 2200, anim: 'pop' });
+    BreakoutEffects.animate('.stat-card', 'anim-dissolve');
+  }, [], 18.2)
+    .to({ val: 0 }, { val: 2580, duration: 0.8, onUpdate: function() { document.getElementById('homeStat1').textContent = Math.round(this.targets()[0].val); } }, 18.2)
+    .to({ val: 0 }, { val: 1200, duration: 0.8, onUpdate: function() { document.getElementById('homeStat2').textContent = Math.round(this.targets()[0].val); } }, 18.5)
+    .to({ val: 0 }, { val: 860, duration: 0.8, onUpdate: function() { document.getElementById('homeStat3').textContent = Math.round(this.targets()[0].val); } }, 18.8);
 
-  masterTL.addLabel('home-end', 19);
+  masterTL.addLabel('home-end', 20);
 
-  // ===== 场景3：智能匹配 (19-33s) =====
-  masterTL.addLabel('match-start', 19);
+  // ===== 场景3：智能匹配 (20-34s) =====
+  masterTL.addLabel('match-start', 20);
 
   masterTL.call(() => {
     switchToScene('match');
     VisualEmphasis.focusPhone('match');
-    subtitleCtrl.show('🎯 **AI智能匹配**', { side: 'left', duration: 2000, pulse: true });
-  }, [], 19);
+    subtitleCtrl.show('🎯 **AI智能匹配**', { side: 'center', duration: 2000, anim: 'pop', pulse: true });
+    // Hero区翻转入场
+    const heroEl = document.querySelector('#matchScrollContent .hero-gradient');
+    if (heroEl) BreakoutEffects.animate(heroEl, 'anim-flip-up');
+  }, [], 20);
 
   // 光标点击输入框
-  masterTL.call(() => subtitleCtrl.show('📍 描述你的**需求**', { side: 'right', duration: 2000 }), [], 19.8)
-    .add(cursor.click('#matchInputField', { moveDuration: 0.6 }), 19.8)
+  masterTL.call(() => subtitleCtrl.show('📍 描述你的**需求**', { side: 'right', duration: 2000 }), [], 20.8)
+    .add(cursor.click('#matchInputField', { moveDuration: 0.6 }), 20.8)
     .call(() => {
       document.getElementById('matchInputCard').classList.add('focused');
       document.getElementById('matchPlaceholder').textContent = '';
       VisualEmphasis.apply('#matchInputCard', 'pulse');
-    }, [], 20.4)
+    }, [], 21.4)
 
-  // 逐字输入 + 示例标签
+  // 逐字输入 + 示例标签百叶窗展开
+  .call(() => {
+    const tags = document.querySelectorAll('#matchExamples .match-example-tag');
+    gsap.fromTo(tags,
+      { opacity: 0, x: -20 },
+      { opacity: 1, x: 0, duration: 0.35, stagger: 0.1, ease: 'power2.out' }
+    );
+  }, [], 21.6)
   masterTL.call(async () => {
     const field = document.getElementById('matchInputField');
     const placeholder = document.getElementById('matchPlaceholder');
     if (placeholder) placeholder.textContent = '';
     await InputSimulator.setContent(field, '我想买一本管理学教材', 45);
     VisualEmphasis.apply('#matchInputCard', 'reset');
-  }, [], 21)
-    .to({}, { duration: 1.5 }, 21)
+  }, [], 22)
+    .to({}, { duration: 1.5 }, 22)
 
-  .call(() => subtitleCtrl.show('🏷️ 点击标签**自动填充**', { side: 'left', duration: 2000 }), [], 22.5)
-    .add(cursor.click('.match-example-tag[data-text*="管理学"]', { moveDuration: 0.5 }), 22.5)
+  .call(() => subtitleCtrl.show('🏷️ 点击标签**自动填充**', { side: 'left', duration: 2000, shake: true }), [], 23.5)
+    .add(cursor.click('.match-example-tag[data-text*="管理学"]', { moveDuration: 0.5 }), 23.5)
     .call(async () => {
       const field = document.getElementById('matchInputField');
       field.textContent = '我想买一本管理学教材，预算30元以内';
+      BreakoutEffects.animate('#matchInputField', 'anim-dissolve');
       subtitleCtrl.show('💰 已添加**预算条件**', { side: 'right', duration: 2000 });
-    }, [], 23.0)
-    .to({}, { duration: 0.6 }, 23.0)
+    }, [], 24)
+    .to({}, { duration: 0.6 }, 24)
 
-  // 点击"开始匹配"
+  // 点击"开始匹配" - 突破效果
   .call(() => {
-    subtitleCtrl.show('🎯 **开始匹配**', { side: 'left', duration: 2000 });
+    subtitleCtrl.show('🎯 **开始匹配**', { side: 'top', duration: 2000, anim: 'pop' });
     VisualEmphasis.apply('#matchStartBtn', 'spotlight');
-  }, [], 24)
-    .add(cursor.click('#matchStartBtn', { moveDuration: 0.6 }), 24)
+    BreakoutEffects.rippleAt(document.querySelector('#matchStartBtn'));
+  }, [], 25)
+    .add(cursor.click('#matchStartBtn', { moveDuration: 0.6 }), 25)
     .call(() => {
       document.getElementById('matchStartBtn').textContent = '⏳ 匹配中...';
       document.getElementById('matchStartBtn').style.opacity = '0.7';
       document.getElementById('matchAiAnalyze').style.display = 'block';
       document.getElementById('matchInputCard').style.opacity = '0.5';
       VisualEmphasis.apply('#matchStartBtn', 'reset');
-    }, [], 24.6)
+      // AI图标旋转弹出
+      const aiBrain = document.querySelector('#matchAiAnalyze .ai-brain-icon');
+      if (aiBrain) BreakoutEffects.animate(aiBrain, 'anim-spin');
+    }, [], 25.6)
 
   // AI分析动画
   .call(() => {
-    subtitleCtrl.show('🧠 **AI分析中**...', { side: 'right', duration: 4000, pulse: true });
+    subtitleCtrl.show('🧠 **AI分析中**...', { side: 'center', duration: 4000, pulse: true });
     document.getElementById('matchAnalyzeText').textContent = '正在解析需求...';
-  }, [], 25)
-    .call(() => document.getElementById('matchAnalyzeText').textContent = '识别品类：教材', [], 25.8)
-    .call(() => document.getElementById('matchAnalyzeText').textContent = '匹配预算范围...', [], 26.4)
-    .call(() => document.getElementById('matchAnalyzeText').textContent = '筛选附近商品...', [], 27.0)
-    .call(() => document.getElementById('matchAnalyzeText').textContent = '计算匹配度...', [], 27.6)
-    .to('#matchAnalyzeProgress', { width: '100%', duration: 1.5, ease: 'power1.inOut' }, 26.5)
+  }, [], 26)
+    .call(() => document.getElementById('matchAnalyzeText').textContent = '识别品类：教材', [], 26.8)
+    .call(() => document.getElementById('matchAnalyzeText').textContent = '匹配预算范围...', [], 27.4)
+    .call(() => document.getElementById('matchAnalyzeText').textContent = '筛选附近商品...', [], 28.0)
+    .call(() => document.getElementById('matchAnalyzeText').textContent = '计算匹配度...', [], 28.6)
+    .to('#matchAnalyzeProgress', { width: '100%', duration: 1.5, ease: 'power1.inOut' }, 27.5)
 
-  // 显示结果
+  // 显示结果 - 突破手机框
   .call(() => {
-    subtitleCtrl.show('✅ 找到**3件**匹配商品', { side: 'left', duration: 2500 });
+    subtitleCtrl.show('✅ 找到**3件**匹配商品', { side: 'top', duration: 2500, anim: 'pop' });
     document.getElementById('matchAiAnalyze').style.display = 'none';
     const resultsArea = document.getElementById('matchResultsArea');
     resultsArea.style.display = 'block';
@@ -2329,7 +2919,7 @@ function buildMasterTimeline() {
             <div style="font-size:18px;font-weight:bold;color:var(--blue-500);">¥${p.currentPrice} <span style="font-size:11px;color:var(--text-hint);text-decoration:line-through;">¥${p.originalPrice}</span></div>
             <div style="font-size:10px;color:var(--text-secondary);margin-top:2px;">${p.condition} · ${p.location}</div>
           </div>
-          <div style="text-align:center;">
+          <div style="text-align:center;" id="matchScore${i}">
             <div style="font-size:22px;font-weight:bold;color:var(--success);">${p.matchScore}%</div>
             <div style="font-size:9px;color:var(--text-hint);">匹配度</div>
           </div>
@@ -2340,152 +2930,180 @@ function buildMasterTimeline() {
         <div class="btn-primary" style="font-size:10px;padding:4px 10px;margin-top:6px;display:inline-flex;" id="matchDetailBtn${i}">查看详情 →</div>
       </div>
     `).join('');
-  }, [], 29)
-    .to({}, { duration: 0.3 }, 29)
+  }, [], 30)
+    .to({}, { duration: 0.3 }, 30)
 
-  // 卡片依次弹出
-  .call(() => { gsap.to('#matchCard0', { opacity: 1, x: 0, duration: 0.5 }); }, [], 30)
+  // 卡片依次翻转弹出 + 匹配度飞出突破
+  .call(() => { 
+    gsap.to('#matchCard0', { opacity: 1, x: 0, duration: 0.5, ease: 'back.out(1.4)' }); 
+    BreakoutEffects.animate('#matchCard0', 'anim-flip');
+  }, [], 31)
     .call(() => {
       const reasons = document.querySelectorAll('#matchReasons0 div');
       gsap.to(reasons, { opacity: 1, stagger: 0.2, duration: 0.3 });
-    }, [], 30.5)
-    .call(() => { gsap.to('#matchCard1', { opacity: 1, x: 0, duration: 0.5 }); }, [], 31)
-    .call(() => { gsap.to('#matchCard2', { opacity: 1, x: 0, duration: 0.5 }); }, [], 31.5)
+      // 96%匹配度飞出
+      const scoreEl = document.getElementById('matchScore0');
+      if (scoreEl) {
+        BreakoutEffects.flyOut(scoreEl, { type: 'score', text: '96%', scale: 1.6 });
+      }
+    }, [], 31.5)
+    .call(() => { 
+      gsap.to('#matchCard1', { opacity: 1, x: 0, duration: 0.5, ease: 'back.out(1.4)' }); 
+    }, [], 32)
+    .call(() => { 
+      gsap.to('#matchCard2', { opacity: 1, x: 0, duration: 0.5, ease: 'back.out(1.4)' }); 
+    }, [], 32.5)
 
   // 点击查看详情
-  .call(() => subtitleCtrl.show('🔍 **查看详情**', { side: 'right', duration: 2000 }), [], 32.3)
-    .add(cursor.click('#matchDetailBtn0', { moveDuration: 0.5 }), 32.3)
-    .to({}, { duration: 0.5 }, 32.8);
+  .call(() => subtitleCtrl.show('🔍 **查看详情**', { side: 'right', duration: 2000 }), [], 33.3)
+    .add(cursor.click('#matchDetailBtn0', { moveDuration: 0.5 }), 33.3)
+    .to({}, { duration: 0.5 }, 33.8);
 
-  masterTL.addLabel('match-end', 33);
+  masterTL.addLabel('match-end', 34);
 
-  // ===== 场景4：商品详情 (33-42s) =====
-  masterTL.addLabel('detail-start', 33);
+  // ===== 场景4：商品详情 (34-43s) =====
+  masterTL.addLabel('detail-start', 34);
 
   masterTL.call(() => {
     switchToScene('detail');
     VisualEmphasis.focusPhone('detail');
-    subtitleCtrl.show('📋 **商品详情页**', { side: 'left', duration: 2000, pulse: true });
+    subtitleCtrl.show('📋 **商品详情页**', { side: 'center', duration: 2000, anim: 'pop', pulse: true });
+    // 主图弹性缩放
+    BreakoutEffects.animate('#detailMainImage', 'anim-bounce');
     document.querySelectorAll('#detailScrollContent .qa-answer-text').forEach((el, i) => {
       if (MOCK_QA[i]) el.textContent = MOCK_QA[i].a;
     });
-  }, [], 33)
-    .to({}, { duration: 0.3 }, 33)
+  }, [], 34)
+    .to({}, { duration: 0.3 }, 34)
 
   // 点击主图放大
-  .call(() => subtitleCtrl.show('🖼️ **查看大图**', { side: 'right', duration: 2000 }), [], 34)
-    .add(cursor.click('#detailMainImage', { moveDuration: 0.5 }), 34)
-    .call(() => { document.getElementById('detailMainImage').style.fontSize = '100px'; document.getElementById('detailMainImage').style.transition = 'font-size 0.3s'; }, [], 34.5)
-    .to({}, { duration: 0.4 }, 34.5)
-    .call(() => { document.getElementById('detailMainImage').style.fontSize = '64px'; }, [], 34.9)
+  .call(() => subtitleCtrl.show('🖼️ **查看大图**', { side: 'right', duration: 2000 }), [], 35)
+    .add(cursor.click('#detailMainImage', { moveDuration: 0.5 }), 35)
+    .call(() => { document.getElementById('detailMainImage').style.fontSize = '100px'; document.getElementById('detailMainImage').style.transition = 'font-size 0.3s'; }, [], 35.5)
+    .to({}, { duration: 0.4 }, 35.5)
+    .call(() => { document.getElementById('detailMainImage').style.fontSize = '64px'; }, [], 35.9)
 
-  // 切换缩略图
-  .call(() => subtitleCtrl.show('📷 **切换图片**', { side: 'left', duration: 1800 }), [], 35.3)
-    .add(cursor.click('#detailThumbnails > div:nth-child(2)', { moveDuration: 0.4 }), 35.3)
+  // 切换缩略图 - 百叶窗
+  .call(() => subtitleCtrl.show('📷 **切换图片**', { side: 'left', duration: 1800 }), [], 36.3)
+    .add(cursor.click('#detailThumbnails > div:nth-child(2)', { moveDuration: 0.4 }), 36.3)
     .call(() => {
       document.getElementById('detailMainImage').textContent = '📖';
       document.querySelectorAll('#detailThumbnails > div').forEach(d => d.style.borderColor = 'transparent');
       document.querySelector('#detailThumbnails > div:nth-child(2)').style.borderColor = 'var(--yellow-500)';
-    }, [], 35.7)
-    .to({}, { duration: 0.3 }, 35.7)
+      BreakoutEffects.animate('#detailMainImage', 'anim-blinds-center');
+    }, [], 36.7)
+    .to({}, { duration: 0.3 }, 36.7)
 
   // 展开全文
-  .call(() => subtitleCtrl.show('📖 **展开全文**', { side: 'right', duration: 2000 }), [], 36.2)
-    .add(cursor.click('#detailExpandDesc', { moveDuration: 0.4 }), 36.2)
-    .call(() => { document.getElementById('detailDescFull').style.display = 'block'; document.getElementById('detailExpandDesc').textContent = '收起'; }, [], 36.6)
+  .call(() => subtitleCtrl.show('📖 **展开全文**', { side: 'right', duration: 2000 }), [], 37.2)
+    .add(cursor.click('#detailExpandDesc', { moveDuration: 0.4 }), 37.2)
+    .call(() => { document.getElementById('detailDescFull').style.display = 'block'; document.getElementById('detailExpandDesc').textContent = '收起'; BreakoutEffects.animate('#detailDescFull', 'anim-float-up'); }, [], 37.6)
 
-  // 收藏
-  .call(() => subtitleCtrl.show('❤️ **收藏**商品', { side: 'left', duration: 2000 }), [], 37.2)
-    .add(cursor.click('#detailFavBtn', { moveDuration: 0.4 }), 37.2)
+  // 收藏 - 弹性跳动
+  .call(() => subtitleCtrl.show('❤️ **收藏**商品', { side: 'left', duration: 2000, anim: 'pop' }), [], 38.2)
+    .add(cursor.click('#detailFavBtn', { moveDuration: 0.4 }), 38.2)
     .call(() => {
       const btn = document.getElementById('detailFavBtn');
       btn.innerHTML = '♥ 已收藏';
       btn.style.color = 'var(--error)';
       btn.style.borderColor = 'var(--error)';
+      BreakoutEffects.animate(btn, 'anim-bounce');
       showToast('❤️ 已收藏');
-    }, [], 37.6)
-    .to({}, { duration: 0.5 }, 37.6)
+    }, [], 38.6)
+    .to({}, { duration: 0.5 }, 38.6)
 
-  // AI问答
-  .call(() => subtitleCtrl.show('💬 **AI智能问答**', { side: 'right', duration: 2200 }), [], 38.3)
-    .add(cursor.click('#detailQa0', { moveDuration: 0.5 }), 38.3)
-    .call(() => { document.querySelector('#detailQa0 .qa-answer').style.display = 'block'; VisualEmphasis.apply('#detailQa0', 'pulse'); }, [], 38.8)
-    .to({}, { duration: 0.4 }, 38.8)
-    .call(() => VisualEmphasis.apply('#detailQa0', 'reset'), [], 39.2)
+  // AI问答 - 溶解入场
+  .call(() => subtitleCtrl.show('💬 **AI智能问答**', { side: 'right', duration: 2200 }), [], 39.3)
+    .add(cursor.click('#detailQa0', { moveDuration: 0.5 }), 39.3)
+    .call(() => { 
+      document.querySelector('#detailQa0 .qa-answer').style.display = 'block'; 
+      BreakoutEffects.animate('#detailQa0 .qa-answer', 'anim-dissolve');
+      VisualEmphasis.apply('#detailQa0', 'pulse'); 
+    }, [], 39.8)
+    .to({}, { duration: 0.4 }, 39.8)
+    .call(() => VisualEmphasis.apply('#detailQa0', 'reset'), [], 40.2)
 
   // 复制回复
-  .call(() => subtitleCtrl.show('📋 **复制回复**', { side: 'left', duration: 2000 }), [], 39.5)
-    .add(cursor.click('#detailQa0 [data-action="copy"]', { moveDuration: 0.4 }), 39.5)
+  .call(() => subtitleCtrl.show('📋 **复制回复**', { side: 'left', duration: 2000 }), [], 40.5)
+    .add(cursor.click('#detailQa0 [data-action="copy"]', { moveDuration: 0.4 }), 40.5)
     .call(() => {
       const btn = document.querySelector('#detailQa0 [data-action="copy"]');
       btn.textContent = '✅ 已复制';
       showToast('📋 已复制到剪贴板');
       setTimeout(() => { btn.textContent = '📋 复制回复'; }, 2000);
-    }, [], 39.9)
-    .to({}, { duration: 0.4 }, 39.9)
+    }, [], 40.9)
+    .to({}, { duration: 0.4 }, 40.9)
 
-  // 联系卖家
-  .call(() => subtitleCtrl.show('💬 **联系卖家**', { side: 'right', duration: 2500 }), [], 40.5)
-    .add(cursor.click('#detailContactBtn', { moveDuration: 0.5 }), 40.5)
-    .call(() => { document.getElementById('detailContactModal').style.display = 'flex'; }, [], 41)
-    .to({}, { duration: 0.8 }, 41)
-    .call(() => { document.getElementById('detailContactModal').style.display = 'none'; }, [], 41.8)
+  // 联系卖家 - 模态框弹出
+  .call(() => subtitleCtrl.show('💬 **联系卖家**', { side: 'top', duration: 2500, anim: 'pop' }), [], 41.5)
+    .add(cursor.click('#detailContactBtn', { moveDuration: 0.5 }), 41.5)
+    .call(() => { 
+      const modal = document.getElementById('detailContactModal');
+      modal.style.display = 'flex'; 
+      BreakoutEffects.animate(modal.querySelector('.card-white'), 'anim-bounce');
+    }, [], 42)
+    .to({}, { duration: 0.8 }, 42)
+    .call(() => { document.getElementById('detailContactModal').style.display = 'none'; }, [], 42.8)
 
-  masterTL.addLabel('detail-end', 42);
+  masterTL.addLabel('detail-end', 43);
 
-  // ===== 场景5：智能发布 (42-54s) =====
-  masterTL.addLabel('publish-start', 42);
+  // ===== 场景5：智能发布 (43-57s) =====
+  masterTL.addLabel('publish-start', 43);
 
   masterTL.call(() => {
     switchToScene('publish');
     VisualEmphasis.focusPhone('publish');
-    subtitleCtrl.show('✨ **AI智能发布**', { side: 'left', duration: 2000, pulse: true });
-  }, [], 42)
-    .to({}, { duration: 0.3 }, 42)
+    subtitleCtrl.show('✨ **AI智能发布**', { side: 'center', duration: 2000, anim: 'pop', pulse: true });
+    // 步骤指示器百叶窗
+    const steps = document.querySelector('#publishScrollContent > div:nth-child(2)');
+    if (steps) BreakoutEffects.animate(steps, 'anim-blinds');
+  }, [], 43)
+    .to({}, { duration: 0.3 }, 43)
 
-  // 选择类别
-  .call(() => subtitleCtrl.show('📚 选择**教材**', { side: 'right', duration: 1800 }), [], 43)
-    .add(cursor.click('#publishCatBook', { moveDuration: 0.4 }), 43)
+  // 选择类别 - 弹性缩放
+  .call(() => subtitleCtrl.show('📚 选择**教材**', { side: 'right', duration: 1800, shake: true }), [], 44)
+    .add(cursor.click('#publishCatBook', { moveDuration: 0.4 }), 44)
     .call(() => {
       document.getElementById('publishCatBook').style.border = '2px solid var(--yellow-500)';
       document.getElementById('publishCatBook').style.background = 'var(--yellow-50)';
-      VisualEmphasis.apply('#publishCatBook', 'spotlight');
-    }, [], 43.4)
-    .to({}, { duration: 0.3 }, 43.4)
-    .call(() => VisualEmphasis.apply('#publishCatBook', 'reset'), [], 43.7)
+      BreakoutEffects.animate('#publishCatBook', 'anim-bounce');
+    }, [], 44.4)
+    .to({}, { duration: 0.3 }, 44.4)
 
   // 输入名称
-  .call(() => subtitleCtrl.show('⌨️ **商品名称**', { side: 'left', duration: 1800 }), [], 44.2)
-    .add(cursor.click('#publishTitle', { moveDuration: 0.4 }), 44.2)
-    .call(async () => { await InputSimulator.typeText('#publishTitle', '管理学原理教材 第7版', 45); }, [], 44.6)
-    .to({}, { duration: 1.4 }, 44.6)
+  .call(() => subtitleCtrl.show('⌨️ **商品名称**', { side: 'left', duration: 1800 }), [], 45)
+    .add(cursor.click('#publishTitle', { moveDuration: 0.4 }), 45)
+    .call(async () => { await InputSimulator.typeText('#publishTitle', '管理学原理教材 第7版', 45); }, [], 45.4)
+    .to({}, { duration: 1.4 }, 45.4)
 
   // 输入价格
-  .call(() => subtitleCtrl.show('💰 **价格**', { side: 'right', duration: 1800 }), [], 46.5)
-    .add(cursor.click('#publishOrigPrice', { moveDuration: 0.4 }), 46.5)
-    .call(async () => { await InputSimulator.typeText('#publishOrigPrice', '58', 55); }, [], 46.9)
-    .add(cursor.click('#publishPrice', { moveDuration: 0.4 }), 47.4)
-    .call(async () => { await InputSimulator.typeText('#publishPrice', '25', 55); }, [], 47.8)
+  .call(() => subtitleCtrl.show('💰 **价格**', { side: 'right', duration: 1800 }), [], 47.2)
+    .add(cursor.click('#publishOrigPrice', { moveDuration: 0.4 }), 47.2)
+    .call(async () => { await InputSimulator.typeText('#publishOrigPrice', '58', 55); }, [], 47.6)
+    .add(cursor.click('#publishPrice', { moveDuration: 0.4 }), 48.1)
+    .call(async () => { await InputSimulator.typeText('#publishPrice', '25', 55); }, [], 48.5)
 
   // AI价格建议
-  .call(() => subtitleCtrl.show('🤖 **AI价格建议**', { side: 'left', duration: 2000 }), [], 48.5)
-    .add(cursor.click('#publishAiPriceBtn', { moveDuration: 0.4 }), 48.5)
+  .call(() => subtitleCtrl.show('🤖 **AI价格建议**', { side: 'left', duration: 2000 }), [], 49.2)
+    .add(cursor.click('#publishAiPriceBtn', { moveDuration: 0.4 }), 49.2)
     .call(() => {
       document.getElementById('publishAiPriceBtn').textContent = '⏳ 分析中...';
+      BreakoutEffects.animate('#publishAiPriceBtn', 'anim-shimmer');
       setTimeout(() => {
         document.getElementById('publishAiPriceBtn').textContent = '🤖 AI建议：¥20-¥30';
         document.getElementById('publishPrice').value = '25';
         showToast('🤖 AI建议价格区间：¥20-¥30');
       }, 800);
-    }, [], 48.9)
-    .to({}, { duration: 0.6 }, 48.9)
+    }, [], 49.6)
+    .to({}, { duration: 0.6 }, 49.6)
 
-  // AI生成
+  // AI生成 - 突破效果
   .call(() => {
-    subtitleCtrl.show('🤖 **AI生成**商品信息', { side: 'right', duration: 2000 });
+    subtitleCtrl.show('🤖 **AI生成**商品信息', { side: 'top', duration: 2000, anim: 'pop' });
     VisualEmphasis.apply('#publishAiGenBtn', 'spotlight');
-  }, [], 49.8)
-    .add(cursor.click('#publishAiGenBtn', { moveDuration: 0.5 }), 49.8)
+    BreakoutEffects.rippleAt(document.querySelector('#publishAiGenBtn'));
+  }, [], 50.5)
+    .add(cursor.click('#publishAiGenBtn', { moveDuration: 0.5 }), 50.5)
     .call(() => {
       document.getElementById('publishAiGenBtn').textContent = '⏳ AI生成中...';
       document.getElementById('publishAiGenBtn').style.opacity = '0.7';
@@ -2493,106 +3111,125 @@ function buildMasterTimeline() {
       document.getElementById('publishFormArea').style.pointerEvents = 'none';
       document.getElementById('publishAiArea').style.display = 'block';
       VisualEmphasis.apply('#publishAiGenBtn', 'reset');
-    }, [], 50.3)
+      // AI大脑旋转
+      const aiBrain = document.querySelector('#publishAiArea .ai-brain-icon');
+      if (aiBrain) BreakoutEffects.animate(aiBrain, 'anim-spin');
+    }, [], 51)
 
   // AI生成动画
   .call(() => {
     document.getElementById('publishAiText').textContent = '分析商品类别：教材...';
-    subtitleCtrl.show('🧠 **AI分析中**...', { side: 'left', duration: 3000, pulse: true });
-  }, [], 50.8)
-    .call(() => { document.getElementById('publishAiText').textContent = '评估市场价格...'; }, [], 51.3)
-    .call(() => { document.getElementById('publishAiText').textContent = '生成卖点标签...'; }, [], 51.8)
-    .to('#publishAiProgress', { width: '100%', duration: 1.5, ease: 'power1.inOut' }, 51)
+    subtitleCtrl.show('🧠 **AI分析中**...', { side: 'center', duration: 3000, pulse: true });
+  }, [], 51.5)
+    .call(() => { document.getElementById('publishAiText').textContent = '评估市场价格...'; }, [], 52)
+    .call(() => { document.getElementById('publishAiText').textContent = '生成卖点标签...'; }, [], 52.5)
+    .to('#publishAiProgress', { width: '100%', duration: 1.5, ease: 'power1.inOut' }, 51.8)
 
-  // 显示结果
+  // 显示结果 - 翻转+火花
   .call(() => {
-    subtitleCtrl.show('✅ **生成完成**', { side: 'right', duration: 2000 });
+    subtitleCtrl.show('✅ **生成完成**', { side: 'top', duration: 2000, anim: 'pop' });
     document.getElementById('publishAiArea').style.display = 'none';
     document.getElementById('publishPreviewArea').style.display = 'block';
-  }, [], 52.5)
+    BreakoutEffects.animate('#publishPreviewCard', 'anim-flip-up');
+  }, [], 53.2)
 
   // 价格可视化 + 成交概率
-  .to('#publishPriceIndicator', { left: '55%', duration: 0.6 }, 53)
+  .to('#publishPriceIndicator', { left: '55%', duration: 0.6 }, 53.8)
     .to({ val: 0 }, { val: 85, duration: 0.8, onUpdate: function() {
       const v = Math.round(this.targets()[0].val);
       document.getElementById('publishRingVal').textContent = v + '%';
       document.getElementById('publishRingChart').style.background = `conic-gradient(var(--success) 0%, var(--success) ${v}%, var(--border) ${v}%)`;
-    }}, 53.2)
+      if (v === 85) BreakoutEffects.animate('#publishRingChart', 'anim-bounce');
+    }}, 54)
 
-  // 发布
-  .call(() => subtitleCtrl.show('🚀 **直接发布**', { side: 'left', duration: 2000 }), [], 54)
-    .add(cursor.click('#publishFinalBtn', { moveDuration: 0.5 }), 54)
+  // 发布 - AI图标飞出
+  .call(() => subtitleCtrl.show('🚀 **直接发布**', { side: 'center', duration: 2000, anim: 'pop' }), [], 55)
+    .add(cursor.click('#publishFinalBtn', { moveDuration: 0.5 }), 55)
     .call(() => {
       showToast('🚀 发布成功！商品已上架');
-      subtitleCtrl.show('🎉 **发布成功**', { side: 'right', duration: 2000, pulse: true });
-    }, [], 54.5)
-    .to({}, { duration: 0.8 }, 54.5);
+      subtitleCtrl.show('🎉 **发布成功**', { side: 'center', duration: 2500, anim: 'pop', pulse: true });
+      const aiIcon = document.querySelector('#publishPreviewCard');
+      if (aiIcon) BreakoutEffects.flyOut(aiIcon, { type: 'ai-icon', emoji: '✨', scale: 1.8 });
+    }, [], 55.5)
+    .to({}, { duration: 1 }, 55.5);
 
-  masterTL.addLabel('publish-end', 56);
+  masterTL.addLabel('publish-end', 57);
 
-  // ===== 场景6：卖家助手 (56-66s) =====
-  masterTL.addLabel('seller-start', 56);
+  // ===== 场景6：卖家助手 (57-68s) =====
+  masterTL.addLabel('seller-start', 57);
 
   masterTL.call(() => {
     switchToScene('seller');
     VisualEmphasis.focusPhone('seller');
-    subtitleCtrl.show('📊 **卖家助手**', { side: 'left', duration: 2000, pulse: true });
-  }, [], 56)
-    .to({}, { duration: 0.3 }, 56)
+    subtitleCtrl.show('📊 **卖家助手**', { side: 'center', duration: 2000, anim: 'pop', pulse: true });
+    // 统计卡片溶解入场
+    const statCards = document.querySelectorAll('#sellerScrollContent .stat-card');
+    gsap.fromTo(statCards, 
+      { opacity: 0, scale: 0.8, filter: 'blur(4px)' },
+      { opacity: 1, scale: 1, filter: 'blur(0)', duration: 0.4, stagger: 0.08, ease: 'power2.out' }
+    );
+  }, [], 57)
+    .to({}, { duration: 0.3 }, 57)
 
   // 数据数字滚动
-  .call(() => subtitleCtrl.show('📈 **数据概览**', { side: 'right', duration: 2000 }), [], 56.8)
-    .to({ val: 0 }, { val: 1, duration: 0.6, onUpdate: function() { document.getElementById('sellerStat1').textContent = Math.round(this.targets()[0].val); } }, 56.8)
-    .to({ val: 0 }, { val: 128, duration: 0.6, onUpdate: function() { document.getElementById('sellerStat2').textContent = Math.round(this.targets()[0].val); } }, 57.1)
-    .to({ val: 0 }, { val: 5, duration: 0.6, onUpdate: function() { document.getElementById('sellerStat3').textContent = Math.round(this.targets()[0].val); } }, 57.4)
-    .to({ val: 0 }, { val: 8, duration: 0.6, onUpdate: function() { document.getElementById('sellerStat4').textContent = Math.round(this.targets()[0].val); } }, 57.7)
-    .to({}, { duration: 0.3 }, 57.7)
+  .call(() => subtitleCtrl.show('📈 **数据概览**', { side: 'right', duration: 2000 }), [], 57.8)
+    .to({ val: 0 }, { val: 1, duration: 0.6, onUpdate: function() { document.getElementById('sellerStat1').textContent = Math.round(this.targets()[0].val); } }, 57.8)
+    .to({ val: 0 }, { val: 128, duration: 0.6, onUpdate: function() { document.getElementById('sellerStat2').textContent = Math.round(this.targets()[0].val); } }, 58.1)
+    .to({ val: 0 }, { val: 5, duration: 0.6, onUpdate: function() { document.getElementById('sellerStat3').textContent = Math.round(this.targets()[0].val); } }, 58.4)
+    .to({ val: 0 }, { val: 8, duration: 0.6, onUpdate: function() { document.getElementById('sellerStat4').textContent = Math.round(this.targets()[0].val); } }, 58.7)
+    .to({}, { duration: 0.3 }, 58.7)
 
-  // 展开商品详情
-  .call(() => subtitleCtrl.show('📦 **商品表现数据**', { side: 'left', duration: 2200 }), [], 58.5)
-    .add(cursor.click('#sellerProductItem', { moveDuration: 0.5 }), 58.5)
+  // 展开商品详情 - 百叶窗
+  .call(() => subtitleCtrl.show('📦 **商品表现数据**', { side: 'left', duration: 2200 }), [], 59.5)
+    .add(cursor.click('#sellerProductItem', { moveDuration: 0.5 }), 59.5)
     .call(() => {
       document.getElementById('sellerProductDetail').style.display = 'block';
+      BreakoutEffects.animate('#sellerProductDetail', 'anim-blinds-h');
       gsap.to('#sellerViewBar', { width: '65%', duration: 0.5 });
       gsap.to('#sellerInquiryBar', { width: '30%', duration: 0.5 });
       gsap.to('#sellerFavBar', { width: '15%', duration: 0.5 });
       document.getElementById('sellerAiTip').textContent = '💡 AI建议：优化价格至¥22，预计咨询率可提升至5.2%';
-    }, [], 59)
-    .to({}, { duration: 1.2 }, 59)
+    }, [], 60)
+    .to({}, { duration: 1.2 }, 60)
 
-  // 快捷回复
-  .call(() => subtitleCtrl.show('💬 **快捷回复**', { side: 'right', duration: 2000 }), [], 60.5)
-    .add(cursor.click('#sellerQuickReplyCard', { moveDuration: 0.5 }), 60.5)
-    .call(() => { document.getElementById('sellerQuickReplyPanel').style.display = 'block'; }, [], 61)
-    .to({}, { duration: 0.4 }, 61)
+  // 快捷回复 - 翻转
+  .call(() => subtitleCtrl.show('💬 **快捷回复**', { side: 'right', duration: 2000 }), [], 61.5)
+    .add(cursor.click('#sellerQuickReplyCard', { moveDuration: 0.5 }), 61.5)
+    .call(() => { 
+      document.getElementById('sellerQuickReplyPanel').style.display = 'block'; 
+      BreakoutEffects.animate('#sellerQuickReplyPanel', 'anim-flip');
+    }, [], 62)
+    .to({}, { duration: 0.4 }, 62)
 
-  // AI生成回复
-  .call(() => subtitleCtrl.show('🤖 **AI生成回复**', { side: 'left', duration: 2200 }), [], 61.8)
-    .add(cursor.click('#sellerQuickReplyPanel .quick-reply-btn[data-q="还在吗？"]', { moveDuration: 0.4 }), 61.8)
+  // AI生成回复 - 弹性弹跳
+  .call(() => subtitleCtrl.show('🤖 **AI生成回复**', { side: 'left', duration: 2200 }), [], 62.8)
+    .add(cursor.click('#sellerQuickReplyPanel .quick-reply-btn[data-q="还在吗？"]', { moveDuration: 0.4 }), 62.8)
     .call(() => {
       const answer = document.getElementById('sellerQuickReplyAnswer');
       answer.style.display = 'block';
       answer.textContent = '✅ AI回复：还在的，同学！随时可以联系交易，支持北区宿舍区面交~';
-    }, [], 62.2)
+      BreakoutEffects.animate(answer, 'anim-bounce');
+    }, [], 63.2)
 
-  // 价格优化
-  .call(() => subtitleCtrl.show('💰 **价格优化建议**', { side: 'right', duration: 2200 }), [], 63.5)
-    .add(cursor.click('#sellerPriceCard', { moveDuration: 0.5 }), 63.5)
+  // 价格优化 - 溶解
+  .call(() => subtitleCtrl.show('💰 **价格优化建议**', { side: 'top', duration: 2200, anim: 'pop' }), [], 64.5)
+    .add(cursor.click('#sellerPriceCard', { moveDuration: 0.5 }), 64.5)
     .call(() => {
       document.getElementById('sellerPriceAdvice').style.display = 'block';
+      BreakoutEffects.animate('#sellerPriceAdvice', 'anim-dissolve');
       VisualEmphasis.apply('#sellerPriceAdvice', 'pulse');
-    }, [], 64)
-    .to({}, { duration: 0.6 }, 64)
+    }, [], 65)
+    .to({}, { duration: 0.6 }, 65)
 
-  // 结束
+  // 结束 - 全屏大字幕
   .call(() => {
-    subtitleCtrl.show('🎉 **演示完成**！感谢观看', { side: 'left', duration: 4000, pulse: true });
+    subtitleCtrl.show('🎉 **演示完成**！感谢观看', { side: 'center', duration: 5000, anim: 'pop', pulse: true });
     showToast('🎉 动画演示结束 — 感谢观看！');
-  }, [], 65.5);
+  }, [], 66.5);
 
-  masterTL.addLabel('seller-end', 66);
+  masterTL.addLabel('seller-end', 68);
 
-  // 更新进度条
+  // 更新进度条 - 更新总时长
   masterTL.eventCallback('onUpdate', () => {
     const progress = Math.min(masterTL.progress() * 100, 100);
     document.getElementById('progressFill').style.width = progress + '%';
