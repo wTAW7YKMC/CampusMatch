@@ -243,6 +243,97 @@ body {
   animation: subPulse 2s ease-in-out infinite;
 }
 
+/* ============================================================
+   动态视觉强调系统 - 同步旁白的元素聚焦动画
+   ============================================================ */
+
+/* 聚焦缩放 + 金色光晕 - 用于正在讲解的核心区域 */
+@keyframes focusGlow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(245, 184, 0, 0.6), 0 0 0 0 rgba(32, 97, 202, 0.4); }
+  50% { box-shadow: 0 0 20px 6px rgba(245, 184, 0, 0.4), 0 0 40px 12px rgba(32, 97, 202, 0.2); }
+}
+
+.zoom-spotlight {
+  animation: zoomIn 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards,
+             focusGlow 1.8s ease-in-out infinite !important;
+  position: relative;
+  z-index: 10 !important;
+}
+
+@keyframes zoomIn {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.06); }
+}
+
+/* 仅缩放，不发光的轻量强调 */
+.zoom-light {
+  animation: zoomIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards !important;
+  position: relative;
+  z-index: 5 !important;
+}
+
+/* 取消聚焦 */
+.zoom-reset {
+  animation: zoomOut 0.35s ease forwards !important;
+  box-shadow: none !important;
+}
+
+@keyframes zoomOut {
+  0% { transform: scale(1.06); }
+  100% { transform: scale(1); }
+}
+
+/* 高亮脉冲 - 边框闪烁提醒 */
+@keyframes borderPulse {
+  0%, 100% { border-color: var(--yellow-500); box-shadow: 0 0 8px rgba(245, 184, 0, 0.3); }
+  50% { border-color: var(--blue-500); box-shadow: 0 0 16px rgba(32, 97, 202, 0.4); }
+}
+
+.highlight-pulse {
+  animation: borderPulse 1.2s ease-in-out infinite !important;
+  border-width: 2.5px !important;
+  border-style: solid !important;
+}
+
+/* 场景区块整体高亮 - 背景短暂亮度提升 */
+@keyframes sectionBrighten {
+  0% { filter: brightness(1); }
+  50% { filter: brightness(1.12) saturate(1.1); }
+  100% { filter: brightness(1); }
+}
+
+.section-highlight {
+  animation: sectionBrighten 0.8s ease-in-out !important;
+}
+
+/* 卡片弹出强调 - 首次出现时使用 */
+@keyframes cardPopIn {
+  0% { transform: translateX(30px) scale(0.95); opacity: 0; }
+  60% { transform: translateX(-3px) scale(1.02); opacity: 1; }
+  100% { transform: translateX(0) scale(1); opacity: 1; }
+}
+
+.card-emerge {
+  animation: cardPopIn 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) forwards !important;
+}
+
+/* 数值跳动动画 - 统计数字变化时 */
+@keyframes numberBounce {
+  0% { transform: scale(1); }
+  30% { transform: scale(1.25); color: var(--yellow-500); }
+  100% { transform: scale(1); }
+}
+
+.number-pop {
+  animation: numberBounce 0.5s ease-out;
+}
+
+/* 手机框整体场景聚焦 - 切换场景时 */
+.phone-frame.scene-focus {
+  box-shadow: 0 8px 40px rgba(0,0,0,0.15), 0 0 60px rgba(245, 184, 0, 0.25) !important;
+  transition: box-shadow 0.6s ease;
+}
+
 /* 旧hint兼容 - 已废弃，保留占位 */
 .hint-box {
   display: none;
@@ -1745,6 +1836,70 @@ class SubtitleController {
 // 全局字幕控制器实例
 let subtitleCtrl;
 
+/* ============================================================
+   3. 视觉强调控制器 - 同步旁白的动态元素聚焦
+   ============================================================ */
+class VisualEmphasis {
+  /**
+   * 对目标元素应用聚焦缩放+发光效果
+   * @param {string|Element} target - CSS选择器或DOM元素
+   * @param {'spotlight'|'light'|'pulse'|'reset'} mode - 强调模式
+   */
+  static apply(target, mode = 'spotlight') {
+    if (typeof target === 'string') target = document.querySelector(target);
+    if (!target) return;
+    
+    // 先清除之前的动画类
+    target.classList.remove('zoom-spotlight', 'zoom-light', 'zoom-reset', 'highlight-pulse');
+
+    switch (mode) {
+      case 'spotlight':
+        target.classList.add('zoom-spotlight');
+        break;
+      case 'light':
+        target.classList.add('zoom-light');
+        break;
+      case 'pulse':
+        target.classList.add('highlight-pulse');
+        break;
+      case 'reset':
+        target.classList.add('zoom-reset');
+        // 动画结束后清理
+        setTimeout(() => {
+          target.classList.remove('zoom-spotlight', 'zoom-light', 'zoom-reset', 'highlight-pulse');
+        }, 400);
+        break;
+    }
+  }
+
+  /** 批量重置多个元素的强调 */
+  static resetAll(selectors) {
+    selectors.forEach(sel => {
+      const el = typeof sel === 'string' ? document.querySelector(sel) : sel;
+      if (el) VisualEmphasis.apply(el, 'reset');
+    });
+  }
+
+  /** 给手机框加场景聚焦光晕 */
+  static focusPhone(sceneId) {
+    const scene = document.getElementById('scene-' + sceneId);
+    if (!scene) return;
+    const phone = scene.querySelector('.phone-frame');
+    if (phone) {
+      phone.classList.add('scene-focus');
+      setTimeout(() => phone.classList.remove('scene-focus'), 2000);
+    }
+  }
+
+  /** 数字弹跳动画 */
+  static popNumber(el) {
+    if (typeof el === 'string') el = document.querySelector(el);
+    if (!el) return;
+    el.classList.add('number-pop');
+    setTimeout(() => el.classList.remove('number-pop'), 600);
+  }
+}
+
 // 兼容旧代码的快捷函数
 function showHint(text, duration = 4000) {
   if (!subtitleCtrl) subtitleCtrl = new SubtitleController();
@@ -1886,7 +2041,7 @@ class PlaybackController {
     this.tl = mainTimeline;
     this.isPlaying = false;
     this.speed = 1;
-    this.totalDuration = 105; // 总时长秒数
+    this.totalDuration = 66; // 总时长秒数（精简后）
   }
 
   play() {
@@ -2000,195 +2155,170 @@ function buildMasterTimeline() {
   masterTL.to(launchAddrBar, { opacity: 1, duration: 0.4 }, 0.5)
     .to(launchLogoArea, { opacity: 1, scale: 1, duration: 0.5 }, 1.0)
     .to(launchRing, { opacity: 0.3, duration: 0.4 }, 1.5)
-    .call(() => subtitleCtrl.show('🚀 正在启动**校易配**智能交易系统', { side: 'left', duration: 3000 }), [], 1.5)
+    .call(() => {
+      subtitleCtrl.show('🚀 **校易配**智能交易系统', { side: 'left', duration: 2500 });
+      VisualEmphasis.apply(launchLogoArea, 'spotlight');
+    }, [], 1.5)
     .to(launchStatus, { opacity: 1, duration: 0.3 }, 1.5)
     .call(() => InputSimulator.setContent(launchStatus, '正在启动智能交易系统...', 80), [], 1.8)
     .to(launchProgressWrap, { opacity: 1, duration: 0.3 }, 2.0)
     .to(launchProgressFill, { width: '30%', duration: 2, ease: 'power1.inOut' }, 2.0)
     .call(() => {
       launchStatus.textContent = '加载智能匹配引擎...';
-      subtitleCtrl.show('⚙️ 初始化**AI引擎模块**', { side: 'right', duration: 3000 });
+      subtitleCtrl.show('⚙️ 初始化**AI引擎**', { side: 'right', duration: 2200 });
+      VisualEmphasis.apply(launchLogoArea, 'reset');
+      VisualEmphasis.apply(launchProgressWrap, 'pulse');
     }, [], 4.0)
     .to(launchProgressFill, { width: '70%', duration: 2, ease: 'power1.inOut' }, 4.0)
     .call(() => {
       launchStatus.textContent = '准备就绪';
-      subtitleCtrl.show('✅ **系统就绪**，即将进入首页', { side: 'left', duration: 2500, pulse: true });
+      subtitleCtrl.show('✅ **系统就绪**', { side: 'left', duration: 2000, pulse: true });
+      VisualEmphasis.apply(launchProgressWrap, 'reset');
     }, [], 6.0)
     .to(launchProgressFill, { width: '100%', duration: 1.5, ease: 'power1.inOut' }, 6.0)
     .call(() => switchToScene('home'), [], 7.5)
     .to('#scene-launch', { opacity: 0, duration: 0.4 }, 7.5)
     .addLabel('launch-end', 8);
 
-  // ===== 场景2：首页浏览 (8-20s) =====
+  // ===== 场景2：首页浏览 (8-19s) =====
   masterTL.addLabel('home-start', 8);
-  // 显示首页
   masterTL.call(() => {
     switchToScene('home');
     initHomeProducts();
+    VisualEmphasis.focusPhone('home');
   }, [], 8);
 
-  // 光标动画序列
-  // 8.0s - 光标出现
   masterTL.set('#simCursor', { opacity: 1 }, 8)
-    // 移动到智能匹配卡片
-    .call(() => subtitleCtrl.show('👆 浏览首页，发现**AI智能匹配**功能', { side: 'left', duration: 3500 }), [], 8.2)
+    // 移动到智能匹配卡片 - 聚焦缩放
+    .call(() => subtitleCtrl.show('👆 发现**AI智能匹配**', { side: 'left', duration: 2200 }), [], 8.2)
     .add(cursor.moveTo('#homeMatchCard', 0.7), 8.5)
     .call(() => {
-      document.getElementById('homeMatchCard').style.borderColor = 'var(--yellow-500)';
-      subtitleCtrl.show('🤖 AI帮你**精准匹配**心仪商品', { side: 'right', duration: 3500 });
+      VisualEmphasis.apply('#homeMatchCard', 'spotlight');
+      subtitleCtrl.show('🤖 **精准匹配**心仪商品', { side: 'right', duration: 2500 });
     }, [], 9.2)
-    .to({}, { duration: 0.5 }, 9.2)
-    .call(() => document.getElementById('homeMatchCard').style.borderColor = ''), 9.7
+    .to({}, { duration: 0.4 }, 9.2)
+    .call(() => VisualEmphasis.apply('#homeMatchCard', 'reset'), [], 9.6)
 
   // 移动到分类区教材图标
-  masterTL.add(cursor.moveTo('#homeCategories .category-chip[data-cat="教材"]', 0.6), 10.0)
+  .add(cursor.moveTo('#homeCategories .category-chip[data-cat="教材"]', 0.6), 10.0)
     .call(() => {
-      const el = document.querySelector('#homeCategories .category-chip[data-cat="教材"]');
-      if (el) el.style.transform = 'scale(1.1)';
-      subtitleCtrl.show('📚 教材分类：**128件**在售', { side: 'left', duration: 3000 });
+      VisualEmphasis.apply('#homeCategories .category-chip[data-cat="教材"]', 'spotlight');
+      subtitleCtrl.show('📚 教材分类：**128件**在售', { side: 'left', duration: 2200 });
     }, [], 10.6)
-    .to({}, { duration: 0.5 }, 10.6)
-    .call(() => {
-      const el = document.querySelector('#homeCategories .category-chip[data-cat="教材"]');
-      if (el) el.style.transform = '';
-    }, [], 11.1)
+    .to({}, { duration: 0.4 }, 10.6)
+    .call(() => VisualEmphasis.apply('#homeCategories .category-chip[data-cat="教材"]', 'reset'), [], 11.0)
 
-  // 移动到商品卡片1（台灯）
-  masterTL.add(cursor.click('#homeProducts .product-card:first-child', { moveDuration: 0.5 }), 11.3)
+  // 移动到商品卡片
+  .add(cursor.click('#homeProducts .product-card:first-child', { moveDuration: 0.5 }), 11.3)
     .call(() => {
-      subtitleCtrl.show('💡 **悬停**商品卡片，查看简要信息', { side: 'right', duration: 3500 });
+      subtitleCtrl.show('💡 **悬停卡片**查看信息', { side: 'right', duration: 2200 });
       const card = document.querySelector('#homeProducts .product-card:first-child');
-      if (card) card.style.transform = 'translateY(-3px)';
+      if (card) { card.style.transform = 'translateY(-3px)'; card.style.boxShadow = '0 0 20px rgba(245,184,0,0.3)'; }
     }, [], 11.8)
-    .to({}, { duration: 0.6 }, 11.8)
+    .to({}, { duration: 0.5 }, 11.8)
     .call(() => {
       const card = document.querySelector('#homeProducts .product-card:first-child');
-      if (card) card.style.transform = '';
-    }, [], 12.4)
+      if (card) { card.style.transform = ''; card.style.boxShadow = ''; }
+    }, [], 12.3)
 
   // 滚动展示AI功能区
-  masterTL.call(() => {
-    const content = document.getElementById('homeScrollContent');
-    content.scrollTo({ top: 200, behavior: 'smooth' });
-    subtitleCtrl.show('📜 向下滚动，发现更多**AI智能功能**', { side: 'left', duration: 4000 });
+  .call(() => {
+    document.getElementById('homeScrollContent').scrollTo({ top: 200, behavior: 'smooth' });
+    subtitleCtrl.show('📜 **AI智能功能**一览', { side: 'left', duration: 2200 });
   }, [], 12.8)
     .to({}, { duration: 1.5 }, 12.8)
 
-  // 点击"去体验"（智能发布）
-  masterTL.add(cursor.click('.ai-card:last-child .home-go-btn', { moveDuration: 0.5, pauseAfter: 0.2 }), 14.5)
+  // 点击"去体验"智能发布
+  .add(cursor.click('.ai-card:last-child .home-go-btn', { moveDuration: 0.5, pauseAfter: 0.2 }), 14.5)
     .call(() => {
-      subtitleCtrl.show('✨ 点击"去体验"，探索**AI智能发布**功能', { side: 'right', duration: 3500 });
+      VisualEmphasis.apply('.ai-card:last-child', 'spotlight');
+      subtitleCtrl.show('✨ **AI智能发布**', { side: 'right', duration: 2200 });
     }, [], 15.0)
-    .to({}, { duration: 0.8 }, 15.0)
+    .to({}, { duration: 0.6 }, 15.0)
+    .call(() => VisualEmphasis.apply('.ai-card:last-child', 'reset'), [], 15.6)
 
   // 滚动到推荐商品区
-  masterTL.call(() => {
+  .call(() => {
     document.getElementById('homeScrollContent').scrollTo({ top: 400, behavior: 'smooth' });
-  }, [], 15.5)
-    .to({}, { duration: 1.2 }, 15.5)
+  }, [], 16.0)
+    .to({}, { duration: 1.0 }, 16.0)
 
-  // 点击"查看全部"
-  masterTL.call(() => subtitleCtrl.show('🔍 查看**全部商品**列表', { side: 'left', duration: 3000 }), [], 17.0)
-    .add(cursor.click('#homeViewAll', { moveDuration: 0.5 }), 17.0)
-    .to({}, { duration: 0.6 }, 17.5)
+  // 数据看板数字滚动
+  .call(() => subtitleCtrl.show('📊 **平台数据**实时更新', { side: 'left', duration: 2200 }), [], 17.2)
+    .to({ val: 0 }, { val: 2580, duration: 0.8, onUpdate: function() { document.getElementById('homeStat1').textContent = Math.round(this.targets()[0].val); } }, 17.2)
+    .to({ val: 0 }, { val: 1200, duration: 0.8, onUpdate: function() { document.getElementById('homeStat2').textContent = Math.round(this.targets()[0].val); } }, 17.5)
+    .to({ val: 0 }, { val: 860, duration: 0.8, onUpdate: function() { document.getElementById('homeStat3').textContent = Math.round(this.targets()[0].val); } }, 17.8);
 
-  // 数据看板数字滚动动画
-  masterTL.call(() => {
-    subtitleCtrl.show('📊 **平台数据**概览实时更新', { side: 'right', duration: 3500 });
-  }, [], 18.5)
-    .to({ val: 0 }, {
-      val: 2580,
-      duration: 1,
-      onUpdate: function() {
-        document.getElementById('homeStat1').textContent = Math.round(this.targets()[0].val);
-      }
-    }, 18.5)
-    .to({ val: 0 }, {
-      val: 1200,
-      duration: 1,
-      onUpdate: function() {
-        document.getElementById('homeStat2').textContent = Math.round(this.targets()[0].val);
-      }
-    }, 18.8)
-    .to({ val: 0 }, {
-      val: 860,
-      duration: 1,
-      onUpdate: function() {
-        document.getElementById('homeStat3').textContent = Math.round(this.targets()[0].val);
-      }
-    }, 19.1);
+  masterTL.addLabel('home-end', 19);
 
-  masterTL.addLabel('home-end', 20);
-
-  // ===== 场景3：智能匹配核心流程 (20-45s) =====
-  masterTL.addLabel('match-start', 20);
+  // ===== 场景3：智能匹配 (19-33s) =====
+  masterTL.addLabel('match-start', 19);
 
   masterTL.call(() => {
     switchToScene('match');
-    subtitleCtrl.show('🎯 进入智能匹配 - AI帮你找到**最合适的商品**', { side: 'left', duration: 4000, pulse: true });
-  }, [], 20);
+    VisualEmphasis.focusPhone('match');
+    subtitleCtrl.show('🎯 **AI智能匹配**', { side: 'left', duration: 2000, pulse: true });
+  }, [], 19);
 
-  // 光标移动到输入框
-  masterTL.call(() => subtitleCtrl.show('📍 点击输入框，开始**描述你的需求**', { side: 'right', duration: 3500 }), [], 21)
-    .add(cursor.click('#matchInputField', { moveDuration: 0.6 }), 21)
+  // 光标点击输入框
+  masterTL.call(() => subtitleCtrl.show('📍 描述你的**需求**', { side: 'right', duration: 2000 }), [], 19.8)
+    .add(cursor.click('#matchInputField', { moveDuration: 0.6 }), 19.8)
     .call(() => {
       document.getElementById('matchInputCard').classList.add('focused');
       document.getElementById('matchPlaceholder').textContent = '';
-    }, [], 21.6)
+      VisualEmphasis.apply('#matchInputCard', 'pulse');
+    }, [], 20.4)
 
-  // 逐字输入主需求
+  // 逐字输入 + 示例标签
   masterTL.call(async () => {
     const field = document.getElementById('matchInputField');
     const placeholder = document.getElementById('matchPlaceholder');
     if (placeholder) placeholder.textContent = '';
-    await InputSimulator.setContent(field, '我想买一本管理学教材', 50);
-  }, [], 22)
-    .to({}, { duration: 1.8 }, 22)
+    await InputSimulator.setContent(field, '我想买一本管理学教材', 45);
+    VisualEmphasis.apply('#matchInputCard', 'reset');
+  }, [], 21)
+    .to({}, { duration: 1.5 }, 21)
 
-  // 点击示例标签
-  masterTL.call(() => subtitleCtrl.show('🏷️ 点击示例标签，**AI自动填充**需求', { side: 'left', duration: 3500 }), [], 24)
-    .add(cursor.click('.match-example-tag[data-text*="管理学"]', { moveDuration: 0.5 }), 24)
+  .call(() => subtitleCtrl.show('🏷️ 点击标签**自动填充**', { side: 'left', duration: 2000 }), [], 22.5)
+    .add(cursor.click('.match-example-tag[data-text*="管理学"]', { moveDuration: 0.5 }), 22.5)
     .call(async () => {
       const field = document.getElementById('matchInputField');
       field.textContent = '我想买一本管理学教材，预算30元以内';
-      subtitleCtrl.show('💰 AI已自动添加**预算条件**', { side: 'right', duration: 3000 });
-    }, [], 24.5)
-    .to({}, { duration: 0.8 }, 24.5)
+      subtitleCtrl.show('💰 已添加**预算条件**', { side: 'right', duration: 2000 });
+    }, [], 23.0)
+    .to({}, { duration: 0.6 }, 23.0)
 
-  // 光标点击"开始匹配"按钮
-  masterTL.call(() => subtitleCtrl.show('🎯 点击"开始匹配"，AI启动**智能推荐引擎**', { side: 'left', duration: 3500 }), [], 26)
-    .add(cursor.click('#matchStartBtn', { moveDuration: 0.6 }), 26)
+  // 点击"开始匹配"
+  .call(() => {
+    subtitleCtrl.show('🎯 **开始匹配**', { side: 'left', duration: 2000 });
+    VisualEmphasis.apply('#matchStartBtn', 'spotlight');
+  }, [], 24)
+    .add(cursor.click('#matchStartBtn', { moveDuration: 0.6 }), 24)
     .call(() => {
       document.getElementById('matchStartBtn').textContent = '⏳ 匹配中...';
       document.getElementById('matchStartBtn').style.opacity = '0.7';
-      // 显示AI分析动画区
       document.getElementById('matchAiAnalyze').style.display = 'block';
       document.getElementById('matchInputCard').style.opacity = '0.5';
-    }, [], 26.6)
+      VisualEmphasis.apply('#matchStartBtn', 'reset');
+    }, [], 24.6)
 
   // AI分析动画
-  masterTL.call(() => {
-    subtitleCtrl.show('🧠 **AI正在分析**你的需求...', { side: 'right', duration: 5000, pulse: true });
+  .call(() => {
+    subtitleCtrl.show('🧠 **AI分析中**...', { side: 'right', duration: 4000, pulse: true });
     document.getElementById('matchAnalyzeText').textContent = '正在解析需求...';
-  }, [], 27)
-    .call(() => document.getElementById('matchAnalyzeText').textContent = '识别品类：教材', [], 28)
-    .call(() => document.getElementById('matchAnalyzeText').textContent = '匹配预算范围...', [], 29)
-    .call(() => document.getElementById('matchAnalyzeText').textContent = '筛选北区商品...', [], 30)
-    .call(() => document.getElementById('matchAnalyzeText').textContent = '计算匹配度...', [], 31)
-    .to('#matchAnalyzeProgress', {
-      width: '100%',
-      duration: 2,
-      ease: 'power1.inOut'
-    }, 30)
+  }, [], 25)
+    .call(() => document.getElementById('matchAnalyzeText').textContent = '识别品类：教材', [], 25.8)
+    .call(() => document.getElementById('matchAnalyzeText').textContent = '匹配预算范围...', [], 26.4)
+    .call(() => document.getElementById('matchAnalyzeText').textContent = '筛选附近商品...', [], 27.0)
+    .call(() => document.getElementById('matchAnalyzeText').textContent = '计算匹配度...', [], 27.6)
+    .to('#matchAnalyzeProgress', { width: '100%', duration: 1.5, ease: 'power1.inOut' }, 26.5)
 
   // 显示结果
-  masterTL.call(() => {
-    subtitleCtrl.show('✅ 找到**3件**匹配商品！', { side: 'left', duration: 4000 });
+  .call(() => {
+    subtitleCtrl.show('✅ 找到**3件**匹配商品', { side: 'left', duration: 2500 });
     document.getElementById('matchAiAnalyze').style.display = 'none';
     const resultsArea = document.getElementById('matchResultsArea');
     resultsArea.style.display = 'block';
-
-    // 填充结果卡片
     const cardsContainer = document.getElementById('matchResultCards');
     cardsContainer.innerHTML = MOCK_PRODUCTS.map((p, i) => `
       <div class="match-result-card" id="matchCard${i}" style="opacity:0;transform:translateX(30px);">
@@ -2210,165 +2340,136 @@ function buildMasterTimeline() {
         <div class="btn-primary" style="font-size:10px;padding:4px 10px;margin-top:6px;display:inline-flex;" id="matchDetailBtn${i}">查看详情 →</div>
       </div>
     `).join('');
-  }, [], 34);
+  }, [], 29)
+    .to({}, { duration: 0.3 }, 29)
 
-  // 卡片动画
-  masterTL.call(() => {
-    gsap.to('#matchCard0', { opacity: 1, x: 0, duration: 0.5 });
-  }, [], 35)
+  // 卡片依次弹出
+  .call(() => { gsap.to('#matchCard0', { opacity: 1, x: 0, duration: 0.5 }); }, [], 30)
     .call(() => {
       const reasons = document.querySelectorAll('#matchReasons0 div');
       gsap.to(reasons, { opacity: 1, stagger: 0.2, duration: 0.3 });
-    }, [], 35.5)
-    .call(() => {
-      gsap.to('#matchCard1', { opacity: 1, x: 0, duration: 0.5 });
-    }, [], 37)
-    .call(() => {
-      gsap.to('#matchCard2', { opacity: 1, x: 0, duration: 0.5 });
-    }, [], 38.5)
+    }, [], 30.5)
+    .call(() => { gsap.to('#matchCard1', { opacity: 1, x: 0, duration: 0.5 }); }, [], 31)
+    .call(() => { gsap.to('#matchCard2', { opacity: 1, x: 0, duration: 0.5 }); }, [], 31.5)
 
   // 点击查看详情
-  masterTL.call(() => subtitleCtrl.show('🔍 点击"查看详情"，了解**完整信息**', { side: 'right', duration: 4000 }), [], 40.5)
-    .add(cursor.click('#matchDetailBtn0', { moveDuration: 0.5 }), 40.5)
-    .to({}, { duration: 0.6 }, 41);
+  .call(() => subtitleCtrl.show('🔍 **查看详情**', { side: 'right', duration: 2000 }), [], 32.3)
+    .add(cursor.click('#matchDetailBtn0', { moveDuration: 0.5 }), 32.3)
+    .to({}, { duration: 0.5 }, 32.8);
 
-  // 浏览全部商品
-  masterTL.call(() => subtitleCtrl.show('📋 浏览**全部匹配商品**', { side: 'left', duration: 3000 }), [], 43)
-    .add(cursor.click('#matchBrowseAll', { moveDuration: 0.5 }), 43)
-    .to({}, { duration: 0.5 }, 43.5);
+  masterTL.addLabel('match-end', 33);
 
-  masterTL.addLabel('match-end', 45);
-
-  // ===== 场景4：商品详情 (45-60s) =====
-  masterTL.addLabel('detail-start', 45);
+  // ===== 场景4：商品详情 (33-42s) =====
+  masterTL.addLabel('detail-start', 33);
 
   masterTL.call(() => {
     switchToScene('detail');
-    subtitleCtrl.show('📋 进入商品详情页 - 查看**完整商品信息**', { side: 'right', duration: 4000, pulse: true });
-    // 初始化问答区回答
+    VisualEmphasis.focusPhone('detail');
+    subtitleCtrl.show('📋 **商品详情页**', { side: 'left', duration: 2000, pulse: true });
     document.querySelectorAll('#detailScrollContent .qa-answer-text').forEach((el, i) => {
       if (MOCK_QA[i]) el.textContent = MOCK_QA[i].a;
     });
-  }, [], 45);
+  }, [], 33)
+    .to({}, { duration: 0.3 }, 33)
 
   // 点击主图放大
-  masterTL.call(() => subtitleCtrl.show('🖼️ 点击商品图片**查看大图**', { side: 'left', duration: 3500 }), [], 46)
-    .add(cursor.click('#detailMainImage', { moveDuration: 0.5 }), 46)
-    .call(() => {
-      document.getElementById('detailMainImage').style.fontSize = '100px';
-      document.getElementById('detailMainImage').style.transition = 'font-size 0.3s';
-    }, [], 46.5)
-    .to({}, { duration: 0.5 }, 46.5)
-    .call(() => {
-      document.getElementById('detailMainImage').style.fontSize = '64px';
-    }, [], 47)
+  .call(() => subtitleCtrl.show('🖼️ **查看大图**', { side: 'right', duration: 2000 }), [], 34)
+    .add(cursor.click('#detailMainImage', { moveDuration: 0.5 }), 34)
+    .call(() => { document.getElementById('detailMainImage').style.fontSize = '100px'; document.getElementById('detailMainImage').style.transition = 'font-size 0.3s'; }, [], 34.5)
+    .to({}, { duration: 0.4 }, 34.5)
+    .call(() => { document.getElementById('detailMainImage').style.fontSize = '64px'; }, [], 34.9)
 
   // 切换缩略图
-  masterTL.call(() => subtitleCtrl.show('📷 点击缩略图**切换图片**', { side: 'right', duration: 3000 }), [], 47.8)
-    .add(cursor.click('#detailThumbnails > div:nth-child(2)', { moveDuration: 0.5 }), 47.8)
+  .call(() => subtitleCtrl.show('📷 **切换图片**', { side: 'left', duration: 1800 }), [], 35.3)
+    .add(cursor.click('#detailThumbnails > div:nth-child(2)', { moveDuration: 0.4 }), 35.3)
     .call(() => {
       document.getElementById('detailMainImage').textContent = '📖';
       document.querySelectorAll('#detailThumbnails > div').forEach(d => d.style.borderColor = 'transparent');
       document.querySelector('#detailThumbnails > div:nth-child(2)').style.borderColor = 'var(--yellow-500)';
-    }, [], 48.3)
-    .to({}, { duration: 0.4 }, 48.3)
+    }, [], 35.7)
+    .to({}, { duration: 0.3 }, 35.7)
 
-  // 点击展开全文
-  masterTL.call(() => subtitleCtrl.show('📖 点击"展开全文"查看**完整描述**', { side: 'left', duration: 3500 }), [], 49)
-    .add(cursor.click('#detailExpandDesc', { moveDuration: 0.5 }), 49)
-    .call(() => {
-      document.getElementById('detailDescFull').style.display = 'block';
-      document.getElementById('detailExpandDesc').textContent = '收起';
-    }, [], 49.5)
+  // 展开全文
+  .call(() => subtitleCtrl.show('📖 **展开全文**', { side: 'right', duration: 2000 }), [], 36.2)
+    .add(cursor.click('#detailExpandDesc', { moveDuration: 0.4 }), 36.2)
+    .call(() => { document.getElementById('detailDescFull').style.display = 'block'; document.getElementById('detailExpandDesc').textContent = '收起'; }, [], 36.6)
 
   // 收藏
-  masterTL.call(() => subtitleCtrl.show('❤️ 点击收藏，保存**心仪商品**', { side: 'right', duration: 3500 }), [], 50.5)
-    .add(cursor.click('#detailFavBtn', { moveDuration: 0.5 }), 50.5)
+  .call(() => subtitleCtrl.show('❤️ **收藏**商品', { side: 'left', duration: 2000 }), [], 37.2)
+    .add(cursor.click('#detailFavBtn', { moveDuration: 0.4 }), 37.2)
     .call(() => {
       const btn = document.getElementById('detailFavBtn');
       btn.innerHTML = '♥ 已收藏';
       btn.style.color = 'var(--error)';
       btn.style.borderColor = 'var(--error)';
       showToast('❤️ 已收藏');
-    }, [], 51)
-    .to({}, { duration: 0.8 }, 51)
+    }, [], 37.6)
+    .to({}, { duration: 0.5 }, 37.6)
 
-  // 点击AI问答1
-  masterTL.call(() => subtitleCtrl.show('💬 查看**AI智能问答** - 点击"还在吗？"', { side: 'left', duration: 4000 }), [], 52)
-    .add(cursor.click('#detailQa0', { moveDuration: 0.5 }), 52)
-    .call(() => {
-      document.querySelector('#detailQa0 .qa-answer').style.display = 'block';
-    }, [], 52.5)
-    .to({}, { duration: 0.6 }, 52.5)
+  // AI问答
+  .call(() => subtitleCtrl.show('💬 **AI智能问答**', { side: 'right', duration: 2200 }), [], 38.3)
+    .add(cursor.click('#detailQa0', { moveDuration: 0.5 }), 38.3)
+    .call(() => { document.querySelector('#detailQa0 .qa-answer').style.display = 'block'; VisualEmphasis.apply('#detailQa0', 'pulse'); }, [], 38.8)
+    .to({}, { duration: 0.4 }, 38.8)
+    .call(() => VisualEmphasis.apply('#detailQa0', 'reset'), [], 39.2)
 
   // 复制回复
-  masterTL.call(() => subtitleCtrl.show('📋 点击复制，获取**议价话术**', { side: 'right', duration: 3500 }), [], 53.3)
-    .add(cursor.click('#detailQa0 [data-action="copy"]', { moveDuration: 0.4 }), 53.3)
+  .call(() => subtitleCtrl.show('📋 **复制回复**', { side: 'left', duration: 2000 }), [], 39.5)
+    .add(cursor.click('#detailQa0 [data-action="copy"]', { moveDuration: 0.4 }), 39.5)
     .call(() => {
       const btn = document.querySelector('#detailQa0 [data-action="copy"]');
       btn.textContent = '✅ 已复制';
       showToast('📋 已复制到剪贴板');
       setTimeout(() => { btn.textContent = '📋 复制回复'; }, 2000);
-    }, [], 53.7)
-    .to({}, { duration: 0.5 }, 53.7)
+    }, [], 39.9)
+    .to({}, { duration: 0.4 }, 39.9)
 
   // 联系卖家
-  masterTL.call(() => subtitleCtrl.show('💬 点击"联系卖家"', { side: 'left', duration: 4000 }), [], 55)
-    .add(cursor.click('#detailContactBtn', { moveDuration: 0.5 }), 55)
-    .call(() => {
-      document.getElementById('detailContactModal').style.display = 'flex';
-    }, [], 55.5)
-    .to({}, { duration: 1.5 }, 55.5)
+  .call(() => subtitleCtrl.show('💬 **联系卖家**', { side: 'right', duration: 2500 }), [], 40.5)
+    .add(cursor.click('#detailContactBtn', { moveDuration: 0.5 }), 40.5)
+    .call(() => { document.getElementById('detailContactModal').style.display = 'flex'; }, [], 41)
+    .to({}, { duration: 0.8 }, 41)
+    .call(() => { document.getElementById('detailContactModal').style.display = 'none'; }, [], 41.8)
 
-  // 关闭联系面板
-  masterTL.call(() => subtitleCtrl.show('关闭弹窗，继续浏览', { side: 'right', duration: 3000 }), [], 57.5)
-    .add(cursor.click('#detailCloseModal', { moveDuration: 0.4 }), 57.5)
-    .call(() => {
-      document.getElementById('detailContactModal').style.display = 'none';
-    }, [], 57.9)
-    .to({}, { duration: 0.5 }, 57.9);
+  masterTL.addLabel('detail-end', 42);
 
-  masterTL.addLabel('detail-end', 60);
-
-  // ===== 场景5：智能发布核心流程 (60-90s) =====
-  masterTL.addLabel('publish-start', 60);
+  // ===== 场景5：智能发布 (42-54s) =====
+  masterTL.addLabel('publish-start', 42);
 
   masterTL.call(() => {
     switchToScene('publish');
-    subtitleCtrl.show('✨ 进入智能发布 - **AI一键生成**商品信息', { side: 'left', duration: 4000, pulse: true });
-  }, [], 60);
+    VisualEmphasis.focusPhone('publish');
+    subtitleCtrl.show('✨ **AI智能发布**', { side: 'left', duration: 2000, pulse: true });
+  }, [], 42)
+    .to({}, { duration: 0.3 }, 42)
 
-  // 选择商品类别
-  masterTL.call(() => subtitleCtrl.show('📚 选择商品类别：**教材**', { side: 'right', duration: 3000 }), [], 61.5)
-    .add(cursor.click('#publishCatBook', { moveDuration: 0.5 }), 61.5)
+  // 选择类别
+  .call(() => subtitleCtrl.show('📚 选择**教材**', { side: 'right', duration: 1800 }), [], 43)
+    .add(cursor.click('#publishCatBook', { moveDuration: 0.4 }), 43)
     .call(() => {
       document.getElementById('publishCatBook').style.border = '2px solid var(--yellow-500)';
       document.getElementById('publishCatBook').style.background = 'var(--yellow-50)';
-    }, [], 62)
-    .to({}, { duration: 0.4 }, 62)
+      VisualEmphasis.apply('#publishCatBook', 'spotlight');
+    }, [], 43.4)
+    .to({}, { duration: 0.3 }, 43.4)
+    .call(() => VisualEmphasis.apply('#publishCatBook', 'reset'), [], 43.7)
 
-  // 输入商品名称
-  masterTL.call(() => subtitleCtrl.show('⌨️ 输入**商品名称**', { side: 'left', duration: 4000 }), [], 63)
-    .add(cursor.click('#publishTitle', { moveDuration: 0.4 }), 63)
-    .call(async () => {
-      await InputSimulator.typeText('#publishTitle', '管理学原理教材 第7版', 50);
-    }, [], 63.4)
-    .to({}, { duration: 1.8 }, 63.4)
+  // 输入名称
+  .call(() => subtitleCtrl.show('⌨️ **商品名称**', { side: 'left', duration: 1800 }), [], 44.2)
+    .add(cursor.click('#publishTitle', { moveDuration: 0.4 }), 44.2)
+    .call(async () => { await InputSimulator.typeText('#publishTitle', '管理学原理教材 第7版', 45); }, [], 44.6)
+    .to({}, { duration: 1.4 }, 44.6)
 
   // 输入价格
-  masterTL.call(() => subtitleCtrl.show('💰 输入原价和**期望售价**', { side: 'right', duration: 4000 }), [], 65.8)
-    .add(cursor.click('#publishOrigPrice', { moveDuration: 0.4 }), 65.8)
-    .call(async () => {
-      await InputSimulator.typeText('#publishOrigPrice', '58', 60);
-    }, [], 66.2)
-    .add(cursor.click('#publishPrice', { moveDuration: 0.4 }), 67)
-    .call(async () => {
-      await InputSimulator.typeText('#publishPrice', '25', 60);
-    }, [], 67.4)
+  .call(() => subtitleCtrl.show('💰 **价格**', { side: 'right', duration: 1800 }), [], 46.5)
+    .add(cursor.click('#publishOrigPrice', { moveDuration: 0.4 }), 46.5)
+    .call(async () => { await InputSimulator.typeText('#publishOrigPrice', '58', 55); }, [], 46.9)
+    .add(cursor.click('#publishPrice', { moveDuration: 0.4 }), 47.4)
+    .call(async () => { await InputSimulator.typeText('#publishPrice', '25', 55); }, [], 47.8)
 
-  // AI建议价格
-  masterTL.call(() => subtitleCtrl.show('🤖 点击获取**AI价格建议**', { side: 'left', duration: 3500 }), [], 68.5)
-    .add(cursor.click('#publishAiPriceBtn', { moveDuration: 0.4 }), 68.5)
+  // AI价格建议
+  .call(() => subtitleCtrl.show('🤖 **AI价格建议**', { side: 'left', duration: 2000 }), [], 48.5)
+    .add(cursor.click('#publishAiPriceBtn', { moveDuration: 0.4 }), 48.5)
     .call(() => {
       document.getElementById('publishAiPriceBtn').textContent = '⏳ 分析中...';
       setTimeout(() => {
@@ -2376,192 +2477,120 @@ function buildMasterTimeline() {
         document.getElementById('publishPrice').value = '25';
         showToast('🤖 AI建议价格区间：¥20-¥30');
       }, 800);
-    }, [], 68.9)
-    .to({}, { duration: 0.8 }, 68.9)
+    }, [], 48.9)
+    .to({}, { duration: 0.6 }, 48.9)
 
-  // 选择成色
-  masterTL.call(() => subtitleCtrl.show('⭐ 选择**商品成色**', { side: 'right', duration: 3000 }), [], 70)
-    .add(cursor.click('#publishConditionOpts span[data-val="八成新"]', { moveDuration: 0.4 }), 70)
-    .call(() => {
-      document.querySelectorAll('#publishConditionOpts span').forEach(s => s.style.background = '');
-      document.querySelector('#publishConditionOpts span[data-val="八成新"]').style.background = 'var(--yellow-500)';
-      document.querySelector('#publishConditionOpts span[data-val="八成新"]').style.color = 'var(--white)';
-    }, [], 70.4)
-
-  // 选择使用时长
-  masterTL.call(() => subtitleCtrl.show('⏱ 选择**使用时长**', { side: 'left', duration: 3000 }), [], 71)
-    .add(cursor.click('#publishUsageOpts span[data-val="1年内"]', { moveDuration: 0.4 }), 71)
-    .call(() => {
-      document.querySelectorAll('#publishUsageOpts span').forEach(s => s.style.background = '');
-      document.querySelector('#publishUsageOpts span[data-val="1年内"]').style.background = 'var(--yellow-500)';
-      document.querySelector('#publishUsageOpts span[data-val="1年内"]').style.color = 'var(--white)';
-    }, [], 71.4)
-
-  // 选择交易地点
-  masterTL.call(() => subtitleCtrl.show('📍 选择**交易地点**', { side: 'right', duration: 3000 }), [], 72)
-    .add(cursor.click('#publishLocationTags span[data-val="南区宿舍"]', { moveDuration: 0.4 }), 72)
-    .call(() => {
-      document.getElementById('publishLocation').value = '南区宿舍';
-    }, [], 72.4)
-
-  // 输入补充说明
-  masterTL.call(() => subtitleCtrl.show('📝 输入**补充说明**', { side: 'left', duration: 4000 }), [], 73)
-    .add(cursor.click('#publishDesc', { moveDuration: 0.4 }), 73)
-    .call(async () => {
-      await InputSimulator.typeText('#publishDesc', '有重点标注，考试必备', 50);
-    }, [], 73.4)
-    .to({}, { duration: 1.5 }, 73.4)
-
-  // 点击AI生成
-  masterTL.call(() => subtitleCtrl.show('🤖 点击"**AI生成商品信息**"按钮', { side: 'right', duration: 3500 }), [], 75.5)
-    .add(cursor.click('#publishAiGenBtn', { moveDuration: 0.5 }), 75.5)
+  // AI生成
+  .call(() => {
+    subtitleCtrl.show('🤖 **AI生成**商品信息', { side: 'right', duration: 2000 });
+    VisualEmphasis.apply('#publishAiGenBtn', 'spotlight');
+  }, [], 49.8)
+    .add(cursor.click('#publishAiGenBtn', { moveDuration: 0.5 }), 49.8)
     .call(() => {
       document.getElementById('publishAiGenBtn').textContent = '⏳ AI生成中...';
       document.getElementById('publishAiGenBtn').style.opacity = '0.7';
       document.getElementById('publishFormArea').style.opacity = '0.5';
       document.getElementById('publishFormArea').style.pointerEvents = 'none';
       document.getElementById('publishAiArea').style.display = 'block';
-    }, [], 76)
+      VisualEmphasis.apply('#publishAiGenBtn', 'reset');
+    }, [], 50.3)
 
   // AI生成动画
-  masterTL.call(() => {
+  .call(() => {
     document.getElementById('publishAiText').textContent = '分析商品类别：教材...';
-    subtitleCtrl.show('🧠 **AI正在分析**商品信息...', { side: 'left', duration: 5000, pulse: true });
-  }, [], 76.5)
-    .call(() => { document.getElementById('publishAiText').textContent = '评估市场价格...'; }, [], 77.5)
-    .call(() => { document.getElementById('publishAiText').textContent = '生成卖点标签...'; }, [], 78.5)
-    .call(() => { document.getElementById('publishAiText').textContent = '优化商品描述...'; }, [], 79.5)
-    .to('#publishAiProgress', { width: '100%', duration: 2, ease: 'power1.inOut' }, 77.5);
+    subtitleCtrl.show('🧠 **AI分析中**...', { side: 'left', duration: 3000, pulse: true });
+  }, [], 50.8)
+    .call(() => { document.getElementById('publishAiText').textContent = '评估市场价格...'; }, [], 51.3)
+    .call(() => { document.getElementById('publishAiText').textContent = '生成卖点标签...'; }, [], 51.8)
+    .to('#publishAiProgress', { width: '100%', duration: 1.5, ease: 'power1.inOut' }, 51)
 
-  // 显示AI生成结果
-  masterTL.call(() => {
-    subtitleCtrl.show('✅ **AI生成完成**！查看预览', { side: 'right', duration: 4000 });
+  // 显示结果
+  .call(() => {
+    subtitleCtrl.show('✅ **生成完成**', { side: 'right', duration: 2000 });
     document.getElementById('publishAiArea').style.display = 'none';
     document.getElementById('publishPreviewArea').style.display = 'block';
-  }, [], 81)
+  }, [], 52.5)
 
-  // 价格可视化动画
-  masterTL.to('#publishPriceIndicator', { left: '55%', duration: 0.8 }, 82)
-    // 成交概率环形图
-    .to({ val: 0 }, {
-      val: 85,
-      duration: 1,
-      onUpdate: function() {
-        const v = Math.round(this.targets()[0].val);
-        document.getElementById('publishRingVal').textContent = v + '%';
-        document.getElementById('publishRingChart').style.background =
-          `conic-gradient(var(--success) 0%, var(--success) ${v}%, var(--border) ${v}%)`;
-      }
-    }, 82.5);
-
-  // 编辑标题
-  masterTL.call(() => subtitleCtrl.show('✏️ 点击编辑，**微调标题**', { side: 'left', duration: 3500 }), [], 84)
-    .add(cursor.click('#publishEditBtn', { moveDuration: 0.4 }), 84)
-    .call(() => {
-      const titleEl = document.getElementById('publishPreviewTitle');
-      titleEl.textContent = '管理学原理教材 第7版 | 笔记详细';
-      showToast('✏️ 标题已更新');
-    }, [], 84.4)
+  // 价格可视化 + 成交概率
+  .to('#publishPriceIndicator', { left: '55%', duration: 0.6 }, 53)
+    .to({ val: 0 }, { val: 85, duration: 0.8, onUpdate: function() {
+      const v = Math.round(this.targets()[0].val);
+      document.getElementById('publishRingVal').textContent = v + '%';
+      document.getElementById('publishRingChart').style.background = `conic-gradient(var(--success) 0%, var(--success) ${v}%, var(--border) ${v}%)`;
+    }}, 53.2)
 
   // 发布
-  masterTL.call(() => subtitleCtrl.show('🚀 点击"直接发布"，商品**即刻上架**', { side: 'right', duration: 3500 }), [], 86)
-    .add(cursor.click('#publishFinalBtn', { moveDuration: 0.5 }), 86)
+  .call(() => subtitleCtrl.show('🚀 **直接发布**', { side: 'left', duration: 2000 }), [], 54)
+    .add(cursor.click('#publishFinalBtn', { moveDuration: 0.5 }), 54)
     .call(() => {
       showToast('🚀 发布成功！商品已上架');
-      subtitleCtrl.show('🎉 **发布成功**！即将跳转到卖家助手页面', { side: 'left', duration: 3000, pulse: true });
-    }, [], 86.5)
-    .to({}, { duration: 1.5 }, 86.5);
+      subtitleCtrl.show('🎉 **发布成功**', { side: 'right', duration: 2000, pulse: true });
+    }, [], 54.5)
+    .to({}, { duration: 0.8 }, 54.5);
 
-  masterTL.addLabel('publish-end', 90);
+  masterTL.addLabel('publish-end', 56);
 
-  // ===== 场景6：卖家助手 (90-105s) =====
-  masterTL.addLabel('seller-start', 90);
+  // ===== 场景6：卖家助手 (56-66s) =====
+  masterTL.addLabel('seller-start', 56);
 
   masterTL.call(() => {
     switchToScene('seller');
-    subtitleCtrl.show('📊 卖家助手 - **管理你的商品与交易**', { side: 'right', duration: 4000, pulse: true });
-  }, [], 90);
+    VisualEmphasis.focusPhone('seller');
+    subtitleCtrl.show('📊 **卖家助手**', { side: 'left', duration: 2000, pulse: true });
+  }, [], 56)
+    .to({}, { duration: 0.3 }, 56)
 
   // 数据数字滚动
-  masterTL.call(() => subtitleCtrl.show('📈 **数据概览**实时更新', { side: 'left', duration: 4000 }), [], 91)
-    .to({ val: 0 }, {
-      val: 1,
-      duration: 0.8,
-      onUpdate: function() {
-        document.getElementById('sellerStat1').textContent = Math.round(this.targets()[0].val);
-      }
-    }, 91)
-    .to({ val: 0 }, {
-      val: 128,
-      duration: 0.8,
-      onUpdate: function() {
-        document.getElementById('sellerStat2').textContent = Math.round(this.targets()[0].val);
-      }
-    }, 91.3)
-    .to({ val: 0 }, {
-      val: 5,
-      duration: 0.8,
-      onUpdate: function() {
-        document.getElementById('sellerStat3').textContent = Math.round(this.targets()[0].val);
-      }
-    }, 91.6)
-    .to({ val: 0 }, {
-      val: 8,
-      duration: 0.8,
-      onUpdate: function() {
-        document.getElementById('sellerStat4').textContent = Math.round(this.targets()[0].val);
-      }
-    }, 91.9);
+  .call(() => subtitleCtrl.show('📈 **数据概览**', { side: 'right', duration: 2000 }), [], 56.8)
+    .to({ val: 0 }, { val: 1, duration: 0.6, onUpdate: function() { document.getElementById('sellerStat1').textContent = Math.round(this.targets()[0].val); } }, 56.8)
+    .to({ val: 0 }, { val: 128, duration: 0.6, onUpdate: function() { document.getElementById('sellerStat2').textContent = Math.round(this.targets()[0].val); } }, 57.1)
+    .to({ val: 0 }, { val: 5, duration: 0.6, onUpdate: function() { document.getElementById('sellerStat3').textContent = Math.round(this.targets()[0].val); } }, 57.4)
+    .to({ val: 0 }, { val: 8, duration: 0.6, onUpdate: function() { document.getElementById('sellerStat4').textContent = Math.round(this.targets()[0].val); } }, 57.7)
+    .to({}, { duration: 0.3 }, 57.7)
 
   // 展开商品详情
-  masterTL.call(() => subtitleCtrl.show('📦 点击展开**商品表现数据**', { side: 'right', duration: 4000 }), [], 93)
-    .add(cursor.click('#sellerProductItem', { moveDuration: 0.5 }), 93)
+  .call(() => subtitleCtrl.show('📦 **商品表现数据**', { side: 'left', duration: 2200 }), [], 58.5)
+    .add(cursor.click('#sellerProductItem', { moveDuration: 0.5 }), 58.5)
     .call(() => {
       document.getElementById('sellerProductDetail').style.display = 'block';
       gsap.to('#sellerViewBar', { width: '65%', duration: 0.5 });
       gsap.to('#sellerInquiryBar', { width: '30%', duration: 0.5 });
       gsap.to('#sellerFavBar', { width: '15%', duration: 0.5 });
-      document.getElementById('sellerAiTip').textContent = '💡 AI建议：咨询率偏低，建议优化价格至¥22，预计咨询率可提升至5.2%';
-    }, [], 93.5)
-    .to({}, { duration: 1.5 }, 93.5)
-
-  // 发布新商品
-  masterTL.call(() => subtitleCtrl.show('✨ "发布新商品"按钮', { side: 'left', duration: 3500 }), [], 96)
-    .add(cursor.moveTo('#sellerNewProductBtn', 0.5), 96)
-    .to({}, { duration: 1 }, 96.5)
+      document.getElementById('sellerAiTip').textContent = '💡 AI建议：优化价格至¥22，预计咨询率可提升至5.2%';
+    }, [], 59)
+    .to({}, { duration: 1.2 }, 59)
 
   // 快捷回复
-  masterTL.call(() => subtitleCtrl.show('💬 点击**快捷回复**工具', { side: 'right', duration: 3500 }), [], 98)
-    .add(cursor.click('#sellerQuickReplyCard', { moveDuration: 0.5 }), 98)
-    .call(() => {
-      document.getElementById('sellerQuickReplyPanel').style.display = 'block';
-    }, [], 98.5)
-    .to({}, { duration: 0.5 }, 98.5)
+  .call(() => subtitleCtrl.show('💬 **快捷回复**', { side: 'right', duration: 2000 }), [], 60.5)
+    .add(cursor.click('#sellerQuickReplyCard', { moveDuration: 0.5 }), 60.5)
+    .call(() => { document.getElementById('sellerQuickReplyPanel').style.display = 'block'; }, [], 61)
+    .to({}, { duration: 0.4 }, 61)
 
-  // 点击"还在吗？"
-  masterTL.call(() => subtitleCtrl.show('🤖 AI一键生成**常用问答**回复', { side: 'left', duration: 4000 }), [], 99.5)
-    .add(cursor.click('#sellerQuickReplyPanel .quick-reply-btn[data-q="还在吗？"]', { moveDuration: 0.4 }), 99.5)
+  // AI生成回复
+  .call(() => subtitleCtrl.show('🤖 **AI生成回复**', { side: 'left', duration: 2200 }), [], 61.8)
+    .add(cursor.click('#sellerQuickReplyPanel .quick-reply-btn[data-q="还在吗？"]', { moveDuration: 0.4 }), 61.8)
     .call(() => {
       const answer = document.getElementById('sellerQuickReplyAnswer');
       answer.style.display = 'block';
       answer.textContent = '✅ AI回复：还在的，同学！随时可以联系交易，支持北区宿舍区面交~';
-    }, [], 99.9)
+    }, [], 62.2)
 
   // 价格优化
-  masterTL.call(() => subtitleCtrl.show('💰 查看**AI价格优化**建议', { side: 'right', duration: 4000 }), [], 102)
-    .add(cursor.click('#sellerPriceCard', { moveDuration: 0.5 }), 102)
+  .call(() => subtitleCtrl.show('💰 **价格优化建议**', { side: 'right', duration: 2200 }), [], 63.5)
+    .add(cursor.click('#sellerPriceCard', { moveDuration: 0.5 }), 63.5)
     .call(() => {
       document.getElementById('sellerPriceAdvice').style.display = 'block';
-    }, [], 102.5)
-    .to({}, { duration: 1 }, 102.5)
+      VisualEmphasis.apply('#sellerPriceAdvice', 'pulse');
+    }, [], 64)
+    .to({}, { duration: 0.6 }, 64)
 
   // 结束
-  masterTL.call(() => {
-    subtitleCtrl.show('🎉 **演示完成**！感谢观看校易配交互动画Demo', { side: 'left', duration: 5000, pulse: true });
+  .call(() => {
+    subtitleCtrl.show('🎉 **演示完成**！感谢观看', { side: 'left', duration: 4000, pulse: true });
     showToast('🎉 动画演示结束 — 感谢观看！');
-  }, [], 104.5);
+  }, [], 65.5);
 
-  masterTL.addLabel('seller-end', 105);
+  masterTL.addLabel('seller-end', 66);
 
   // 更新进度条
   masterTL.eventCallback('onUpdate', () => {
@@ -2693,7 +2722,7 @@ document.addEventListener('DOMContentLoaded', () => {
   console.log('🚀 校易配 - 交互式动画演示Demo 初始化完成');
   console.log('   📋 6幕场景：启动 → 首页 → 匹配 → 详情 → 发布 → 卖家');
   console.log('   ⌨️  快捷键：空格=暂停 | →=下一幕 | ←=上一幕 | R=重播');
-  console.log('   ⏱ 总时长：≈105秒');
+  console.log('   ⏱ 总时长：≈66秒（精简节奏版）');
 });
 </script>
 
