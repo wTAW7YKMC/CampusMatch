@@ -451,7 +451,14 @@
       transform: translateX(-50%);
       flex-direction: row; align-items: flex-end; gap: 14px;
     }
+    .caption.center {
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      flex-direction: column; align-items: center; gap: 14px;
+    }
     .caption.top .kw, .caption.bottom .kw { transform-origin: center top; }
+    .caption.center .kw { transform-origin: center center; }
+
     .kw {
       display: inline-flex;
       align-items: center;
@@ -662,7 +669,31 @@
     .typing-cursor { display: inline-block; width: 2px; height: 1em; background: var(--neon-violet); margin-left: 2px; animation: blink 1s step-end infinite; vertical-align: middle; }
 
     /* =========================
-       Scene 04: 匹配页
+       Scene 04: 校园心愿池
+       ========================= */
+    .scene-04 { background: var(--dark-base); }
+    .wish-header { position: absolute; top: 58px; left: 0; right: 0; text-align: center; z-index: 50; }
+    .wish-title { font-size: 18px; font-weight: 700; color: var(--paper-white); }
+    .wish-sub { font-size: 13px; color: var(--paper-60); margin-top: 4px; }
+    .wish-body { position: absolute; top: 120px; left: 20px; right: 20px; bottom: 84px; overflow: hidden; }
+    .wish-form { padding: 16px; margin-bottom: 14px; }
+    .wish-input { width: 100%; background: #f7f8fc; border-radius: 12px; padding: 12px; font-size: 13px; color: var(--text); border: none; margin-bottom: 10px; font-family: inherit; }
+    .wish-input.second { opacity: 0.8; }
+    .wish-btn { width: 100%; height: 42px; border-radius: 16px; background: linear-gradient(135deg, #8B5CF6, #EC4899); color: #fff; font-size: 14px; font-weight: 700; display: grid; place-items: center; box-shadow: 0 0 10px rgba(236,72,153,0.4); }
+    .wish-card { padding: 16px; margin-bottom: 12px; opacity: 0; transform: translateY(20px); }
+    .wish-card.in { animation: wishIn 0.6s var(--expo) forwards; }
+    @keyframes wishIn { to { opacity: 1; transform: translateY(0); } }
+    .wish-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .wish-name { font-size: 16px; font-weight: 700; color: var(--neon-violet); }
+    .wish-count { font-size: 12px; color: var(--neon-pink); font-weight: 600; }
+    .wish-muted { font-size: 12px; color: var(--text); opacity: 0.6; margin-bottom: 8px; }
+    .wish-tip { font-size: 12px; color: var(--neon-cyan); margin-bottom: 10px; }
+    .wish-go { height: 34px; display: grid; place-items: center; background: transparent; color: var(--neon-cyan); border: 1.5px solid var(--neon-cyan); border-radius: 14px; font-size: 12px; box-shadow: 0 0 8px rgba(6,182,212,0.25); }
+    .trend-row { display: flex; gap: 8px; margin-top: 10px; }
+    .trend-tag { padding: 4px 10px; border-radius: 10px; background: rgba(139,92,246,0.1); color: var(--neon-violet); font-size: 11px; }
+
+    /* =========================
+       Scene 05: 智能匹配页
        ========================= */
     .scene-04 { background: linear-gradient(180deg, #1A1025 0%, #0F0A1A 100%); }
     .match-header {
@@ -700,69 +731,89 @@
     @keyframes bubbleIn { to { opacity: 1; transform: translateY(0); } }
 
     /* =========================
-       Scene 05: 多边交换可视化
+       Scene 06: 多边交换挑战局
        ========================= */
-    .scene-05 { background: var(--dark-base); display: flex; align-items: center; justify-content: center; }
-    .poly-title { position: absolute; top: 70px; left: 0; right: 0; text-align: center; color: #fff; z-index: 10; }
-    .poly-title-main { font-size: 18px; font-weight: 700; }
-    .poly-sub { font-size: 13px; color: var(--paper-60); font-weight: 400; margin-top: 4px; }
-    .poly-svg { width: 340px; height: 340px; overflow: visible; }
+    .scene-06 { background: var(--dark-base); display: flex; align-items: center; justify-content: center; }
+    .chain-title { position: absolute; top: 70px; left: 0; right: 0; text-align: center; color: #fff; z-index: 10; }
+    .chain-title-main { font-size: 18px; font-weight: 700; }
+    .chain-sub { font-size: 13px; color: var(--paper-60); font-weight: 400; margin-top: 4px; }
+    .chain-card { position: absolute; top: 120px; left: 20px; right: 20px; padding: 20px; background: linear-gradient(135deg, #F5F0EB 0%, #EDE6DE 100%); border-radius: 24px; box-shadow: 0 14px 40px rgba(0,0,0,0.08); opacity: 0; transform: translateY(30px); }
+    .chain-card.in { animation: chainIn 0.7s var(--expo) forwards; }
+    @keyframes chainIn { to { opacity: 1; transform: translateY(0); } }
+    .chain-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .chain-name { font-size: 16px; font-weight: 700; color: var(--neon-violet); }
+    .chain-score { font-size: 18px; font-weight: 700; color: var(--neon-pink); }
+    .chain-reason { font-size: 12px; color: var(--text); opacity: 0.8; margin-bottom: 14px; line-height: 1.5; }
+    .chain-nodes { display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 14px; }
+    .chain-node { text-align: center; }
+    .chain-avatar { width: 46px; height: 46px; border-radius: 50%; background: linear-gradient(135deg, var(--neon-violet), var(--neon-pink)); display: grid; place-items: center; font-size: 22px; color: #fff; margin: 0 auto 6px; box-shadow: 0 0 10px rgba(139,92,246,0.4); }
+    .chain-user { font-size: 12px; font-weight: 700; color: var(--text); }
+    .chain-item { font-size: 10px; color: var(--text); opacity: 0.6; }
+    .chain-arrow { font-size: 20px; color: var(--neon-cyan); }
+    .chain-reward { font-size: 12px; color: var(--neon-cyan); margin-bottom: 12px; text-align: center; }
+    .chain-join { height: 40px; display: grid; place-items: center; background: linear-gradient(135deg, #8B5CF6, #EC4899); color: #fff; border-radius: 16px; font-size: 14px; font-weight: 700; box-shadow: 0 0 10px rgba(236,72,153,0.4); }
+    .poly-svg { width: 340px; height: 340px; overflow: visible; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); opacity: 0.25; }
     .poly-line { fill: none; stroke: rgba(139,92,246,0.55); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 600; stroke-dashoffset: 600; }
     .poly-node { fill: var(--dark-base); stroke: rgba(139,92,246,0.8); stroke-width: 2; filter: drop-shadow(0 0 12px rgba(139,92,246,0.35)); transform-origin: center; animation: nodePulse 2.5s ease-in-out infinite; }
-    .poly-node:nth-child(2) { animation-delay: 0s; } .poly-node:nth-child(4) { animation-delay: 0.8s; } .poly-node:nth-child(6) { animation-delay: 1.6s; }
     @keyframes nodePulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); } }
-    .node-label { font-size: 13px; fill: #fff; font-weight: 600; text-anchor: middle; dominant-baseline: middle; }
-    .node-item { font-size: 10px; fill: var(--paper-60); text-anchor: middle; dominant-baseline: middle; }
-    .node-avatar { font-size: 26px; text-anchor: middle; dominant-baseline: middle; }
 
     /* =========================
-       Scene 06: 信任机制页
+       Scene 07: 学生认证页
        ========================= */
-    .scene-06 { background: var(--dark-base); }
+    .scene-07 { background: var(--dark-base); }
     .trust-header { position: absolute; top: 58px; left: 0; right: 0; text-align: center; z-index: 50; }
     .trust-title { font-size: 18px; font-weight: 700; color: var(--paper-white); }
     .trust-sub { font-size: 13px; color: var(--paper-60); margin-top: 4px; }
-    .trust-card {
-      position: absolute; top: 130px; left: 20px; right: 20px;
-      background: linear-gradient(135deg, #F5F0EB 0%, #EDE6DE 100%);
-      border-radius: 28px; padding: 24px;
-      box-shadow: 0 14px 40px rgba(0,0,0,0.08); text-align: center;
-      opacity: 0; transform: translateY(40px);
-    }
+    .trust-card { position: absolute; top: 130px; left: 20px; right: 20px; background: linear-gradient(135deg, #F5F0EB 0%, #EDE6DE 100%); border-radius: 28px; padding: 24px; box-shadow: 0 14px 40px rgba(0,0,0,0.08); text-align: center; opacity: 0; transform: translateY(40px); }
     .trust-card.in { animation: trustIn 0.8s var(--expo) forwards; }
     @keyframes trustIn { to { opacity: 1; transform: translateY(0); } }
-    .trust-badge {
-      display: inline-flex; align-items: center; gap: 6px;
-      padding: 8px 16px; border-radius: 20px;
-      background: rgba(52,199,89,0.1); color: var(--success);
-      font-size: 13px; font-weight: 600; margin-bottom: 20px;
-      opacity: 0; transform: translateX(-20px); animation: slideRight 0.6s var(--expo) 0.4s forwards;
-    }
+    .trust-badge { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 20px; background: rgba(52,199,89,0.1); color: var(--success); font-size: 13px; font-weight: 600; margin-bottom: 20px; opacity: 0; transform: translateX(-20px); animation: slideRight 0.6s var(--expo) 0.4s forwards; }
     @keyframes slideRight { to { opacity: 1; transform: translateX(0); } }
+    .auth-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; font-size: 14px; color: var(--text); border-bottom: 1px solid rgba(0,0,0,0.06); }
+    .auth-row:last-child { border-bottom: none; }
+    .auth-badge { padding: 4px 10px; border-radius: 10px; background: rgba(52,199,89,0.12); color: var(--success); font-size: 12px; font-weight: 600; }
     .score-ring-wrap { position: relative; width: 150px; height: 150px; margin: 0 auto 18px; }
     .score-ring-svg { width: 100%; height: 100%; transform: rotate(-90deg); }
     .score-ring-track { fill: none; stroke: rgba(0,0,0,0.1); stroke-width: 12; }
     .score-ring-fill { fill: none; stroke: var(--neon-violet); stroke-width: 12; stroke-linecap: round; stroke-dasharray: 471; stroke-dashoffset: 471; }
-    .score-ring-fill.draw { transition: stroke-dashoffset 1.4s var(--expo); stroke-dashoffset: 37; }
+    .score-ring-fill.draw { transition: stroke-dashoffset 1.4s var(--expo); stroke-dashoffset: 24; }
     .score-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; }
     .score-big { font-size: 44px; font-weight: 700; color: var(--text); line-height: 1; }
     .score-small { font-size: 12px; color: var(--text); opacity: 0.6; margin-top: 4px; }
-    .trust-stars { display: flex; justify-content: center; gap: 8px; margin-bottom: 16px; }
-    .star { font-size: 24px; color: #E5E5EA; opacity: 0; transform: scale(0.4); }
-    .star.lit { color: #FFB800; animation: starLit 0.4s var(--back) forwards; }
-    @keyframes starLit { to { opacity: 1; transform: scale(1); } }
-    .trust-row { display: flex; justify-content: space-around; }
-    .trust-item { text-align: center; }
-    .trust-item-num { font-size: 18px; font-weight: 700; color: var(--text); }
-    .trust-item-label { font-size: 11px; color: var(--text); opacity: 0.6; margin-top: 4px; }
 
     /* =========================
-       Scene 07: 交换成功页
+       Scene 08: 消息协商页
        ========================= */
-    .scene-07 { background: var(--dark-base); }
+    .scene-08 { background: var(--dark-base); }
+    .msg-header { position: absolute; top: 58px; left: 0; right: 0; text-align: center; z-index: 50; }
+    .msg-title { font-size: 18px; font-weight: 700; color: var(--paper-white); }
+    .msg-sub { font-size: 13px; color: var(--paper-60); margin-top: 4px; }
+    .msg-body { position: absolute; top: 120px; left: 20px; right: 20px; bottom: 84px; overflow: hidden; }
+    .notice-card { padding: 14px; margin-bottom: 12px; opacity: 0; transform: translateX(-20px); }
+    .notice-card.in { animation: noticeIn 0.5s var(--expo) forwards; }
+    @keyframes noticeIn { to { opacity: 1; transform: translateX(0); } }
+    .notice-title { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+    .notice-title .icon { margin-right: 6px; }
+    .notice-desc { font-size: 12px; color: var(--text); opacity: 0.7; line-height: 1.5; }
+    .notice-time { font-size: 10px; color: var(--text); opacity: 0.5; margin-top: 6px; }
+    .chat-card { padding: 16px; }
+    .chat-card-head { font-size: 14px; font-weight: 700; color: var(--neon-violet); margin-bottom: 12px; }
+    .chat-bubbles { display: flex; flex-direction: column; gap: 10px; }
+    .bubble { max-width: 80%; padding: 10px 14px; border-radius: 16px; font-size: 13px; line-height: 1.5; opacity: 0; transform: translateY(10px); }
+    .bubble.in { animation: bubbleIn 0.5s var(--expo) forwards; }
+    .bubble.left { align-self: flex-start; background: #f0f0f5; color: var(--text); border-bottom-left-radius: 4px; }
+    .bubble.right { align-self: flex-end; background: linear-gradient(135deg, #8B5CF6, #EC4899); color: #fff; border-bottom-right-radius: 4px; }
+    @keyframes bubbleIn { to { opacity: 1; transform: translateY(0); } }
+    .safe-point { margin-top: 12px; padding: 10px; border-radius: 12px; background: rgba(6,182,212,0.1); border: 1px solid var(--neon-cyan); color: var(--neon-cyan); font-size: 12px; text-align: center; opacity: 0; }
+    .safe-point.in { animation: fadeUp 0.5s var(--expo) forwards; }
+
+    /* =========================
+       Scene 09: 交换成功 + 个人中心
+       ========================= */
+    .scene-09 { background: var(--dark-base); }
     .success-wrap { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding-bottom: 60px; }
-    .success-circle { width: 130px; height: 130px; border-radius: 50%; background: rgba(52,199,89,0.1); display: grid; place-items: center; position: relative; margin-bottom: 22px; }
-    .success-check { width: 74px; height: 74px; }
+    .success-circle { width: 120px; height: 120px; border-radius: 50%; background: rgba(52,199,89,0.1); display: grid; place-items: center; position: relative; margin-bottom: 22px; }
+    .success-check { width: 64px; height: 64px; }
     .success-check path { fill: none; stroke: var(--success); stroke-width: 6; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 100; stroke-dashoffset: 100; }
     .success-check.spring path { animation: checkSpring 0.7s var(--back) forwards; }
     @keyframes checkSpring { to { stroke-dashoffset: 0; } }
@@ -770,25 +821,77 @@
     .success-title.in { animation: fadeUp 0.6s var(--expo) 0.5s forwards; }
     .success-desc { font-size: 13px; color: var(--paper-60); margin-bottom: 24px; opacity: 0; }
     .success-desc.in { animation: fadeUp 0.6s var(--expo) 0.65s forwards; }
-    .review-cards { display: flex; gap: 12px; opacity: 0; transform: translateY(30px); }
-    .review-cards.in { animation: reviewIn 0.7s var(--expo) 0.9s forwards; }
-    @keyframes reviewIn { to { opacity: 1; transform: translateY(0); } }
-    .review-card { width: 140px; background: linear-gradient(135deg, #F5F0EB 0%, #EDE6DE 100%); border-radius: 20px; padding: 16px; text-align: center; }
-    .review-avatar { width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, var(--neon-violet), var(--neon-pink)); margin: 0 auto 10px; display: grid; place-items: center; font-size: 20px; color: #fff; }
-    .review-name { font-size: 13px; font-weight: 700; color: var(--text); }
-    .review-stars { font-size: 13px; color: #FFB800; margin-top: 6px; letter-spacing: 2px; }
-    .review-score { font-size: 12px; color: var(--text); opacity: 0.6; margin-top: 6px; }
-    .review-score span { color: var(--success); font-weight: 700; }
-    .final-logo { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.8); opacity: 0; pointer-events: none; text-align: center; }
-    .final-logo.show { animation: finalLogoIn 0.9s var(--expo) forwards; }
-    @keyframes finalLogoIn { to { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
-    .final-mark { width: 110px; height: 110px; border-radius: 26px; background: linear-gradient(135deg, var(--neon-violet) 0%, var(--neon-pink) 100%); display: grid; place-items: center; font-size: 52px; color: #fff; margin: 0 auto 14px; box-shadow: 0 20px 50px rgba(139,92,246,0.4); }
-    .final-name { font-size: 26px; font-weight: 700; color: var(--paper-white); letter-spacing: 0.12em; }
+    .profile-overlay { position: absolute; inset: 0; background: var(--dark-base); opacity: 0; pointer-events: none; transition: opacity 0.6s ease; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px; }
+    .profile-overlay.show { opacity: 1; pointer-events: auto; }
+    .profile-card { width: 100%; background: linear-gradient(135deg, #F5F0EB 0%, #EDE6DE 100%); border-radius: 28px; padding: 24px; text-align: center; box-shadow: 0 14px 40px rgba(0,0,0,0.08); }
+    .profile-avatar { width: 70px; height: 70px; border-radius: 50%; background: linear-gradient(135deg, var(--neon-violet), var(--neon-pink)); margin: 0 auto 12px; display: grid; place-items: center; font-size: 32px; color: #fff; box-shadow: 0 0 16px rgba(139,92,246,0.4); }
+    .profile-name { font-size: 20px; font-weight: 700; color: var(--text); }
+    .profile-meta { font-size: 12px; color: var(--text); opacity: 0.6; margin: 4px 0 14px; }
+    .profile-stats { display: flex; justify-content: space-around; margin-bottom: 16px; }
+    .profile-stat { text-align: center; }
+    .profile-stat-num { font-size: 22px; font-weight: 700; color: var(--neon-violet); }
+    .profile-stat-label { font-size: 11px; color: var(--text); opacity: 0.6; margin-top: 2px; }
+    .badge-list { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 16px; }
+    .fun-badge { padding: 4px 10px; border-radius: 10px; background: rgba(139,92,246,0.1); color: var(--neon-violet); font-size: 11px; }
+    .task-progress { text-align: left; }
+    .task-line { display: flex; justify-content: space-between; font-size: 12px; color: var(--text); margin-bottom: 6px; }
+    .task-bar { height: 6px; background: rgba(0,0,0,0.08); border-radius: 3px; overflow: hidden; }
+    .task-bar-inner { height: 100%; background: linear-gradient(90deg, var(--neon-violet), var(--neon-pink)); border-radius: 3px; }
+
+
+    /* =========================
+       Scene 10: 结尾落版
+       ========================= */
+    .scene-10 { background: radial-gradient(circle at 50% 45%, #1A1025 0%, #0F0A1A 70%); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+    .ending-wrap { position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 40px; }
+    .ending-logo {
+      width: 100px; height: 100px; border-radius: 28px;
+      background: linear-gradient(135deg, var(--neon-violet) 0%, var(--neon-pink) 100%);
+      display: grid; place-items: center; font-size: 48px; color: #fff;
+      margin-bottom: 28px; box-shadow: 0 20px 60px rgba(139,92,246,0.5), 0 0 40px rgba(236,72,153,0.35);
+      opacity: 0; transform: scale(0.5) rotate(-15deg);
+    }
+    .ending-logo.in { animation: logoReveal 0.9s var(--back) forwards; }
+    @keyframes logoReveal { to { opacity: 1; transform: scale(1) rotate(0deg); } }
+    .ending-title { font-size: 34px; font-weight: 700; color: #fff; letter-spacing: 0.08em; margin-bottom: 14px; opacity: 0; transform: translateY(20px); }
+    .ending-title.in { animation: fadeUp 0.7s var(--expo) 0.4s forwards; }
+    .ending-sub { font-size: 15px; color: var(--paper-60); margin-bottom: 34px; opacity: 0; transform: translateY(16px); }
+    .ending-sub.in { animation: fadeUp 0.7s var(--expo) 0.6s forwards; }
+    .ending-cta {
+      padding: 12px 32px; border-radius: 20px;
+      background: linear-gradient(135deg, var(--neon-violet), var(--neon-pink));
+      color: #fff; font-size: 15px; font-weight: 700;
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.2) inset, 0 8px 0 var(--neon-pink), 0 14px 28px rgba(236,72,153,0.4);
+      opacity: 0; transform: scale(0.9);
+    }
+    .ending-cta.in { animation: ctaPop 0.7s var(--back) 1s forwards; }
+    @keyframes ctaPop { 60% { opacity: 1; transform: scale(1.08); } 100% { opacity: 1; transform: scale(1); } }
+    .ending-loop { margin-top: 28px; font-size: 12px; color: var(--paper-60); opacity: 0; }
+    .ending-loop.in { animation: fadeIn 0.6s ease 1.6s forwards; }
+    .floating-item {
+      position: absolute; font-size: 28px; opacity: 0; pointer-events: none;
+      text-shadow: 0 0 18px rgba(139,92,246,0.6);
+    }
+    .floating-item.in { animation: floatUp 3.2s ease-out forwards; }
+    @keyframes floatUp {
+      0% { opacity: 0; transform: translateY(60px) scale(0.7) rotate(0deg); }
+      15% { opacity: 0.85; }
+      100% { opacity: 0; transform: translateY(-420px) scale(1.1) rotate(25deg); }
+    }
+    .ending-glow {
+      position: absolute; width: 500px; height: 500px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(139,92,246,0.18), transparent 60%);
+      top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.8);
+      animation: glowPulse 3s ease-in-out infinite;
+      pointer-events: none;
+    }
+    @keyframes glowPulse { 0%, 100% { opacity: 0.6; transform: translate(-50%, -50%) scale(0.8); } 50% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); } }
 
     /* =========================
        音频控制
        ========================= */
     .audio-control {
+
       position: absolute; right: 40px; bottom: 40px;
       width: 52px; height: 52px; border-radius: 50%;
       background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18);
@@ -904,8 +1007,24 @@
           </div>
         </section>
 
-        <!-- Scene 04: 匹配页 -->
+        <!-- Scene 04: 校园心愿池 -->
         <section class="scene scene-04" id="scene04">
+          <div class="wish-header">
+            <div class="wish-title">校园心愿池</div>
+            <div class="wish-sub">把“我想要”丢进池子，AI 反馈需求趋势</div>
+          </div>
+          <div class="wish-body" id="wishBody">
+            <div class="otaku-card wish-form">
+              <div class="wish-input" id="wishName">我想要：科学计算器</div>
+              <div class="wish-input second" id="wishCategory">类别：学习用品</div>
+              <div class="wish-btn">✨ 点亮心愿 +10 脑洞</div>
+            </div>
+            <div id="wishCards"></div>
+          </div>
+        </section>
+
+        <!-- Scene 05: 智能匹配页 -->
+        <section class="scene scene-05" id="scene05">
           <div class="match-header">
             <div class="match-title">智能匹配</div>
             <div class="match-sub">AI 正在为你寻找最佳交换对象</div>
@@ -949,39 +1068,46 @@
           </div>
         </section>
 
-        <!-- Scene 05: 多边交换可视化 -->
-        <section class="scene scene-05" id="scene05">
-          <div class="poly-title">
-            <div class="poly-title-main">多边交换挑战局</div>
-            <div class="poly-sub">A→B→C→A 的交换闭环</div>
+        <!-- Scene 06: 多边交换挑战局 -->
+        <section class="scene scene-06" id="scene06">
+          <div class="chain-title">
+            <div class="chain-title-main">多边交换挑战局</div>
+            <div class="chain-sub">A→B→C→A 的交换闭环</div>
           </div>
           <svg class="poly-svg" viewBox="0 0 340 340">
             <path class="poly-line" id="polyLineAB" d="M170 60 L280 230" />
             <path class="poly-line" id="polyLineBC" d="M280 230 L60 230" />
             <path class="poly-line" id="polyLineCA" d="M60 230 L170 60" />
             <circle class="poly-node" cx="170" cy="60" r="36" />
-            <text class="node-avatar" x="170" y="55">👩‍🎓</text>
-            <text class="node-label" x="170" y="72">Alice</text>
-            <text class="node-item" x="170" y="118">出：雨伞</text>
             <circle class="poly-node" cx="280" cy="230" r="36" />
-            <text class="node-avatar" x="280" y="225">👨‍🎓</text>
-            <text class="node-label" x="280" y="242">Bob</text>
-            <text class="node-item" x="280" y="288">出：计算器</text>
             <circle class="poly-node" cx="60" cy="230" r="36" />
-            <text class="node-avatar" x="60" y="225">🧑‍🎓</text>
-            <text class="node-label" x="60" y="242">Coco</text>
-            <text class="node-item" x="60" y="288">出：台灯</text>
           </svg>
+          <div class="chain-card" id="chainCard">
+            <div class="chain-head">
+              <div class="chain-name">雨伞 → 计算器 → 台灯</div>
+              <div class="chain-score">92%</div>
+            </div>
+            <div class="chain-reason">AI 发现：Alice 有雨伞想要台灯，Bob 有计算器想要雨伞，Coco 有台灯想要计算器，三方正好形成闭环。</div>
+            <div class="chain-nodes">
+              <div class="chain-node"><div class="chain-avatar">👩‍🎓</div><div class="chain-user">Alice</div><div class="chain-item">雨伞→台灯</div></div>
+              <div class="chain-arrow">→</div>
+              <div class="chain-node"><div class="chain-avatar">👨‍🎓</div><div class="chain-user">Bob</div><div class="chain-item">计算器→雨伞</div></div>
+              <div class="chain-arrow">→</div>
+              <div class="chain-node"><div class="chain-avatar">🧑‍🎓</div><div class="chain-user">Coco</div><div class="chain-item">台灯→计算器</div></div>
+            </div>
+            <div class="chain-reward">奖励：+20 脑洞值 / +15 闲置能量</div>
+            <div class="chain-join">开启挑战局</div>
+          </div>
         </section>
 
-        <!-- Scene 06: 信任机制页 -->
-        <section class="scene scene-06" id="scene06">
+        <!-- Scene 07: 学生认证页 -->
+        <section class="scene scene-07" id="scene07">
           <div class="trust-header">
-            <div class="trust-title">校园实名认证</div>
-            <div class="trust-sub">身份已核验，交换更安心</div>
+            <div class="trust-title">学生认证</div>
+            <div class="trust-sub">校园邮箱认证，交换更安心</div>
           </div>
           <div class="trust-card" id="trustCard">
-            <div class="trust-badge">✓ 已实名认证</div>
+            <div class="trust-badge">✓ 已认证大学生</div>
             <div class="score-ring-wrap">
               <svg class="score-ring-svg" viewBox="0 0 160 160">
                 <circle class="score-ring-track" cx="80" cy="80" r="75" />
@@ -992,19 +1118,38 @@
                 <div class="score-small">信用分</div>
               </div>
             </div>
-            <div class="trust-stars" id="trustStars">
-              <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span>
+            <div class="auth-row"><span>当前状态</span><span class="auth-badge">已认证</span></div>
+            <div class="auth-row"><span>认证方式</span><span>校园邮箱</span></div>
+            <div class="auth-row"><span>信用分</span><span class="auth-badge">95</span></div>
+          </div>
+        </section>
+
+        <!-- Scene 08: 消息协商页 -->
+        <section class="scene scene-08" id="scene08">
+          <div class="msg-header">
+            <div class="msg-title">消息中心</div>
+            <div class="msg-sub">提案、成功、奖励与聊天</div>
+          </div>
+          <div class="msg-body" id="msgBody">
+            <div class="otaku-card notice-card" id="noticeCard">
+              <div class="notice-title"><span class="icon">🎯</span>交换提案</div>
+              <div class="notice-desc">Alice 对你的「科学计算器」发起了交换请求，愿意用折叠雨伞交换。</div>
+              <div class="notice-time">2 分钟前</div>
             </div>
-            <div class="trust-row">
-              <div class="trust-item"><div class="trust-item-num">12</div><div class="trust-item-label">成功交换</div></div>
-              <div class="trust-item"><div class="trust-item-num">0</div><div class="trust-item-label">差评</div></div>
-              <div class="trust-item"><div class="trust-item-num">98%</div><div class="trust-item-label">好评率</div></div>
+            <div class="otaku-card chat-card">
+              <div class="chat-card-head">💬 与 Alice 协商中</div>
+              <div class="chat-bubbles" id="chatBubbles">
+                <div class="bubble left">你好，雨伞九成新，计算器功能都正常吗？</div>
+                <div class="bubble right">正常，考试周刚用过。可以图书馆门口面交吗？</div>
+                <div class="bubble left">可以，下午 4 点安全交易点见。</div>
+              </div>
+              <div class="safe-point" id="safePoint">📍 已推荐最近安全交易点：图书馆北门</div>
             </div>
           </div>
         </section>
 
-        <!-- Scene 07: 交换成功页 -->
-        <section class="scene scene-07" id="scene07">
+        <!-- Scene 09: 交换成功 + 个人中心 -->
+        <section class="scene scene-09" id="scene09">
           <div class="success-wrap" id="successWrap">
             <div class="success-circle">
               <svg class="success-check" viewBox="0 0 80 80">
@@ -1013,28 +1158,45 @@
             </div>
             <div class="success-title" id="successTitle">交换成功！</div>
             <div class="success-desc" id="successDesc">雨伞 ↔ 计算器 已达成匹配</div>
-            <div class="review-cards" id="reviewCards">
-              <div class="review-card">
-                <div class="review-avatar">👩‍🎓</div>
-                <div class="review-name">Alice</div>
-                <div class="review-stars">★★★★★</div>
-                <div class="review-score">信用 <span id="scoreA">92</span></div>
+          </div>
+          <div class="profile-overlay" id="profileOverlay">
+            <div class="profile-card">
+              <div class="profile-avatar">👩‍🎓</div>
+              <div class="profile-name">Alice</div>
+              <div class="profile-meta">商学院 · 大三 · 认证玩家</div>
+              <div class="profile-stats">
+                <div class="profile-stat"><div class="profile-stat-num" id="profileCredit">93</div><div class="profile-stat-label">信用分</div></div>
+                <div class="profile-stat"><div class="profile-stat-num" id="profileExchange">13</div><div class="profile-stat-label">交换次数</div></div>
+                <div class="profile-stat"><div class="profile-stat-num" id="profileBrain">126</div><div class="profile-stat-label">脑洞值</div></div>
               </div>
-              <div class="review-card">
-                <div class="review-avatar">👨‍🎓</div>
-                <div class="review-name">Bob</div>
-                <div class="review-stars">★★★★★</div>
-                <div class="review-score">信用 <span id="scoreB">92</span></div>
+              <div class="badge-list" id="profileBadges">
+                <span class="fun-badge">🌧 雨天守护</span>
+                <span class="fun-badge">📚 考试周救星</span>
+                <span class="fun-badge">🤝 靠谱交换者</span>
+              </div>
+              <div class="task-progress">
+                <div class="task-line"><span>任务：完成 3 次交换</span><span>2/3</span></div>
+                <div class="task-bar"><div class="task-bar-inner" style="width: 66%;"></div></div>
               </div>
             </div>
           </div>
-          <div class="final-logo" id="finalLogo">
-            <div class="final-mark">🔄</div>
-            <div class="final-name">校换</div>
+        </section>
+
+        <!-- Scene 10: 结尾落版 -->
+        <section class="scene scene-10" id="scene10">
+          <div class="ending-glow"></div>
+          <div class="ending-wrap" id="endingWrap">
+            <div class="ending-logo" id="endingLogo">🔄</div>
+            <div class="ending-title" id="endingTitle">CampusSwap</div>
+            <div class="ending-sub" id="endingSub">让闲置流动，让故事继续</div>
+            <div class="ending-cta" id="endingCta">✨ 立即加入校园交换</div>
+            <div class="ending-loop" id="endingLoop">演示结束 · 即将重新播放</div>
           </div>
+          <div id="floatLayer"></div>
         </section>
       </div>
     </div>
+
 
     <div class="caption" id="caption"></div>
     <div id="progressTrack">
@@ -1123,18 +1285,23 @@
        ========================= */
     const scenes = $$('.scene');
     const captions = [
-      { pos: 'right', anim: 'pop', texts: ['校园闲置交换平台'] },
-      { pos: 'left', anim: 'blinds', texts: ['交换广场', '看看同校都在换什么'] },
-      { pos: 'right', anim: 'rotate', texts: ['AI 发布助手', '一句话挂上闲置'] },
-      { pos: 'left', anim: 'pop', texts: ['AI 智能匹配', '87% 匹配度'] },
-      { pos: 'top', anim: 'blinds', texts: ['多边交换', '三角闭环撮合'] },
-      { pos: 'left', anim: 'rotate', texts: ['校园实名认证', '信用分 92'] },
-      { pos: 'bottom', anim: 'elastic', texts: ['交换成功', '闲置变有用'] }
+      { pos: 'right', anim: 'pop', texts: ['校园闲置交换平台', '让闲置重新流动'] },
+      { pos: 'left', anim: 'blinds', texts: ['交换广场', 'AI 正在派单'] },
+      { pos: 'right', anim: 'rotate', texts: ['AI 发布助手', '一句话生成交换卡'] },
+      { pos: 'left', anim: 'elastic', texts: ['校园心愿池', 'AI 捕捉需求趋势'] },
+      { pos: 'left', anim: 'pop', texts: ['智能匹配', '87% 高匹配度'] },
+      { pos: 'top', anim: 'blinds', texts: ['多边交换挑战局', 'A→B→C→A 闭环'] },
+      { pos: 'left', anim: 'rotate', texts: ['学生认证', '信用分 95'] },
+      { pos: 'right', anim: 'slide', texts: ['消息协商', '安全交易点'] },
+      { pos: 'bottom', anim: 'elastic', texts: ['交换成功', '信用 + 徽章 + 任务'] },
+      { pos: 'center', anim: 'pop', texts: [] }
+
     ];
-    const sceneDurations = [0, 5000, 6000, 8000, 8000, 6000, 6000]; // 每个 Scene 内容展示时长（ms）
-    const sceneTimes = [0, 5000, 11600, 20200, 28800, 35400, 42000]; // 对应加速后的总时间轴，用于拖拽跳转
-    const totalTime = 48000;
-    const sceneTransitions = [null, 'push', 'push', 'push', 'dissolve', 'flip', 'scaleblur'];
+    const sceneDurations = [0, 4000, 6000, 7000, 5000, 7000, 6000, 5000, 5000, 6000, 5000]; // 每个 Scene 内容展示时长（ms）
+    const sceneTimes = [0, 4000, 10600, 18200, 24200, 32200, 38800, 44800, 50800, 57400, 63400]; // 对应加速后的总时间轴，用于拖拽跳转
+    const totalTime = 63400;
+    const sceneTransitions = [null, 'push', 'push', 'push', 'dissolve', 'push', 'flip', 'push', 'scaleblur', 'scaleblur', 'scaleblur'];
+
     function resetScenes() {
       scenes.forEach(s => {
         s.classList.remove('active', 'push-enter', 'push-leave', 'dissolve-enter', 'dissolve-leave', 'flip-enter', 'flip-leave', 'scaleblur-enter', 'scaleblur-leave');
@@ -1172,7 +1339,8 @@
       kws.forEach(el => { el.classList.remove('in'); el.classList.add('out'); });
       setTimeout(() => { container.innerHTML = ''; }, 550);
     }
-    function timeToScene(ms) { return Math.min(Math.floor((ms / totalTime) * 7), 6) + 1; }
+    function timeToScene(ms) { return Math.min(Math.floor((ms / totalTime) * 10), 9) + 1; }
+
     function formatTime(ms) { const s = Math.floor(ms / 1000); const m = Math.floor(s / 60); const sec = s % 60; return `${m}:${String(sec).padStart(2, '0')}`; }
 
     /* Scene 01 */
@@ -1226,10 +1394,10 @@
       const fillTexts = ['折叠雨伞', '科学计算器', '九成新，轻便防晒两用'];
       for (let i = 0; i < inputs.length; i++) {
         const el = $(inputs[i]); el.textContent = '';
-        for (let c of fillTexts[i]) { el.textContent += c; await wait(60 + Math.random() * 40); }
-        await wait(300);
+        for (let c of fillTexts[i]) { el.textContent += c; await wait(55 + Math.random() * 35); }
+        await wait(250);
       }
-      await wait(300);
+      await wait(250);
       const card = document.createElement('div'); card.className = 'ai-card'; card.innerHTML = `
         <div class="ai-card-head">
           <div><div class="ai-title">AI 交换卡已生成</div><div class="ai-subtitle">稀有度 SSR · 脑洞分 92 · 匹配 91%</div></div>
@@ -1237,11 +1405,35 @@
         </div>
         <div class="ai-tags"><span class="ai-tag">防晒</span><span class="ai-tag">便携</span><span class="ai-tag">考试必备</span></div>
         <div class="ai-reason">AI 推荐理由：雨伞与计算器在校园场景下互补性强，雨天通勤与考试周需求高度匹配，建议立即交换。</div>
+        <div class="suggest-box" style="margin-top:10px;padding:10px;background:rgba(139,92,246,0.08);border-radius:10px;">
+          <div style="font-size:11px;font-weight:700;color:var(--neon-violet);margin-bottom:6px;">可接受替代品</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;"><span class="ai-tag">错题本</span><span class="ai-tag">草稿纸</span><span class="ai-tag">便利贴</span></div>
+        </div>
+        <div class="quest" style="margin-top:10px;font-size:12px;color:var(--neon-pink);font-weight:600;">🎯 任务：7 天内完成交换，额外 +15 脑洞值</div>
       `; result.appendChild(card);
     }
 
-    /* Scene 04 */
-    function runScene04Match() {
+    /* Scene 04: 校园心愿池 */
+    function setupScene04Wish() {
+      const wishes = [
+        { name: '科学计算器', count: 24, category: '学习用品', tag: '考试周', trend: '热度 ↑ 38%' },
+        { name: '折叠雨伞', count: 18, category: '生活用品', tag: '雨季', trend: '热度 ↑ 22%' },
+        { name: '拍立得', count: 12, category: '数码', tag: '毕业季', trend: '热度 → 平稳' }
+      ];
+      $('#wishCards').innerHTML = wishes.map((w, i) => `
+        <div class="otaku-card wish-card" style="animation-delay:${i * 0.15}s;">
+          <div class="wish-head"><div class="wish-name">${w.name}</div><div class="wish-count">${w.count} 人想要</div></div>
+          <div class="wish-muted">${w.category} · ${w.tag} · ${w.trend}</div>
+          <div class="wish-tip">如果你有相关闲置，现在发布更容易被匹配。</div>
+          <div class="wish-go">我要换这个</div>
+          <div class="trend-row"><span class="trend-tag">AI 推荐</span><span class="trend-tag">同校需求</span></div>
+        </div>
+      `).join('');
+    }
+    function runScene04Wish() { $$('.wish-card').forEach((c, i) => { setTimeout(() => c.classList.add('in'), i * 120); }); }
+
+    /* Scene 05: 智能匹配 */
+    function runScene05Match() {
       $('#matchCard1').classList.add('in'); setTimeout(() => $('#matchCard2').classList.add('in'), 180);
       setTimeout(() => $$('.score-num').forEach(el => animateNumber(el, +el.dataset.target, 1400)), 600);
       setTimeout(() => $('#matchAction').classList.add('in'), 1200);
@@ -1252,38 +1444,71 @@
       requestAnimationFrame(frame);
     }
 
-    /* Scene 05 */
-    function runScene05Poly() {
+    /* Scene 06: 多边交换挑战局 */
+    function runScene06Chain() {
+      $('#chainCard').classList.add('in');
       ['#polyLineAB', '#polyLineBC', '#polyLineCA'].forEach((sel, i) => {
         const path = $(sel); const len = path.getTotalLength();
         path.style.strokeDasharray = len; path.style.strokeDashoffset = len; path.style.transition = 'none';
         void path.getBoundingClientRect();
-        setTimeout(() => { path.style.transition = `stroke-dashoffset 1.4s var(--expo)`; path.style.strokeDashoffset = '0'; }, i * 1200);
+        setTimeout(() => { path.style.transition = `stroke-dashoffset 1.2s var(--expo)`; path.style.strokeDashoffset = '0'; }, 400 + i * 900);
       });
     }
 
-    /* Scene 06 */
-    function runScene06Trust() {
+    /* Scene 07: 学生认证 */
+    function runScene07Trust() {
       $('#trustCard').classList.add('in');
-      setTimeout(() => { $('#scoreRing').classList.add('draw'); animateNumber($('#scoreNum'), 92, 1500); }, 700);
-      $$('#trustStars .star').forEach((s, i) => { setTimeout(() => s.classList.add('lit'), 1400 + i * 120); });
+      setTimeout(() => { $('#scoreRing').classList.add('draw'); animateNumber($('#scoreNum'), 95, 1500); }, 700);
     }
 
-    /* Scene 07 */
-    function runScene07Success() {
-      $('.success-check').classList.add('spring'); $('#successTitle').classList.add('in'); $('#successDesc').classList.add('in'); $('#reviewCards').classList.add('in'); playSuccessSfx();
+    /* Scene 08: 消息协商 */
+    function runScene08Messages() {
+      $('#noticeCard').classList.add('in');
+      $$('#chatBubbles .bubble').forEach((b, i) => { setTimeout(() => b.classList.add('in'), 400 + i * 450); });
+      setTimeout(() => $('#safePoint').classList.add('in'), 2000);
+    }
+
+    /* Scene 09: 交换成功 + 个人中心 */
+    function runScene09Success() {
+      $('.success-check').classList.add('spring'); $('#successTitle').classList.add('in'); $('#successDesc').classList.add('in'); playSuccessSfx();
       setTimeout(() => {
-        ['scoreA', 'scoreB'].forEach(id => {
-          const el = $('#' + id); el.style.transition = 'transform 0.4s var(--expo), opacity 0.3s'; el.style.transform = 'rotateX(90deg)'; el.style.opacity = '0';
-          setTimeout(() => { el.textContent = '93'; el.style.transform = 'rotateX(0)'; el.style.opacity = '1'; }, 250);
-        });
-      }, 1800);
-      setTimeout(() => { $('#successWrap').style.transition = 'opacity 0.6s ease'; $('#successWrap').style.opacity = '0'; $('#finalLogo').classList.add('show'); }, 3500);
+        $('#successWrap').style.transition = 'opacity 0.6s ease';
+        $('#successWrap').style.opacity = '0';
+        $('#profileOverlay').classList.add('show');
+        animateNumber($('#profileCredit'), 95, 1200);
+        animateNumber($('#profileExchange'), 13, 1200);
+        animateNumber($('#profileBrain'), 126, 1200);
+      }, 2200);
+    }
+
+    /* Scene 10: 结尾落版 */
+    function runScene10Ending() {
+      $('#endingLogo').classList.add('in');
+      $('#endingTitle').classList.add('in');
+      $('#endingSub').classList.add('in');
+      $('#endingCta').classList.add('in');
+      $('#endingLoop').classList.add('in');
+      const layer = $('#floatLayer'); layer.innerHTML = '';
+      const icons = ['📚', '🎧', '🌂', '🧮', '📷', '🏆', '💬', '✨'];
+      icons.forEach((icon, i) => {
+        const el = document.createElement('div');
+        el.className = 'floating-item';
+        el.textContent = icon;
+        el.style.left = (10 + i * 11 + Math.random() * 6) + '%';
+        el.style.bottom = (8 + Math.random() * 12) + '%';
+        el.style.fontSize = (22 + Math.random() * 14) + 'px';
+        el.style.animationDelay = (0.6 + i * 0.25) + 's';
+        el.style.animationDuration = (2.8 + Math.random() * 1.2) + 's';
+        layer.appendChild(el);
+        setTimeout(() => el.classList.add('in'), 50);
+      });
+      setTimeout(() => { $('#endingCta').style.animation = 'ctaPop 1.2s var(--back) infinite'; }, 1500);
     }
 
     /* =========================
-       75s 时间轴（可中断、可拖拽跳转）
+       63.4s 时间轴（可中断、可拖拽跳转）
        ========================= */
+
     let currentToken = null;
     function createToken() {
       if (currentToken && currentToken.cbs) currentToken.cbs.forEach(cb => cb());
@@ -1352,7 +1577,7 @@
         setupScene01(); scenes[0].classList.add('active');
         if (!await wait(200, token)) return;
         showCaption(1);
-        if (!await wait(4200, token)) return;
+        if (!await wait(3200, token)) return;
         hideCaption();
       } else if (startScene === 2) {
         setupScene02(); scenes[1].classList.add('active');
@@ -1367,55 +1592,80 @@
         if (!await wait(sceneDurations[2], token)) return;
         hideCaption();
       } else if (startScene === 4) {
-        $('#matchCard1').classList.remove('in'); $('#matchCard2').classList.remove('in'); $('#matchAction').classList.remove('in');
-        $$('.score-num').forEach(el => el.textContent = '0');
-        scenes[3].classList.add('active'); showCaption(4);
+        setupScene04Wish(); scenes[3].classList.add('active'); showCaption(4);
         if (!await wait(300, token)) return;
-        runScene04Match();
+        runScene04Wish();
         if (!await wait(sceneDurations[3], token)) return;
         hideCaption();
       } else if (startScene === 5) {
-        ['#polyLineAB', '#polyLineBC', '#polyLineCA'].forEach(sel => {
-          const path = $(sel); path.style.transition = 'none'; path.style.strokeDashoffset = path.getTotalLength();
-        });
+        $('#matchCard1').classList.remove('in'); $('#matchCard2').classList.remove('in'); $('#matchAction').classList.remove('in');
+        $$('.score-num').forEach(el => el.textContent = '0');
         scenes[4].classList.add('active'); showCaption(5);
-        if (!await wait(400, token)) return;
-        runScene05Poly();
+        if (!await wait(300, token)) return;
+        runScene05Match();
         if (!await wait(sceneDurations[4], token)) return;
         hideCaption();
       } else if (startScene === 6) {
-        $('#trustCard').classList.remove('in'); $('#scoreRing').classList.remove('draw'); $('#scoreNum').textContent = '0';
-        $$('#trustStars .star').forEach(s => s.classList.remove('lit'));
+        $('#chainCard').classList.remove('in');
+        ['#polyLineAB', '#polyLineBC', '#polyLineCA'].forEach(sel => {
+          const path = $(sel); path.style.transition = 'none'; path.style.strokeDashoffset = path.getTotalLength();
+        });
         scenes[5].classList.add('active'); showCaption(6);
-        if (!await wait(300, token)) return;
-        runScene06Trust();
+        if (!await wait(400, token)) return;
+        runScene06Chain();
         if (!await wait(sceneDurations[5], token)) return;
         hideCaption();
       } else if (startScene === 7) {
-        $('.success-check').classList.remove('spring'); $('#successTitle').classList.remove('in'); $('#successDesc').classList.remove('in'); $('#reviewCards').classList.remove('in');
-        $('#successWrap').style.opacity = '1'; $('#finalLogo').classList.remove('show');
-        $('#scoreA').textContent = '92'; $('#scoreB').textContent = '92';
+        $('#trustCard').classList.remove('in'); $('#scoreRing').classList.remove('draw'); $('#scoreNum').textContent = '0';
         scenes[6].classList.add('active'); showCaption(7);
         if (!await wait(300, token)) return;
-        runScene07Success();
+        runScene07Trust();
         if (!await wait(sceneDurations[6], token)) return;
+        hideCaption();
+      } else if (startScene === 8) {
+        $('#noticeCard').classList.remove('in'); $$('#chatBubbles .bubble').forEach(b => b.classList.remove('in')); $('#safePoint').classList.remove('in');
+        scenes[7].classList.add('active'); showCaption(8);
+        if (!await wait(300, token)) return;
+        runScene08Messages();
+        if (!await wait(sceneDurations[7], token)) return;
+        hideCaption();
+      } else if (startScene === 9) {
+        $('.success-check').classList.remove('spring'); $('#successTitle').classList.remove('in'); $('#successDesc').classList.remove('in');
+        $('#successWrap').style.opacity = '1'; $('#profileOverlay').classList.remove('show');
+        scenes[8].classList.add('active'); showCaption(9);
+        if (!await wait(300, token)) return;
+        runScene09Success();
+        if (!await wait(sceneDurations[8], token)) return;
+        hideCaption();
+      } else if (startScene === 10) {
+        $('#endingLogo').classList.remove('in'); $('#endingTitle').classList.remove('in'); $('#endingSub').classList.remove('in'); $('#endingCta').classList.remove('in'); $('#endingLoop').classList.remove('in');
+        $('#floatLayer').innerHTML = ''; $('#endingCta').style.animation = '';
+        scenes[9].classList.add('active'); showCaption(10);
+        if (!await wait(300, token)) return;
+        runScene10Ending();
+        if (!await wait(sceneDurations[9], token)) return;
         hideCaption();
       }
 
       // 继续播放后续 Scene
-      for (let i = startScene + 1; i <= 7; i++) {
+      for (let i = startScene + 1; i <= 10; i++) {
         if (!await wait(600, token)) return;
-        if (i === 2) setupScene02(); // 先准备好内容再转场
+        if (i === 2) setupScene02();
+        else if (i === 4) setupScene04Wish();
         switchScene(i - 1, i, sceneTransitions[i - 1]);
         if (i === 2) { showCaption(2); startScene02Scroll(); }
         else if (i === 3) { showCaption(3); if (!await wait(300, token)) return; runScene03Typing(); }
-        else if (i === 4) { showCaption(4); if (!await wait(300, token)) return; runScene04Match(); }
-        else if (i === 5) { showCaption(5); if (!await wait(400, token)) return; runScene05Poly(); }
-        else if (i === 6) { showCaption(6); if (!await wait(300, token)) return; runScene06Trust(); }
-        else if (i === 7) { showCaption(7); if (!await wait(300, token)) return; runScene07Success(); }
+        else if (i === 4) { showCaption(4); if (!await wait(300, token)) return; runScene04Wish(); }
+        else if (i === 5) { showCaption(5); if (!await wait(300, token)) return; runScene05Match(); }
+        else if (i === 6) { showCaption(6); if (!await wait(400, token)) return; runScene06Chain(); }
+        else if (i === 7) { showCaption(7); if (!await wait(300, token)) return; runScene07Trust(); }
+        else if (i === 8) { showCaption(8); if (!await wait(300, token)) return; runScene08Messages(); }
+        else if (i === 9) { showCaption(9); if (!await wait(300, token)) return; runScene09Success(); }
+        else if (i === 10) { showCaption(10); if (!await wait(300, token)) return; runScene10Ending(); }
         if (!await wait(sceneDurations[i - 1], token)) return;
         hideCaption();
       }
+
 
       await wait(1500, token);
     }
