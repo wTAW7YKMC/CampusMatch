@@ -1,0 +1,1440 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CampusSwap 系统运行说明 Demo</title>
+  <style>
+    /* =========================
+       全局重置与舞台
+       ========================= */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --neon-violet: #8B5CF6;
+      --neon-pink: #EC4899;
+      --neon-cyan: #06B6D4;
+      --neon-orange: #F59E0B;
+      --dark-base: #0F0A1A;
+      --dark-elevated: #1A1025;
+      --paper-white: #F5F0EB;
+      --paper-80: rgba(245, 240, 235, 0.8);
+      --paper-60: rgba(245, 240, 235, 0.6);
+      --glitch-red: #EF4444;
+      --success: #34C759;
+      --text: #1A1A1A;
+      --muted: #9CA3AF;
+      --expo: cubic-bezier(0.16, 1, 0.3, 1);
+      --back: cubic-bezier(0.34, 1.56, 0.64, 1);
+      --screen-w: 390px;
+      --screen-h: 844px;
+    }
+    html, body {
+      width: 100%; height: 100%;
+      overflow: hidden;
+      background: #000;
+      font-family: "ZCOOL KuaiLe", "Noto Sans SC", "PingFang SC", "SF Pro Text", sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    #stage {
+      position: fixed; top: 50%; left: 50%;
+      width: 1920px; height: 1080px;
+      transform: translate(-50%, -50%) scale(var(--scale));
+      transform-origin: center center;
+      background: #000;
+      overflow: hidden;
+    }
+
+    /* 装饰进度条：二次元风格时间轴，位于设备下方，可拖拽跳转 */
+    #progressTrack {
+      position: absolute;
+      left: 50%; bottom: 70px;
+      transform: translateX(-50%);
+      width: 360px; height: 10px;
+      border-radius: 5px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02)),
+        radial-gradient(circle, rgba(139,92,246,0.18) 1px, transparent 1px);
+      background-size: 100% 100%, 8px 8px;
+      border: 1px solid rgba(139,92,246,0.35);
+      box-shadow:
+        0 4px 12px rgba(0,0,0,0.5),
+        0 0 14px rgba(139,92,246,0.15),
+        inset 0 1px 0 rgba(255,255,255,0.08);
+      z-index: 10;
+      opacity: 0;
+      transition: opacity 0.8s var(--expo), transform 0.3s var(--expo), box-shadow 0.3s ease;
+      overflow: visible;
+      cursor: pointer;
+    }
+    #progressTrack:hover {
+      transform: translateX(-50%) scale(1.03);
+      box-shadow:
+        0 6px 18px rgba(0,0,0,0.55),
+        0 0 22px rgba(139,92,246,0.25),
+        inset 0 1px 0 rgba(255,255,255,0.1);
+    }
+    #progressTrack.dragging { cursor: grabbing; transform: translateX(-50%) scale(1.05); }
+    #progressTrack.show { opacity: 1; }
+    #progressBar {
+      position: relative;
+      width: 0%; height: 100%;
+      border-radius: 5px;
+      background: linear-gradient(90deg, var(--neon-violet), var(--neon-pink), var(--neon-cyan));
+      box-shadow:
+        0 0 10px rgba(139,92,246,0.5),
+        0 0 20px rgba(236,72,153,0.35),
+        0 0 30px rgba(6,182,212,0.18);
+      opacity: 0.95;
+      transition: width 0.05s linear;
+    }
+    #progressBar::after {
+      content: "";
+      position: absolute; top: 0; right: 0; bottom: 0;
+      width: 80px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
+      filter: blur(4px);
+      animation: progressScan 1.4s linear infinite;
+    }
+    @keyframes progressScan {
+      0% { transform: translateX(30px); opacity: 0; }
+      25% { opacity: 1; }
+      75% { opacity: 1; }
+      100% { transform: translateX(-110px); opacity: 0; }
+    }
+    /* 进度条拖拽按钮 */
+    .progress-knob {
+      position: absolute;
+      top: 50%;
+      right: -8px;
+      transform: translate(50%, -50%) scale(0);
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      background: var(--paper-white);
+      border: 3px solid var(--neon-violet);
+      box-shadow: 0 0 10px var(--neon-violet), 0 0 20px rgba(236,72,153,0.4);
+      transition: transform 0.25s var(--back), opacity 0.2s ease;
+      pointer-events: none;
+      z-index: 3;
+    }
+    #progressTrack:hover .progress-knob,
+    #progressTrack.dragging .progress-knob { transform: translate(50%, -50%) scale(1); }
+    #progressBar:hover .progress-knob { transform: translate(50%, -50%) scale(1); }
+    /* 左侧装饰图标 */
+    .progress-icon {
+      position: absolute;
+      left: -32px; top: 50%;
+      transform: translateY(-50%);
+      width: 22px; height: 22px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px;
+      color: var(--neon-violet);
+      text-shadow: 0 0 8px rgba(139,92,246,0.6);
+      animation: iconPulse 1.6s ease-in-out infinite;
+    }
+    @keyframes iconPulse { 0%, 100% { opacity: 0.6; transform: translateY(-50%) scale(1); } 50% { opacity: 1; transform: translateY(-50%) scale(1.15); } }
+    /* 标签文字 */
+    .progress-label {
+      position: absolute;
+      top: -20px; left: 50%;
+      transform: translateX(-50%);
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      color: rgba(245,240,235,0.55);
+      text-transform: uppercase;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+    .progress-label strong {
+      color: var(--neon-pink);
+      font-weight: 400;
+    }
+    /* 拖拽提示 */
+    .progress-tooltip {
+      position: absolute;
+      top: -42px; left: 0;
+      transform: translateX(-50%) translateY(6px);
+      padding: 4px 10px;
+      border-radius: 6px;
+      background: rgba(15,10,26,0.9);
+      border: 1px solid rgba(139,92,246,0.4);
+      color: var(--paper-white);
+      font-size: 12px;
+      font-family: "SF Mono", "Roboto Mono", monospace;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.2s var(--expo);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4), 0 0 12px rgba(139,92,246,0.2);
+      z-index: 20;
+    }
+    .progress-tooltip.visible { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .progress-tooltip::after {
+      content: "";
+      position: absolute; bottom: -4px; left: 50%;
+      transform: translateX(-50%) rotate(45deg);
+      width: 8px; height: 8px;
+      background: rgba(15,10,26,0.9);
+      border-right: 1px solid rgba(139,92,246,0.4);
+      border-bottom: 1px solid rgba(139,92,246,0.4);
+    }
+    /* 像素装饰点 */
+    .pixel-dots {
+      position: absolute; bottom: -16px; left: 50%;
+      transform: translateX(-50%);
+      display: flex; gap: 8px;
+      pointer-events: none;
+    }
+    .pixel-dots i {
+      width: 4px; height: 4px;
+      background: var(--neon-violet);
+      opacity: 0.5;
+      animation: pixelBlink 1.2s ease-in-out infinite;
+    }
+    .pixel-dots i:nth-child(2) { background: var(--neon-pink); animation-delay: 0.4s; }
+    .pixel-dots i:nth-child(3) { background: var(--neon-cyan); animation-delay: 0.8s; }
+    @keyframes pixelBlink { 0%, 100% { opacity: 0.25; transform: scale(1); } 50% { opacity: 0.8; transform: scale(1.3); } }
+
+    /* =========================
+       iPhone 15 Pro 极简外框
+       ========================= */
+    .device {
+      position: absolute;
+      top: 50%; left: 50%;
+      width: 438px; height: 892px;
+      transform: translate(-50%, calc(-50% - 45px)) scale(1.15);
+      border-radius: 48px;
+      border: 2px solid rgba(255,255,255,0.35);
+      background: #000;
+      box-shadow:
+        0 80px 160px rgba(0,0,0,0.75),
+        0 24px 48px rgba(139,92,246,0.12),
+        inset 0 0 0 1px rgba(255,255,255,0.06);
+      opacity: 0;
+      will-change: transform, opacity;
+    }
+    .device.in { opacity: 1; animation: deviceIn 1.2s var(--expo) forwards; }
+    @keyframes deviceIn {
+      from { opacity: 0; transform: translate(-50%, calc(-48% - 45px)) scale(0.94); }
+      to { opacity: 1; transform: translate(-50%, calc(-50% - 45px)) scale(1.15); }
+    }
+
+    .notch {
+      position: absolute;
+      top: 12px; left: 50%;
+      transform: translateX(-50%);
+      width: 126px; height: 34px;
+      background: #000;
+      border-radius: 18px;
+      z-index: 100;
+    }
+
+    .screen {
+      position: absolute;
+      top: 24px; left: 24px;
+      width: var(--screen-w); height: var(--screen-h);
+      border-radius: 40px;
+      background: var(--dark-base);
+      overflow: hidden;
+    }
+    .screen::before {
+      content: "";
+      position: absolute; inset: 0;
+      pointer-events: none; z-index: 0;
+      background-image: radial-gradient(circle, rgba(139, 92, 246, 0.05) 1px, transparent 1px);
+      background-size: 8px 8px;
+    }
+
+    /* =========================
+       Scene 通用层
+       ========================= */
+    .scene {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateZ(0);
+      will-change: transform, opacity, filter;
+      z-index: 1;
+    }
+    .scene.active { opacity: 1; pointer-events: auto; }
+
+    .push-enter { animation: pushIn 0.7s var(--expo) forwards; }
+    .push-leave { animation: pushOut 0.7s var(--expo) forwards; }
+    .dissolve-enter { animation: dissolveIn 0.9s ease forwards; }
+    .dissolve-leave { animation: dissolveOut 0.9s ease forwards; }
+    .scaleblur-enter { animation: scaleBlurIn 0.8s var(--expo) forwards; }
+    .flip-enter { animation: flipIn 0.9s var(--expo) forwards; }
+    .flip-leave { animation: flipOut 0.9s var(--expo) forwards; }
+
+    @keyframes pushIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    @keyframes pushOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(-35%); opacity: 0; } }
+    @keyframes dissolveIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes dissolveOut { from { opacity: 1; } to { opacity: 0; } }
+    @keyframes scaleBlurIn { from { transform: scale(0.92); opacity: 0; filter: blur(8px); } to { transform: scale(1); opacity: 1; filter: blur(0); } }
+    @keyframes flipIn { from { transform: perspective(1200px) rotateY(-90deg); opacity: 0; } to { transform: perspective(1200px) rotateY(0); opacity: 1; } }
+    @keyframes flipOut { from { transform: perspective(1200px) rotateY(0); opacity: 1; } to { transform: perspective(1200px) rotateY(90deg); opacity: 0; } }
+
+    /* =========================
+       组件：自定义导航
+       ========================= */
+    .custom-nav {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%);
+      padding: 48px 24px 44px;
+      border-radius: 0 0 36px 36px;
+      box-shadow: 0 12px 40px rgba(236, 72, 153, 0.35);
+      z-index: 50;
+      overflow: hidden;
+    }
+    .custom-nav::before {
+      content: "";
+      position: absolute; inset: 0;
+      background-image: radial-gradient(circle, rgba(255,255,255,0.08) 1px, transparent 1px);
+      background-size: 12px 12px;
+      pointer-events: none;
+    }
+    .nav-status {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 16px;
+      position: relative; z-index: 1;
+    }
+    .nav-time {
+      font-family: "DSEG14 Classic", "LCD", monospace;
+      font-size: 14px; color: #fff;
+      text-shadow: 0 0 8px rgba(255,255,255,0.5);
+      letter-spacing: 1px;
+    }
+    .nav-hud { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #fff; }
+    .battery {
+      width: 22px; height: 11px;
+      border: 1px solid #fff; border-radius: 2px;
+      padding: 1px; position: relative;
+    }
+    .battery::after {
+      content: ""; position: absolute;
+      right: -3px; top: 3px;
+      width: 2px; height: 4px; background: #fff; border-radius: 0 1px 1px 0;
+    }
+    .battery-fill { width: 70%; height: 100%; background: var(--neon-cyan); border-radius: 1px; box-shadow: 0 0 6px var(--neon-cyan); }
+    .nav-title-row { display: flex; align-items: center; position: relative; z-index: 1; }
+    .nav-title {
+      font-size: 26px; font-weight: 700; color: #fff;
+      text-shadow: 0 2px 0 var(--glitch-red), 0 4px 0 var(--neon-pink), 0 6px 8px rgba(0,0,0,0.3);
+      letter-spacing: 1px;
+    }
+    .nav-cursor {
+      color: var(--neon-cyan); font-size: 22px; margin-left: 6px;
+      animation: blink 1s infinite;
+    }
+    @keyframes blink { 0%, 50% { opacity: 1; } 51%, 100% { opacity: 0; } }
+
+    .back-header {
+      position: absolute; top: 48px; left: 18px; right: 18px;
+      display: flex; align-items: center; gap: 10px; z-index: 50;
+    }
+    .back-btn-dark {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: rgba(255,255,255,0.1); display: grid; place-items: center;
+      color: #fff; font-size: 20px; backdrop-filter: blur(8px);
+    }
+    .back-title { font-size: 17px; font-weight: 600; color: #fff; }
+
+    /* =========================
+       组件：卡片/按钮/标签
+       ========================= */
+    .otaku-card {
+      position: relative;
+      background: linear-gradient(135deg, #F5F0EB 0%, #EDE6DE 100%);
+      border-radius: 24px; padding: 20px;
+      color: var(--text);
+      box-shadow: 0 0 0 1px rgba(139, 92, 246, 0.3), 0 8px 24px rgba(15, 10, 26, 0.25);
+      overflow: hidden;
+    }
+    .otaku-card::before, .otaku-card::after {
+      content: ""; position: absolute; width: 20px; height: 20px; border: 3px solid var(--neon-violet); z-index: 2;
+    }
+    .otaku-card::before { top: 12px; left: 12px; border-right: none; border-bottom: none; }
+    .otaku-card::after { bottom: 12px; right: 12px; border-left: none; border-top: none; }
+
+    .otaku-btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      height: 42px; border-radius: 16px;
+      background: linear-gradient(135deg, #06B6D4 0%, #8B5CF6 100%);
+      color: #fff; font-size: 14px; font-weight: 700;
+      border: none; box-shadow: 0 0 0 1px rgba(255,255,255,0.2) inset, 0 6px 0 var(--neon-violet), 0 8px 16px rgba(139,92,246,0.4);
+      transform: skewX(-6deg) rotate(-1deg);
+      padding: 0 20px;
+    }
+    .otaku-btn-violet { background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%); box-shadow: 0 0 0 1px rgba(255,255,255,0.2) inset, 0 6px 0 var(--neon-pink), 0 8px 16px rgba(236,72,153,0.4); }
+    .otaku-btn-ghost { background: transparent; color: var(--neon-cyan); border: 2px solid var(--neon-cyan); box-shadow: 0 0 8px rgba(6,182,212,0.4); }
+    .otaku-tag {
+      display: inline-flex; align-items: center;
+      padding: 6px 14px; background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%);
+      color: #fff; font-size: 12px; border-radius: 6px 16px 6px 16px;
+      box-shadow: 0 3px 8px rgba(236,72,153,0.3); transform: rotate(-2deg);
+    }
+    .otaku-tag:nth-child(even) { background: linear-gradient(135deg, #06B6D4 0%, #8B5CF6 100%); transform: rotate(2deg); box-shadow: 0 3px 8px rgba(6,182,212,0.3); }
+    .otaku-badge {
+      display: inline-flex; align-items: center; justify-content: center;
+      padding: 4px 10px; background: rgba(139, 92, 246, 0.12);
+      border: 1px solid var(--neon-violet); border-radius: 8px;
+      font-size: 11px; color: var(--neon-violet); box-shadow: 0 0 6px rgba(139,92,246,0.3);
+    }
+    .otaku-badge-cyan { background: rgba(6,182,212,0.12); border-color: var(--neon-cyan); color: var(--neon-cyan); }
+    .otaku-badge-pink { background: rgba(236,72,153,0.12); border-color: var(--neon-pink); color: var(--neon-pink); }
+    .otaku-badge-orange { background: rgba(245,158,11,0.12); border-color: var(--neon-orange); color: var(--neon-orange); }
+    .otaku-new-badge {
+      position: absolute; top: -8px; right: -8px;
+      padding: 3px 8px; background: var(--neon-pink); color: #fff;
+      font-size: 10px; font-weight: 700; border-radius: 6px 12px 6px 12px;
+      transform: rotate(15deg); box-shadow: 0 3px 10px rgba(236,72,153,0.5); z-index: 10;
+    }
+    .otaku-avatar {
+      position: relative; width: 44px; height: 44px; border-radius: 50%;
+      background: linear-gradient(135deg, #8B5CF6, #EC4899); padding: 2px;
+      box-shadow: 0 0 0 2px var(--paper-white), 0 0 12px rgba(139,92,246,0.5);
+      display: grid; place-items: center; font-size: 22px; color: #fff;
+    }
+    .otaku-avatar::before, .otaku-avatar::after {
+      content: ""; position: absolute; top: -6px; width: 10px; height: 12px;
+      background: linear-gradient(135deg, #8B5CF6, #EC4899); border-radius: 50% 50% 0 0; z-index: -1;
+    }
+    .otaku-avatar::before { left: 8px; transform: rotate(-20deg); }
+    .otaku-avatar::after { right: 8px; transform: rotate(20deg); }
+
+    /* =========================
+       底部 Home 指示条与 Tab 栏
+       ========================= */
+    .pill {
+      position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%);
+      width: 134px; height: 5px; background: rgba(245,240,235,0.6); border-radius: 3px; z-index: 90;
+    }
+    .tab-bar {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      height: 84px; background: rgba(15,10,26,0.92); backdrop-filter: blur(20px);
+      border-top: 0.5px solid rgba(255,255,255,0.08);
+      display: flex; justify-content: space-around; align-items: flex-start; padding-top: 12px; z-index: 80;
+    }
+    .tab { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 10px; color: var(--muted); transition: color 0.2s; }
+    .tab.active { color: var(--neon-violet); }
+    .tab-icon { width: 24px; height: 24px; display: grid; place-items: center; font-size: 18px; }
+
+    /* =========================
+       关键词弹幕（取代传统字幕）
+       ========================= */
+    .caption {
+      position: absolute;
+      display: flex;
+      pointer-events: none;
+      z-index: 10;
+      transition: all 0.5s var(--expo);
+    }
+    .caption.right {
+      right: 180px; top: 50%;
+      transform: translateY(-50%);
+      flex-direction: column; align-items: flex-start; gap: 14px;
+    }
+    .caption.left {
+      left: 180px; top: 50%;
+      transform: translateY(-50%);
+      flex-direction: column; align-items: flex-end; gap: 14px;
+    }
+    .caption.left .kw { transform-origin: right center; }
+    .caption.top {
+      top: 100px; left: 50%;
+      transform: translateX(-50%);
+      flex-direction: row; align-items: flex-start; gap: 14px;
+    }
+    .caption.bottom {
+      bottom: 100px; left: 50%;
+      transform: translateX(-50%);
+      flex-direction: row; align-items: flex-end; gap: 14px;
+    }
+    .caption.top .kw, .caption.bottom .kw { transform-origin: center top; }
+    .kw {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 20px;
+      border-radius: 14px;
+      background: rgba(15,10,26,0.9);
+      border: 1.5px solid rgba(139,92,246,0.55);
+      box-shadow:
+        0 4px 18px rgba(0,0,0,0.45),
+        0 0 16px rgba(139,92,246,0.25);
+      color: var(--paper-white);
+      font-size: 22px;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      opacity: 0;
+      will-change: transform, opacity, clip-path;
+    }
+    .kw::before {
+      content: "✦";
+      color: var(--neon-pink);
+      font-size: 14px;
+      animation: iconSpin 2.5s linear infinite;
+    }
+    .kw:nth-child(2) { border-color: rgba(236,72,153,0.6); }
+    .kw:nth-child(3) { border-color: rgba(6,182,212,0.6); }
+    .kw:nth-child(2)::before { color: var(--neon-cyan); }
+    .kw:nth-child(3)::before { color: var(--neon-orange); }
+    @keyframes iconSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    .kw.in { animation: kwIn 0.7s var(--back) forwards, kwFloat 2.1s ease-in-out infinite 0.7s; }
+    .kw.out { animation: kwOut 0.5s var(--expo) forwards; }
+    .kw:nth-child(2).in { animation-delay: 0.18s, 0.88s; }
+    .kw:nth-child(3).in { animation-delay: 0.36s, 1.06s; }
+    .kw-pop.in { animation-name: kwPop, kwFloat; }
+    .kw-blinds.in { animation-name: kwBlinds, kwFloat; }
+    .kw-rotate.in { animation-name: kwRotate, kwFloat; }
+    .kw-elastic.in { animation-name: kwElastic, kwFloat; }
+    .kw-slide.in { animation-name: kwSlide, kwFloat; }
+    .caption.left .kw-slide.in { --slide-from: -70px; }
+    .caption.right .kw-slide.in { --slide-from: 70px; }
+    .caption.top .kw-slide.in { --slide-from: 0 -50px; }
+    .caption.bottom .kw-slide.in { --slide-from: 0 50px; }
+    @keyframes kwIn {
+      0% { opacity: 0; transform: translateX(45px) scale(0.82) rotate(-4deg); }
+      65% { opacity: 1; transform: translateX(-6px) scale(1.05) rotate(1deg); }
+      100% { opacity: 1; transform: translateX(0) scale(1) rotate(0deg); }
+    }
+    @keyframes kwPop {
+      0% { opacity: 0; transform: scale(0) rotate(-10deg); }
+      55% { opacity: 1; transform: scale(1.25) rotate(3deg); }
+      80% { transform: scale(0.92) rotate(-1deg); }
+      100% { opacity: 1; transform: scale(1) rotate(0deg); }
+    }
+    @keyframes kwBlinds {
+      0% { opacity: 0; clip-path: inset(0 100% 0 0); transform: translateX(-20px); }
+      40% { opacity: 1; }
+      100% { opacity: 1; clip-path: inset(0 0% 0 0); transform: translateX(0); }
+    }
+    @keyframes kwRotate {
+      0% { opacity: 0; transform: rotate(-130deg) scale(0.35); }
+      70% { opacity: 1; transform: rotate(12deg) scale(1.12); }
+      100% { opacity: 1; transform: rotate(0deg) scale(1); }
+    }
+    @keyframes kwElastic {
+      0% { opacity: 0; transform: translateY(50px) scale(0.5) skewX(-12deg); }
+      45% { opacity: 1; transform: translateY(-10px) scale(1.15) skewX(4deg); }
+      70% { transform: translateY(5px) scale(0.95) skewX(-2deg); }
+      100% { opacity: 1; transform: translateY(0) scale(1) skewX(0deg); }
+    }
+    @keyframes kwSlide {
+      0% { opacity: 0; transform: translate(var(--slide-from, 60px)); }
+      100% { opacity: 1; transform: translate(0, 0); }
+    }
+    @keyframes kwOut {
+      0% { opacity: 1; transform: scale(1) rotate(0deg); }
+      100% { opacity: 0; transform: scale(0.85) rotate(5deg) translateX(25px); }
+    }
+    @keyframes kwFloat {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-7px) rotate(1.5deg); }
+    }
+
+    /* =========================
+       Scene 01: 品牌启动页
+       ========================= */
+    .scene-01 { background: var(--dark-base); display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .logo-mark {
+      width: 110px; height: 110px; border-radius: 26px;
+      background: linear-gradient(135deg, var(--neon-violet) 0%, var(--neon-pink) 100%);
+      display: grid; place-items: center; font-size: 52px; color: #fff;
+      margin-bottom: 28px; box-shadow: 0 20px 50px rgba(139,92,246,0.45);
+      transform: scale(0.8); opacity: 0; animation: logoMarkIn 0.8s var(--expo) 0.3s forwards;
+    }
+    @keyframes logoMarkIn { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
+    .brand-name { display: flex; gap: 6px; font-size: 40px; font-weight: 700; color: #fff; letter-spacing: 0.1em; }
+    .brand-char { opacity: 0; transform: translateY(18px); animation: charIn 0.6s var(--expo) forwards; }
+    @keyframes charIn { to { opacity: 1; transform: translateY(0); } }
+    .slogan { margin-top: 16px; font-size: 15px; color: var(--paper-60); font-weight: 400; opacity: 0; animation: fadeIn 0.8s ease 1.8s forwards; }
+    @keyframes fadeIn { to { opacity: 1; } }
+
+    /* =========================
+       Scene 02: 首页交换广场
+       ========================= */
+    .scene-02 { background: var(--dark-base); }
+    .home-body {
+      position: absolute; top: 124px; left: 0; right: 0; bottom: 84px;
+      padding: 0 20px; overflow: hidden;
+    }
+    .home-body-inner { will-change: transform; }
+    .home-body.scrolling .home-body-inner { animation: gentleScroll 10s linear infinite; }
+    @keyframes gentleScroll { from { transform: translateY(0); } to { transform: translateY(-220px); } }
+
+    .cassette {
+      background: linear-gradient(135deg, #F5F0EB 0%, #EDE6DE 100%);
+      border-radius: 22px; padding: 22px 18px; margin-bottom: 18px;
+      position: relative; transform: rotate(-2deg);
+      box-shadow: 0 0 0 2px var(--neon-pink), 0 10px 28px rgba(236,72,153,0.25);
+      overflow: hidden;
+    }
+    .cassette::before, .cassette::after {
+      content: ""; position: absolute; left: 0; right: 0; height: 6px;
+      background: repeating-linear-gradient(90deg, var(--neon-violet) 0, var(--neon-violet) 9px, var(--neon-pink) 9px, var(--neon-pink) 18px);
+    }
+    .cassette::before { top: 0; } .cassette::after { bottom: 0; }
+    .cassette-title { font-size: 26px; font-weight: 700; color: var(--neon-violet); margin-bottom: 6px; position: relative; z-index: 1; }
+    .cassette-subtitle { font-size: 13px; color: var(--text); opacity: 0.7; margin-bottom: 16px; position: relative; z-index: 1; }
+    .cassette-actions { display: flex; gap: 12px; position: relative; z-index: 1; }
+    .cassette-btn { flex: 1; font-size: 13px; }
+    .cassette-counter { text-align: center; margin-top: 12px; font-size: 11px; color: var(--text); opacity: 0.7; position: relative; z-index: 1; }
+    .counter-num { color: var(--neon-pink); font-size: 14px; margin: 0 4px; font-weight: 700; }
+
+    .search-box {
+      display: flex; align-items: center;
+      padding: 12px 16px; background: linear-gradient(135deg, #F5F0EB 0%, #EDE6DE 100%);
+      border-radius: 28px; margin-bottom: 14px; transform: rotate(-1deg);
+      box-shadow: 0 4px 16px rgba(15,10,26,0.15), 0 0 0 1px rgba(6,182,212,0.2);
+    }
+    .search-icon { font-size: 16px; margin-right: 8px; }
+    .search-placeholder { font-size: 14px; color: var(--text); opacity: 0.5; }
+
+    .topic-strip { display: flex; gap: 10px; overflow: hidden; margin-bottom: 16px; }
+    .topic-tag { flex: 0 0 auto; }
+
+    .quick-row { display: flex; gap: 12px; margin-bottom: 18px; }
+    .quick-item {
+      flex: 1; display: flex; flex-direction: column; align-items: center;
+      padding: 14px 8px; background: rgba(245,240,235,0.08); border-radius: 18px;
+      border: 1px solid rgba(139,92,246,0.3); position: relative; box-shadow: 0 6px 16px rgba(15,10,26,0.2);
+    }
+    .quick-icon { font-size: 26px; margin-bottom: 4px; filter: drop-shadow(2px 2px 0 rgba(0,0,0,0.3)); }
+    .quick-text { font-size: 11px; color: var(--paper-white); }
+
+    .section-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px; }
+    .section-tag { font-size: 18px; color: #fff; font-weight: 700; text-shadow: 0 2px 0 var(--neon-pink); }
+    .section-sub { font-size: 11px; color: var(--neon-cyan); opacity: 0.8; }
+
+    .swap-card { margin-bottom: 16px; }
+    .swap-head { display: flex; align-items: center; margin-bottom: 12px; }
+    .swap-user { margin-left: 12px; flex: 1; }
+    .user-name { font-size: 15px; font-weight: 700; color: var(--text); }
+    .verified { font-size: 10px; color: var(--neon-orange); margin-left: 6px; font-weight: 600; }
+    .user-meta { font-size: 10px; color: var(--text); opacity: 0.6; margin-top: 2px; }
+    .swap-image-wrap {
+      position: relative; border-radius: 18px; overflow: hidden; margin-bottom: 12px;
+      height: 150px; background: linear-gradient(135deg, #E8E6F8 0%, #F2F0FC 100%);
+      display: grid; place-items: center; font-size: 60px;
+    }
+    .swap-title { font-size: 18px; color: var(--neon-violet); font-weight: 700; margin-bottom: 8px; transform: rotate(-1.5deg); transform-origin: left center; }
+    .swap-line { font-size: 12px; color: var(--text); line-height: 1.5; margin-bottom: 2px; }
+    .swap-label { font-weight: 700; color: var(--neon-pink); }
+    .badge-row { display: flex; gap: 8px; margin: 10px 0; flex-wrap: wrap; }
+    .swap-actions { display: flex; gap: 10px; }
+    .chat-btn { flex: 1; height: 36px; display: grid; place-items: center; background: transparent; color: var(--neon-cyan); border: 1.5px solid var(--neon-cyan); border-radius: 16px; font-size: 13px; box-shadow: 0 0 8px rgba(6,182,212,0.3); }
+    .swap-btn { flex: 1.2; height: 36px; display: grid; place-items: center; background: linear-gradient(135deg, #8B5CF6, #EC4899); color: #fff; border-radius: 16px; font-size: 13px; box-shadow: 0 0 10px rgba(236,72,153,0.4); }
+
+    /* =========================
+       Scene 03: AI 发布助手
+       ========================= */
+    .scene-03 { background: var(--dark-base); }
+    .publish-body {
+      position: absolute; top: 96px; left: 0; right: 0; bottom: 84px;
+      padding: 0 20px; overflow: hidden;
+    }
+    .section-title { font-size: 22px; font-weight: 700; color: var(--paper-white); margin-bottom: 4px; }
+    .section-subtitle { font-size: 13px; color: var(--paper-60); margin-bottom: 16px; }
+    .form-card { padding: 18px; margin-bottom: 14px; }
+    .field { margin-bottom: 14px; }
+    .field-label { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+    .field-input {
+      width: 100%; background: #f7f8fc; border-radius: 12px; padding: 12px;
+      font-size: 13px; color: var(--text); border: none; font-family: inherit;
+    }
+    .upload-grid { display: flex; gap: 10px; }
+    .upload-slot { width: 64px; height: 64px; border-radius: 12px; background: #ecebff; color: var(--neon-violet); display: grid; place-items: center; font-size: 12px; border: 1.5px dashed var(--neon-violet); }
+    .ai-card {
+      padding: 14px; border-radius: 14px;
+      background: linear-gradient(135deg, #f5f4ff 0%, #fff7e6 100%);
+      border: 1px solid #ecebff; color: var(--text); opacity: 0;
+      transform: translateY(10px); animation: bubbleIn 0.5s var(--expo) forwards;
+    }
+    .ai-card-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 8px; }
+    .ai-title { font-size: 15px; font-weight: 700; color: #222; }
+    .ai-subtitle { font-size: 11px; color: var(--neon-violet); margin-top: 2px; }
+    .ai-value { padding: 4px 10px; border-radius: 20px; background: var(--neon-orange); color: #fff; font-size: 11px; font-weight: 700; }
+    .ai-tags { display: flex; gap: 6px; margin-top: 8px; }
+    .ai-tag { padding: 3px 8px; border-radius: 10px; background: rgba(139,92,246,0.1); color: var(--neon-violet); font-size: 10px; }
+    .ai-reason { margin-top: 8px; font-size: 12px; color: #555; line-height: 1.5; }
+    .typing-cursor { display: inline-block; width: 2px; height: 1em; background: var(--neon-violet); margin-left: 2px; animation: blink 1s step-end infinite; vertical-align: middle; }
+
+    /* =========================
+       Scene 04: 匹配页
+       ========================= */
+    .scene-04 { background: linear-gradient(180deg, #1A1025 0%, #0F0A1A 100%); }
+    .match-header {
+      position: absolute; top: 58px; left: 0; right: 0; text-align: center; z-index: 50;
+    }
+    .match-title { font-size: 18px; font-weight: 700; color: var(--paper-white); }
+    .match-sub { font-size: 13px; color: var(--paper-60); font-weight: 400; margin-top: 4px; }
+    .match-cards {
+      position: absolute; top: 130px; left: 0; right: 0; bottom: 84px;
+      padding: 0 20px; display: flex; flex-direction: column; gap: 16px; justify-content: center;
+    }
+    .match-card {
+      background: var(--paper-white); border-radius: 24px; padding: 18px;
+      box-shadow: 0 10px 30px rgba(107,92,231,0.15);
+      opacity: 0; transform: translateY(60px) scale(0.92); will-change: transform, opacity;
+    }
+    .match-card.in { animation: matchCardIn 0.9s var(--back) forwards; }
+    @keyframes matchCardIn { to { opacity: 1; transform: translateY(0) scale(1); } }
+    .match-row { display: flex; gap: 12px; align-items: center; margin-bottom: 12px; }
+    .match-thumb { width: 56px; height: 56px; border-radius: 14px; background: linear-gradient(135deg, #E8E6F8, #F2F0FC); display: grid; place-items: center; font-size: 28px; }
+    .match-info h4 { font-size: 14px; font-weight: 700; color: var(--text); }
+    .match-info p { font-size: 11px; color: var(--text); opacity: 0.6; margin-top: 2px; }
+    .match-score { margin-left: auto; text-align: center; }
+    .score-num { font-size: 26px; font-weight: 700; color: var(--neon-violet); line-height: 1; }
+    .score-label { font-size: 10px; color: var(--text); opacity: 0.6; margin-top: 2px; }
+    .match-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+    .match-tag { padding: 4px 8px; border-radius: 8px; font-size: 10px; background: rgba(139,92,246,0.08); color: var(--neon-violet); }
+    .match-action {
+      margin-top: 14px; height: 42px; border-radius: 16px;
+      background: linear-gradient(135deg, #8B5CF6, #EC4899); color: #fff;
+      font-size: 15px; font-weight: 700; display: grid; place-items: center;
+      opacity: 0; transform: translateY(10px); animation: fadeUp 0.5s var(--expo) 1.2s forwards;
+    }
+    @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+    @keyframes bubbleIn { to { opacity: 1; transform: translateY(0); } }
+
+    /* =========================
+       Scene 05: 多边交换可视化
+       ========================= */
+    .scene-05 { background: var(--dark-base); display: flex; align-items: center; justify-content: center; }
+    .poly-title { position: absolute; top: 70px; left: 0; right: 0; text-align: center; color: #fff; z-index: 10; }
+    .poly-title-main { font-size: 18px; font-weight: 700; }
+    .poly-sub { font-size: 13px; color: var(--paper-60); font-weight: 400; margin-top: 4px; }
+    .poly-svg { width: 340px; height: 340px; overflow: visible; }
+    .poly-line { fill: none; stroke: rgba(139,92,246,0.55); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 600; stroke-dashoffset: 600; }
+    .poly-node { fill: var(--dark-base); stroke: rgba(139,92,246,0.8); stroke-width: 2; filter: drop-shadow(0 0 12px rgba(139,92,246,0.35)); transform-origin: center; animation: nodePulse 2.5s ease-in-out infinite; }
+    .poly-node:nth-child(2) { animation-delay: 0s; } .poly-node:nth-child(4) { animation-delay: 0.8s; } .poly-node:nth-child(6) { animation-delay: 1.6s; }
+    @keyframes nodePulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); } }
+    .node-label { font-size: 13px; fill: #fff; font-weight: 600; text-anchor: middle; dominant-baseline: middle; }
+    .node-item { font-size: 10px; fill: var(--paper-60); text-anchor: middle; dominant-baseline: middle; }
+    .node-avatar { font-size: 26px; text-anchor: middle; dominant-baseline: middle; }
+
+    /* =========================
+       Scene 06: 信任机制页
+       ========================= */
+    .scene-06 { background: var(--dark-base); }
+    .trust-header { position: absolute; top: 58px; left: 0; right: 0; text-align: center; z-index: 50; }
+    .trust-title { font-size: 18px; font-weight: 700; color: var(--paper-white); }
+    .trust-sub { font-size: 13px; color: var(--paper-60); margin-top: 4px; }
+    .trust-card {
+      position: absolute; top: 130px; left: 20px; right: 20px;
+      background: linear-gradient(135deg, #F5F0EB 0%, #EDE6DE 100%);
+      border-radius: 28px; padding: 24px;
+      box-shadow: 0 14px 40px rgba(0,0,0,0.08); text-align: center;
+      opacity: 0; transform: translateY(40px);
+    }
+    .trust-card.in { animation: trustIn 0.8s var(--expo) forwards; }
+    @keyframes trustIn { to { opacity: 1; transform: translateY(0); } }
+    .trust-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 16px; border-radius: 20px;
+      background: rgba(52,199,89,0.1); color: var(--success);
+      font-size: 13px; font-weight: 600; margin-bottom: 20px;
+      opacity: 0; transform: translateX(-20px); animation: slideRight 0.6s var(--expo) 0.4s forwards;
+    }
+    @keyframes slideRight { to { opacity: 1; transform: translateX(0); } }
+    .score-ring-wrap { position: relative; width: 150px; height: 150px; margin: 0 auto 18px; }
+    .score-ring-svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+    .score-ring-track { fill: none; stroke: rgba(0,0,0,0.1); stroke-width: 12; }
+    .score-ring-fill { fill: none; stroke: var(--neon-violet); stroke-width: 12; stroke-linecap: round; stroke-dasharray: 471; stroke-dashoffset: 471; }
+    .score-ring-fill.draw { transition: stroke-dashoffset 1.4s var(--expo); stroke-dashoffset: 37; }
+    .score-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; }
+    .score-big { font-size: 44px; font-weight: 700; color: var(--text); line-height: 1; }
+    .score-small { font-size: 12px; color: var(--text); opacity: 0.6; margin-top: 4px; }
+    .trust-stars { display: flex; justify-content: center; gap: 8px; margin-bottom: 16px; }
+    .star { font-size: 24px; color: #E5E5EA; opacity: 0; transform: scale(0.4); }
+    .star.lit { color: #FFB800; animation: starLit 0.4s var(--back) forwards; }
+    @keyframes starLit { to { opacity: 1; transform: scale(1); } }
+    .trust-row { display: flex; justify-content: space-around; }
+    .trust-item { text-align: center; }
+    .trust-item-num { font-size: 18px; font-weight: 700; color: var(--text); }
+    .trust-item-label { font-size: 11px; color: var(--text); opacity: 0.6; margin-top: 4px; }
+
+    /* =========================
+       Scene 07: 交换成功页
+       ========================= */
+    .scene-07 { background: var(--dark-base); }
+    .success-wrap { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding-bottom: 60px; }
+    .success-circle { width: 130px; height: 130px; border-radius: 50%; background: rgba(52,199,89,0.1); display: grid; place-items: center; position: relative; margin-bottom: 22px; }
+    .success-check { width: 74px; height: 74px; }
+    .success-check path { fill: none; stroke: var(--success); stroke-width: 6; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 100; stroke-dashoffset: 100; }
+    .success-check.spring path { animation: checkSpring 0.7s var(--back) forwards; }
+    @keyframes checkSpring { to { stroke-dashoffset: 0; } }
+    .success-title { font-size: 22px; font-weight: 700; color: var(--paper-white); margin-bottom: 6px; opacity: 0; transform: translateY(14px); }
+    .success-title.in { animation: fadeUp 0.6s var(--expo) 0.5s forwards; }
+    .success-desc { font-size: 13px; color: var(--paper-60); margin-bottom: 24px; opacity: 0; }
+    .success-desc.in { animation: fadeUp 0.6s var(--expo) 0.65s forwards; }
+    .review-cards { display: flex; gap: 12px; opacity: 0; transform: translateY(30px); }
+    .review-cards.in { animation: reviewIn 0.7s var(--expo) 0.9s forwards; }
+    @keyframes reviewIn { to { opacity: 1; transform: translateY(0); } }
+    .review-card { width: 140px; background: linear-gradient(135deg, #F5F0EB 0%, #EDE6DE 100%); border-radius: 20px; padding: 16px; text-align: center; }
+    .review-avatar { width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, var(--neon-violet), var(--neon-pink)); margin: 0 auto 10px; display: grid; place-items: center; font-size: 20px; color: #fff; }
+    .review-name { font-size: 13px; font-weight: 700; color: var(--text); }
+    .review-stars { font-size: 13px; color: #FFB800; margin-top: 6px; letter-spacing: 2px; }
+    .review-score { font-size: 12px; color: var(--text); opacity: 0.6; margin-top: 6px; }
+    .review-score span { color: var(--success); font-weight: 700; }
+    .final-logo { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.8); opacity: 0; pointer-events: none; text-align: center; }
+    .final-logo.show { animation: finalLogoIn 0.9s var(--expo) forwards; }
+    @keyframes finalLogoIn { to { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
+    .final-mark { width: 110px; height: 110px; border-radius: 26px; background: linear-gradient(135deg, var(--neon-violet) 0%, var(--neon-pink) 100%); display: grid; place-items: center; font-size: 52px; color: #fff; margin: 0 auto 14px; box-shadow: 0 20px 50px rgba(139,92,246,0.4); }
+    .final-name { font-size: 26px; font-weight: 700; color: var(--paper-white); letter-spacing: 0.12em; }
+
+    /* =========================
+       音频控制
+       ========================= */
+    .audio-control {
+      position: absolute; right: 40px; bottom: 40px;
+      width: 52px; height: 52px; border-radius: 50%;
+      background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18);
+      display: grid; place-items: center; color: #fff; font-size: 22px;
+      cursor: pointer; backdrop-filter: blur(8px); transition: background 0.2s; z-index: 200;
+    }
+    .audio-control:hover { background: rgba(255,255,255,0.14); }
+    .audio-control.muted { color: rgba(255,255,255,0.5); }
+  </style>
+</head>
+<body>
+
+  <div id="stage">
+    <div class="device" id="device">
+      <div class="notch"></div>
+      <div class="screen" id="screen">
+
+        <!-- Scene 01: 品牌启动页 -->
+        <section class="scene scene-01 active" id="scene01">
+          <div class="logo-mark">🔄</div>
+          <div class="brand-name" id="brandName"></div>
+          <div class="slogan">校园闲置 · 智能交换</div>
+        </section>
+
+        <!-- Scene 02: 首页交换广场 -->
+        <section class="scene scene-02" id="scene02">
+          <div class="custom-nav">
+            <div class="nav-status">
+              <div class="nav-time" id="clock">9:41</div>
+              <div class="nav-hud">
+                <span>📶</span><span>HP</span>
+                <div class="battery"><div class="battery-fill"></div></div>
+              </div>
+            </div>
+            <div class="nav-title-row">
+              <div class="nav-title">交换广场</div>
+              <div class="nav-cursor">▌</div>
+            </div>
+          </div>
+          <div class="home-body" id="homeBody">
+            <div class="home-body-inner" id="homeBodyInner">
+              <div class="cassette">
+                <div class="cassette-title">换个啥</div>
+                <div class="cassette-subtitle">你的闲置，可能正是别人眼里的宝藏。</div>
+                <div class="cassette-actions">
+                  <div class="otaku-btn cassette-btn">➕ 挂个闲置</div>
+                  <div class="otaku-btn otaku-btn-ghost cassette-btn">AI 撮合 ✦</div>
+                </div>
+                <div class="cassette-counter">今日已撮合 <span class="counter-num">128</span> 次</div>
+              </div>
+              <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <span class="search-placeholder">搜点啥？</span>
+              </div>
+              <div class="topic-strip" id="topicStrip">
+                <div class="otaku-tag topic-tag">教材</div>
+                <div class="otaku-tag topic-tag">数码</div>
+                <div class="otaku-tag topic-tag">日用</div>
+                <div class="otaku-tag topic-tag">美妆</div>
+                <div class="otaku-tag topic-tag">运动</div>
+                <div class="otaku-tag topic-tag">零食</div>
+              </div>
+              <div class="quick-row">
+                <div class="quick-item"><div class="quick-icon">🏆</div><div class="quick-text">排行榜</div><div class="otaku-new-badge">NEW</div></div>
+                <div class="quick-item"><div class="quick-icon">🔥</div><div class="quick-text">今日离谱</div></div>
+                <div class="quick-item"><div class="quick-icon">📖</div><div class="quick-text">交换物语</div></div>
+              </div>
+              <div class="section-header">
+                <div class="section-tag">【推荐交换】</div>
+                <div class="section-sub">AI 正在派单…</div>
+              </div>
+              <div id="homeCards"></div>
+            </div>
+          </div>
+          <div class="tab-bar">
+            <div class="tab active"><div class="tab-icon">🏠</div><div>广场</div></div>
+            <div class="tab"><div class="tab-icon">➕</div><div>发布</div></div>
+            <div class="tab"><div class="tab-icon">💬</div><div>消息</div></div>
+            <div class="tab"><div class="tab-icon">👤</div><div>我的</div></div>
+          </div>
+        </section>
+
+        <!-- Scene 03: AI 发布助手 -->
+        <section class="scene scene-03" id="scene03">
+          <div class="back-header">
+            <div class="back-btn-dark">‹</div>
+            <div class="back-title">AI 发布助手</div>
+          </div>
+          <div class="publish-body" id="publishBody">
+            <div class="section-title">发起交换</div>
+            <div class="section-subtitle">填写你有什么、想换什么，生成一张 AI 交换卡。</div>
+            <div class="otaku-card form-card">
+              <div class="field">
+                <div class="field-label">我有什么</div>
+                <div class="field-input" id="haveInput">例如：雨伞</div>
+              </div>
+              <div class="field">
+                <div class="field-label">上传图片</div>
+                <div class="upload-grid">
+                  <div class="upload-slot">+ 添加</div>
+                </div>
+              </div>
+              <div class="field">
+                <div class="field-label">我想换什么</div>
+                <div class="field-input" id="wantInput">例如：计算器</div>
+              </div>
+              <div class="field">
+                <div class="field-label">交换故事</div>
+                <div class="field-input" id="storyInput">介绍一下这个物品…</div>
+              </div>
+            </div>
+            <div id="aiResult"></div>
+          </div>
+        </section>
+
+        <!-- Scene 04: 匹配页 -->
+        <section class="scene scene-04" id="scene04">
+          <div class="match-header">
+            <div class="match-title">智能匹配</div>
+            <div class="match-sub">AI 正在为你寻找最佳交换对象</div>
+          </div>
+          <div class="match-cards" id="matchCards">
+            <div class="match-card" id="matchCard1">
+              <div class="match-row">
+                <div class="match-thumb">🌂</div>
+                <div class="match-info">
+                  <h4>折叠雨伞</h4>
+                  <p>用了两次，九成新</p>
+                </div>
+                <div class="match-score">
+                  <div class="score-num" data-target="87">0</div>
+                  <div class="score-label">匹配度</div>
+                </div>
+              </div>
+              <div class="match-tags">
+                <span class="match-tag">防水</span>
+                <span class="match-tag">便携</span>
+              </div>
+            </div>
+            <div class="match-card" id="matchCard2">
+              <div class="match-row">
+                <div class="match-thumb">🧮</div>
+                <div class="match-info">
+                  <h4>科学计算器</h4>
+                  <p>考试可用，功能完好</p>
+                </div>
+                <div class="match-score">
+                  <div class="score-num" data-target="72">0</div>
+                  <div class="score-label">匹配度</div>
+                </div>
+              </div>
+              <div class="match-tags">
+                <span class="match-tag">学习</span>
+                <span class="match-tag">文具</span>
+              </div>
+            </div>
+            <div class="match-action" id="matchAction">发起交换</div>
+          </div>
+        </section>
+
+        <!-- Scene 05: 多边交换可视化 -->
+        <section class="scene scene-05" id="scene05">
+          <div class="poly-title">
+            <div class="poly-title-main">多边交换挑战局</div>
+            <div class="poly-sub">A→B→C→A 的交换闭环</div>
+          </div>
+          <svg class="poly-svg" viewBox="0 0 340 340">
+            <path class="poly-line" id="polyLineAB" d="M170 60 L280 230" />
+            <path class="poly-line" id="polyLineBC" d="M280 230 L60 230" />
+            <path class="poly-line" id="polyLineCA" d="M60 230 L170 60" />
+            <circle class="poly-node" cx="170" cy="60" r="36" />
+            <text class="node-avatar" x="170" y="55">👩‍🎓</text>
+            <text class="node-label" x="170" y="72">Alice</text>
+            <text class="node-item" x="170" y="118">出：雨伞</text>
+            <circle class="poly-node" cx="280" cy="230" r="36" />
+            <text class="node-avatar" x="280" y="225">👨‍🎓</text>
+            <text class="node-label" x="280" y="242">Bob</text>
+            <text class="node-item" x="280" y="288">出：计算器</text>
+            <circle class="poly-node" cx="60" cy="230" r="36" />
+            <text class="node-avatar" x="60" y="225">🧑‍🎓</text>
+            <text class="node-label" x="60" y="242">Coco</text>
+            <text class="node-item" x="60" y="288">出：台灯</text>
+          </svg>
+        </section>
+
+        <!-- Scene 06: 信任机制页 -->
+        <section class="scene scene-06" id="scene06">
+          <div class="trust-header">
+            <div class="trust-title">校园实名认证</div>
+            <div class="trust-sub">身份已核验，交换更安心</div>
+          </div>
+          <div class="trust-card" id="trustCard">
+            <div class="trust-badge">✓ 已实名认证</div>
+            <div class="score-ring-wrap">
+              <svg class="score-ring-svg" viewBox="0 0 160 160">
+                <circle class="score-ring-track" cx="80" cy="80" r="75" />
+                <circle class="score-ring-fill" id="scoreRing" cx="80" cy="80" r="75" />
+              </svg>
+              <div class="score-center">
+                <div class="score-big" id="scoreNum">0</div>
+                <div class="score-small">信用分</div>
+              </div>
+            </div>
+            <div class="trust-stars" id="trustStars">
+              <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span>
+            </div>
+            <div class="trust-row">
+              <div class="trust-item"><div class="trust-item-num">12</div><div class="trust-item-label">成功交换</div></div>
+              <div class="trust-item"><div class="trust-item-num">0</div><div class="trust-item-label">差评</div></div>
+              <div class="trust-item"><div class="trust-item-num">98%</div><div class="trust-item-label">好评率</div></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Scene 07: 交换成功页 -->
+        <section class="scene scene-07" id="scene07">
+          <div class="success-wrap" id="successWrap">
+            <div class="success-circle">
+              <svg class="success-check" viewBox="0 0 80 80">
+                <path d="M20 42 L34 56 L62 28" />
+              </svg>
+            </div>
+            <div class="success-title" id="successTitle">交换成功！</div>
+            <div class="success-desc" id="successDesc">雨伞 ↔ 计算器 已达成匹配</div>
+            <div class="review-cards" id="reviewCards">
+              <div class="review-card">
+                <div class="review-avatar">👩‍🎓</div>
+                <div class="review-name">Alice</div>
+                <div class="review-stars">★★★★★</div>
+                <div class="review-score">信用 <span id="scoreA">92</span></div>
+              </div>
+              <div class="review-card">
+                <div class="review-avatar">👨‍🎓</div>
+                <div class="review-name">Bob</div>
+                <div class="review-stars">★★★★★</div>
+                <div class="review-score">信用 <span id="scoreB">92</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="final-logo" id="finalLogo">
+            <div class="final-mark">🔄</div>
+            <div class="final-name">校换</div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <div class="caption" id="caption"></div>
+    <div id="progressTrack">
+      <div class="progress-icon">✦</div>
+      <div id="progressBar"><div class="progress-knob"></div></div>
+      <div class="progress-label"><strong>タイムライン</strong> / TIMELINE</div>
+      <div class="progress-tooltip" id="progressTooltip">00:00</div>
+      <div class="pixel-dots"><i></i><i></i><i></i></div>
+    </div>
+    <button class="audio-control" id="audioControl" aria-label="Toggle sound">🔊</button>
+  </div>
+
+  <script>
+    const $ = (sel) => document.querySelector(sel);
+    const $$ = (sel) => Array.from(document.querySelectorAll(sel));
+    const wait = (ms, token) => {
+      return new Promise(resolve => {
+        if (token && token.cancelled) { resolve(false); return; }
+        const t = setTimeout(() => resolve(true), ms);
+        if (token) {
+          token.cbs = token.cbs || [];
+          const cb = () => { clearTimeout(t); resolve(false); };
+          token.cbs.push(cb);
+        }
+      });
+    };
+    const easeOutExpo = (t) => t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
+
+    function updateClock() {
+      const now = new Date();
+      $('#clock').textContent = now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0');
+    }
+    updateClock(); setInterval(updateClock, 60000);
+
+    function fitStage() {
+      const w = window.innerWidth, h = window.innerHeight;
+      const scale = Math.min(w / 1920, h / 1080);
+      document.documentElement.style.setProperty('--scale', scale.toFixed(4));
+    }
+    window.addEventListener('resize', fitStage); fitStage();
+
+    /* =========================
+       音频系统（Web Audio 程序生成）
+       ========================= */
+    let audioCtx = null, bgmGain = null, sfxGain = null, isMuted = false, bgmInterval = null;
+    function initAudio() {
+      if (audioCtx) return;
+      try {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        bgmGain = audioCtx.createGain(); sfxGain = audioCtx.createGain();
+        bgmGain.connect(audioCtx.destination); sfxGain.connect(audioCtx.destination);
+        bgmGain.gain.value = 0.3; sfxGain.gain.value = 0.5;
+      } catch (e) { console.warn('Audio init failed', e); }
+    }
+    function playTone(freq, duration, type = 'sine', when = 0, gainNode = sfxGain) {
+      if (!audioCtx || isMuted) return;
+      const osc = audioCtx.createOscillator(), g = audioCtx.createGain();
+      osc.type = type; osc.frequency.value = freq; osc.connect(g); g.connect(gainNode);
+      const t = audioCtx.currentTime + when;
+      g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(0.35, t + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.001, t + duration);
+      osc.start(t); osc.stop(t + duration + 0.05);
+    }
+    function playAmbientChord() {
+      if (!audioCtx || isMuted) return;
+      [261.63, 329.63, 392.00].forEach((f) => {
+        const osc = audioCtx.createOscillator(), g = audioCtx.createGain();
+        osc.type = 'sine'; osc.frequency.value = f; osc.connect(g); g.connect(bgmGain);
+        g.gain.setValueAtTime(0, audioCtx.currentTime); g.gain.linearRampToValueAtTime(0.05, audioCtx.currentTime + 0.8);
+        g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 3.2);
+        osc.start(); osc.stop(audioCtx.currentTime + 3.3);
+      });
+    }
+    function playArpeggioNote() {
+      if (!audioCtx || isMuted) return;
+      const scale = [261.63, 293.66, 329.63, 349.23, 392.00, 440.00, 493.88, 523.25];
+      playTone(scale[Math.floor(Math.random() * scale.length)], 1.2, 'triangle', 0, bgmGain);
+    }
+    function startBGM() {
+      if (!audioCtx || bgmInterval) return;
+      playAmbientChord();
+      bgmInterval = setInterval(() => { playAmbientChord(); if (Math.random() > 0.4) setTimeout(playArpeggioNote, 800); }, 4000);
+    }
+    function stopBGM() { if (bgmInterval) { clearInterval(bgmInterval); bgmInterval = null; } }
+    function playSuccessSfx() { if (!audioCtx || isMuted) return; playTone(523.25, 0.12, 'sine'); setTimeout(() => playTone(659.25, 0.18, 'sine'), 80); }
+    function toggleMute() {
+      isMuted = !isMuted;
+      const btn = $('#audioControl'); btn.textContent = isMuted ? '🔇' : '🔊'; btn.classList.toggle('muted', isMuted);
+      if (bgmGain) bgmGain.gain.setTargetAtTime(isMuted ? 0 : 0.3, audioCtx.currentTime, 0.05);
+      if (sfxGain) sfxGain.gain.setTargetAtTime(isMuted ? 0 : 0.5, audioCtx.currentTime, 0.05);
+      if (!isMuted && !bgmInterval) startBGM();
+    }
+    $('#audioControl').addEventListener('click', () => { initAudio(); if (audioCtx.state === 'suspended') audioCtx.resume(); startBGM(); toggleMute(); });
+    document.body.addEventListener('click', function firstInteract() { initAudio(); if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume(); startBGM(); document.body.removeEventListener('click', firstInteract); }, { once: true });
+
+    /* =========================
+       Scene 引擎
+       ========================= */
+    const scenes = $$('.scene');
+    const captions = [
+      { pos: 'right', anim: 'pop', texts: ['校园闲置交换平台'] },
+      { pos: 'left', anim: 'blinds', texts: ['交换广场', '看看同校都在换什么'] },
+      { pos: 'right', anim: 'rotate', texts: ['AI 发布助手', '一句话挂上闲置'] },
+      { pos: 'left', anim: 'pop', texts: ['AI 智能匹配', '87% 匹配度'] },
+      { pos: 'top', anim: 'blinds', texts: ['多边交换', '三角闭环撮合'] },
+      { pos: 'left', anim: 'rotate', texts: ['校园实名认证', '信用分 92'] },
+      { pos: 'bottom', anim: 'elastic', texts: ['交换成功', '闲置变有用'] }
+    ];
+    const sceneDurations = [0, 9000, 9000, 14000, 14000, 9000, 9000]; // 每个 Scene 内容展示时长（ms）
+    const sceneTimes = [0, 10714, 21428, 32142, 42857, 53571, 64285]; // 7 等分 75s，用于拖拽跳转
+    const totalTime = 75000;
+    const sceneTransitions = [null, 'push', 'push', 'push', 'dissolve', 'flip', 'scaleblur'];
+    function resetScenes() {
+      scenes.forEach(s => {
+        s.classList.remove('active', 'push-enter', 'push-leave', 'dissolve-enter', 'dissolve-leave', 'flip-enter', 'flip-leave', 'scaleblur-enter', 'scaleblur-leave');
+        s.style.transform = 'none'; s.style.opacity = ''; s.style.filter = '';
+      });
+    }
+    function switchScene(fromIdx, toIdx, transitionClass) {
+      const from = scenes[fromIdx - 1], to = scenes[toIdx - 1];
+      if (from) {
+        from.classList.add(transitionClass + '-leave'); from.classList.remove('active');
+        setTimeout(() => { from.classList.remove(transitionClass + '-leave'); from.style.transform = 'none'; from.style.opacity = ''; from.style.filter = ''; }, 1000);
+      }
+      to.classList.add('active', transitionClass + '-enter');
+      setTimeout(() => { to.classList.remove(transitionClass + '-enter'); to.style.transform = 'none'; to.style.opacity = ''; to.style.filter = ''; }, 1000);
+    }
+    function showCaption(idx) {
+      const container = $('#caption');
+      container.innerHTML = '';
+      const cfg = captions[idx - 1];
+      if (!cfg || !cfg.texts.length) return;
+      container.className = 'caption ' + cfg.pos;
+      cfg.texts.forEach((text) => {
+        const span = document.createElement('span');
+        span.className = 'kw kw-' + cfg.anim;
+        span.textContent = text;
+        container.appendChild(span);
+      });
+      void container.offsetWidth;
+      container.querySelectorAll('.kw').forEach(el => el.classList.add('in'));
+    }
+    function hideCaption() {
+      const container = $('#caption');
+      const kws = container.querySelectorAll('.kw');
+      if (!kws.length) { container.innerHTML = ''; return; }
+      kws.forEach(el => { el.classList.remove('in'); el.classList.add('out'); });
+      setTimeout(() => { container.innerHTML = ''; }, 550);
+    }
+    function timeToScene(ms) { return Math.min(Math.floor((ms / totalTime) * 7), 6) + 1; }
+    function formatTime(ms) { const s = Math.floor(ms / 1000); const m = Math.floor(s / 60); const sec = s % 60; return `${m}:${String(sec).padStart(2, '0')}`; }
+
+    /* Scene 01 */
+    function setupScene01() {
+      const name = '校换'; const container = $('#brandName'); container.innerHTML = '';
+      name.split('').forEach((ch, i) => { const span = document.createElement('span'); span.className = 'brand-char'; span.textContent = ch; span.style.animationDelay = (0.8 + i * 0.18) + 's'; container.appendChild(span); });
+    }
+
+    /* Scene 02 */
+    function setupScene02() {
+      const items = [
+        { icon: '📚', title: '◤高等数学（上）◢', have: '📚 高等数学', want: '🎮 游戏手柄', user: '小林', school: '计算机学院', badge: '教材', score: '87' },
+        { icon: '🎧', title: '◤无线降噪耳机◢', have: '🎧 降噪耳机', want: '📷 拍立得', user: '阿杰', school: '设计学院', badge: '数码', score: '72' },
+        { icon: '🌂', title: '◤折叠雨伞◢', have: '🌂 折叠雨伞', want: '🧮 计算器', user: 'Alice', school: '商学院', badge: '日用', score: '91' },
+        { icon: '🧮', title: '◤科学计算器◢', have: '🧮 科学计算器', want: '🌂 雨伞', user: 'Bob', school: '理学院', badge: '文具', score: '88' }
+      ];
+      $('#homeCards').innerHTML = items.map(it => `
+        <div class="otaku-card swap-card">
+          <div class="swap-head">
+            <div class="otaku-avatar">${it.icon}</div>
+            <div class="swap-user">
+              <div class="user-name">${it.user}<span class="verified">★认证玩家</span></div>
+              <div class="user-meta">${it.school} · 3分钟前在线</div>
+            </div>
+          </div>
+          <div class="swap-image-wrap">${it.icon}</div>
+          <div class="swap-title">${it.title}</div>
+          <div class="swap-line"><span class="swap-label">我有什么：</span>${it.have}</div>
+          <div class="swap-line"><span class="swap-label">我想换：</span>${it.want}</div>
+          <div class="badge-row">
+            <span class="otaku-badge otaku-badge-cyan">距200m</span>
+            <span class="otaku-badge otaku-badge-pink">匹配${it.score}%</span>
+            <span class="otaku-badge otaku-badge-orange">急出</span>
+          </div>
+          <div class="swap-actions">
+            <div class="chat-btn">💬 聊一聊</div>
+            <div class="swap-btn">⚡ 立即交换</div>
+          </div>
+        </div>
+      `).join('');
+    }
+    function startScene02Scroll() {
+      $('#homeBody').classList.add('scrolling');
+      $$('#topicStrip .topic-tag').forEach((t, i) => { t.style.transform = `rotate(${(i % 2 === 0 ? -2 : 2)}deg) translateX(${(i % 2 === 0 ? 5 : -3)}px)`; });
+    }
+
+    /* Scene 03: AI 发布助手 */
+    async function runScene03Typing() {
+      const result = $('#aiResult'); result.innerHTML = '';
+      const inputs = ['#haveInput', '#wantInput', '#storyInput'];
+      const fillTexts = ['折叠雨伞', '科学计算器', '九成新，轻便防晒两用'];
+      for (let i = 0; i < inputs.length; i++) {
+        const el = $(inputs[i]); el.textContent = '';
+        for (let c of fillTexts[i]) { el.textContent += c; await wait(60 + Math.random() * 40); }
+        await wait(300);
+      }
+      await wait(300);
+      const card = document.createElement('div'); card.className = 'ai-card'; card.innerHTML = `
+        <div class="ai-card-head">
+          <div><div class="ai-title">AI 交换卡已生成</div><div class="ai-subtitle">稀有度 SSR · 脑洞分 92 · 匹配 91%</div></div>
+          <div class="ai-value">约35元</div>
+        </div>
+        <div class="ai-tags"><span class="ai-tag">防晒</span><span class="ai-tag">便携</span><span class="ai-tag">考试必备</span></div>
+        <div class="ai-reason">AI 推荐理由：雨伞与计算器在校园场景下互补性强，雨天通勤与考试周需求高度匹配，建议立即交换。</div>
+      `; result.appendChild(card);
+    }
+
+    /* Scene 04 */
+    function runScene04Match() {
+      $('#matchCard1').classList.add('in'); setTimeout(() => $('#matchCard2').classList.add('in'), 180);
+      setTimeout(() => $$('.score-num').forEach(el => animateNumber(el, +el.dataset.target, 1400)), 600);
+      setTimeout(() => $('#matchAction').classList.add('in'), 1200);
+    }
+    function animateNumber(el, target, duration) {
+      const start = performance.now();
+      function frame(now) { const p = Math.min((now - start) / duration, 1); el.textContent = Math.round(target * easeOutExpo(p)); if (p < 1) requestAnimationFrame(frame); }
+      requestAnimationFrame(frame);
+    }
+
+    /* Scene 05 */
+    function runScene05Poly() {
+      ['#polyLineAB', '#polyLineBC', '#polyLineCA'].forEach((sel, i) => {
+        const path = $(sel); const len = path.getTotalLength();
+        path.style.strokeDasharray = len; path.style.strokeDashoffset = len; path.style.transition = 'none';
+        void path.getBoundingClientRect();
+        setTimeout(() => { path.style.transition = `stroke-dashoffset 1.4s var(--expo)`; path.style.strokeDashoffset = '0'; }, i * 1200);
+      });
+    }
+
+    /* Scene 06 */
+    function runScene06Trust() {
+      $('#trustCard').classList.add('in');
+      setTimeout(() => { $('#scoreRing').classList.add('draw'); animateNumber($('#scoreNum'), 92, 1500); }, 700);
+      $$('#trustStars .star').forEach((s, i) => { setTimeout(() => s.classList.add('lit'), 1400 + i * 120); });
+    }
+
+    /* Scene 07 */
+    function runScene07Success() {
+      $('.success-check').classList.add('spring'); $('#successTitle').classList.add('in'); $('#successDesc').classList.add('in'); $('#reviewCards').classList.add('in'); playSuccessSfx();
+      setTimeout(() => {
+        ['scoreA', 'scoreB'].forEach(id => {
+          const el = $('#' + id); el.style.transition = 'transform 0.4s var(--expo), opacity 0.3s'; el.style.transform = 'rotateX(90deg)'; el.style.opacity = '0';
+          setTimeout(() => { el.textContent = '93'; el.style.transform = 'rotateX(0)'; el.style.opacity = '1'; }, 250);
+        });
+      }, 1800);
+      setTimeout(() => { $('#successWrap').style.transition = 'opacity 0.6s ease'; $('#successWrap').style.opacity = '0'; $('#finalLogo').classList.add('show'); }, 3500);
+    }
+
+    /* =========================
+       75s 时间轴（可中断、可拖拽跳转）
+       ========================= */
+    let currentToken = null;
+    function createToken() {
+      if (currentToken && currentToken.cbs) currentToken.cbs.forEach(cb => cb());
+      currentToken = { cancelled: false, cbs: [] };
+      return currentToken;
+    }
+
+    let progressStart = 0, progressOffset = 0, progressRaf = null, isDragging = false;
+    function updateProgress() {
+      if (isDragging) return;
+      const elapsed = performance.now() - progressStart + progressOffset;
+      const p = Math.min(elapsed / totalTime, 1);
+      $('#progressBar').style.width = (p * 100) + '%';
+      if (p < 1) progressRaf = requestAnimationFrame(updateProgress);
+    }
+    function startProgress() {
+      $('#progressTrack').classList.add('show');
+      progressStart = performance.now(); progressOffset = 0; isDragging = false;
+      updateProgress();
+    }
+    function setProgressAt(ms) {
+      progressOffset = ms; progressStart = performance.now();
+      $('#progressBar').style.width = (Math.min(ms / totalTime, 1) * 100) + '%';
+    }
+
+    function initProgressDrag() {
+      const track = $('#progressTrack');
+      const bar = $('#progressBar');
+      const tooltip = $('#progressTooltip');
+      let drag = false, lastX = 0;
+      function setFromX(clientX) {
+        const rect = track.getBoundingClientRect();
+        const x = clientX - rect.left;
+        let p = Math.max(0, Math.min(1, x / rect.width));
+        bar.style.width = (p * 100) + '%';
+        const ms = Math.round(p * totalTime);
+        tooltip.textContent = `${formatTime(ms)} · Scene ${timeToScene(ms)}`;
+        tooltip.style.left = (p * 100) + '%';
+        return ms;
+      }
+      function startDrag(clientX) { drag = true; isDragging = true; track.classList.add('dragging'); tooltip.classList.add('visible'); lastX = clientX; return setFromX(clientX); }
+      function onMove(clientX) { if (!drag) return; lastX = clientX; setFromX(clientX); }
+      function endDrag() {
+        if (!drag) return;
+        drag = false; isDragging = false; track.classList.remove('dragging'); tooltip.classList.remove('visible');
+        const ms = setFromX(lastX);
+        const targetScene = timeToScene(ms);
+        setProgressAt(sceneTimes[targetScene - 1]);
+        startTimeline(targetScene);
+      }
+      track.addEventListener('mousedown', e => { startDrag(e.clientX); });
+      window.addEventListener('mousemove', e => { onMove(e.clientX); });
+      window.addEventListener('mouseup', () => { endDrag(); });
+      track.addEventListener('touchstart', e => { startDrag(e.touches[0].clientX); e.preventDefault(); }, { passive: false });
+      window.addEventListener('touchmove', e => { onMove(e.touches[0].clientX); e.preventDefault(); }, { passive: false });
+      window.addEventListener('touchend', () => { endDrag(); });
+    }
+
+    async function startTimeline(startScene = 1) {
+      const token = createToken();
+      resetScenes();
+      $('#device').classList.add('in');
+
+      // 初始化目标 Scene 并执行其内容
+      if (startScene === 1) {
+        setupScene01(); scenes[0].classList.add('active');
+        if (!await wait(200, token)) return;
+        showCaption(1);
+        if (!await wait(3800, token)) return;
+        hideCaption();
+      } else if (startScene === 2) {
+        setupScene02(); scenes[1].classList.add('active');
+        showCaption(2); startScene02Scroll();
+        if (!await wait(sceneDurations[1], token)) return;
+        hideCaption();
+      } else if (startScene === 3) {
+        $('#haveInput').textContent = '例如：雨伞'; $('#wantInput').textContent = '例如：计算器'; $('#storyInput').textContent = '介绍一下这个物品…'; $('#aiResult').innerHTML = '';
+        scenes[2].classList.add('active'); showCaption(3);
+        if (!await wait(300, token)) return;
+        runScene03Typing();
+        if (!await wait(sceneDurations[2], token)) return;
+        hideCaption();
+      } else if (startScene === 4) {
+        $('#matchCard1').classList.remove('in'); $('#matchCard2').classList.remove('in'); $('#matchAction').classList.remove('in');
+        $$('.score-num').forEach(el => el.textContent = '0');
+        scenes[3].classList.add('active'); showCaption(4);
+        if (!await wait(300, token)) return;
+        runScene04Match();
+        if (!await wait(sceneDurations[3], token)) return;
+        hideCaption();
+      } else if (startScene === 5) {
+        ['#polyLineAB', '#polyLineBC', '#polyLineCA'].forEach(sel => {
+          const path = $(sel); path.style.transition = 'none'; path.style.strokeDashoffset = path.getTotalLength();
+        });
+        scenes[4].classList.add('active'); showCaption(5);
+        if (!await wait(400, token)) return;
+        runScene05Poly();
+        if (!await wait(sceneDurations[4], token)) return;
+        hideCaption();
+      } else if (startScene === 6) {
+        $('#trustCard').classList.remove('in'); $('#scoreRing').classList.remove('draw'); $('#scoreNum').textContent = '0';
+        $$('#trustStars .star').forEach(s => s.classList.remove('lit'));
+        scenes[5].classList.add('active'); showCaption(6);
+        if (!await wait(300, token)) return;
+        runScene06Trust();
+        if (!await wait(sceneDurations[5], token)) return;
+        hideCaption();
+      } else if (startScene === 7) {
+        $('.success-check').classList.remove('spring'); $('#successTitle').classList.remove('in'); $('#successDesc').classList.remove('in'); $('#reviewCards').classList.remove('in');
+        $('#successWrap').style.opacity = '1'; $('#finalLogo').classList.remove('show');
+        $('#scoreA').textContent = '92'; $('#scoreB').textContent = '92';
+        scenes[6].classList.add('active'); showCaption(7);
+        if (!await wait(300, token)) return;
+        runScene07Success();
+        if (!await wait(sceneDurations[6], token)) return;
+        hideCaption();
+      }
+
+      // 继续播放后续 Scene
+      for (let i = startScene + 1; i <= 7; i++) {
+        if (!await wait(600, token)) return;
+        if (i === 2) setupScene02(); // 先准备好内容再转场
+        switchScene(i - 1, i, sceneTransitions[i - 1]);
+        if (i === 2) { showCaption(2); startScene02Scroll(); }
+        else if (i === 3) { showCaption(3); if (!await wait(300, token)) return; runScene03Typing(); }
+        else if (i === 4) { showCaption(4); if (!await wait(300, token)) return; runScene04Match(); }
+        else if (i === 5) { showCaption(5); if (!await wait(400, token)) return; runScene05Poly(); }
+        else if (i === 6) { showCaption(6); if (!await wait(300, token)) return; runScene06Trust(); }
+        else if (i === 7) { showCaption(7); if (!await wait(300, token)) return; runScene07Success(); }
+        if (!await wait(sceneDurations[i - 1], token)) return;
+        hideCaption();
+      }
+
+      await wait(1500, token);
+    }
+
+    window.addEventListener('load', () => {
+      setTimeout(() => { startProgress(); startTimeline(1); initProgressDrag(); }, 300);
+    });
+  </script>
+</body>
+</html>
