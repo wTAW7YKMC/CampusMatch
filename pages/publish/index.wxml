@@ -11,9 +11,12 @@
       <view class="field-label">上传图片</view>
       <view class="upload-grid">
         <block wx:for="{{form.images}}" wx:key="*this">
-          <image class="upload-img" src="{{item}}" mode="aspectFill"></image>
+          <view class="upload-img-wrap">
+            <image class="upload-img" src="{{item}}" mode="aspectFill" data-src="{{item}}" bindtap="previewImage"></image>
+            <view class="img-delete" data-index="{{index}}" catchtap="removeImage">×</view>
+          </view>
         </block>
-        <view class="upload-slot" bindtap="addMockImage">+ 添加</view>
+        <view wx:if="{{form.images.length < 3}}" class="upload-slot" bindtap="addImage">+ 添加</view>
       </view>
     </view>
     <view class="field">

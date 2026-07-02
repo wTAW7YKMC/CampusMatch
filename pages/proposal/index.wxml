@@ -9,11 +9,11 @@
 
   <view class="card form">
     <view class="field-label">我愿意拿什么交换</view>
-    <input class="input" placeholder="例如：奶茶券 / 早餐 / 摄影服务" value="{{offerItem}}" bindinput="onOfferInput" />
+    <input class="input" placeholder-class="placeholder" placeholder="例如：奶茶券 / 早餐 / 摄影服务" value="{{offerItem}}" bindinput="onOfferInput" />
     <button class="btn-secondary ai-btn" bindtap="generateProposal">✨ 让 AI 帮我润色提案</button>
     <view wx:if="{{aiText}}" class="ai-box">{{aiText}}</view>
     <view class="field-label">补充说明</view>
-    <textarea class="textarea" placeholder="例如：我还可以请你喝奶茶" value="{{description}}" bindinput="onDescInput"></textarea>
+    <textarea class="textarea" placeholder-class="placeholder" placeholder="例如：我还可以请你喝奶茶" value="{{description}}" bindinput="onDescInput"></textarea>
     <button class="btn-primary submit" bindtap="submitProposal">提交提案</button>
   </view>
 </view>

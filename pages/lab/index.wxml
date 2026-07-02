@@ -2,8 +2,8 @@
   <view class="section-title">AI 换物管家</view>
   <view class="section-subtitle">输入物品和目标，生成交换卡、替代建议和挑战路线。</view>
   <view class="card lab">
-    <input class="input" placeholder="我有：保温杯" value="{{haveItem}}" bindinput="onInput" />
-    <input class="input second" placeholder="我想换：开放脑洞" value="{{wantItem}}" bindinput="onWantInput" />
+    <input class="input" placeholder-class="placeholder" placeholder="我有：保温杯" value="{{haveItem}}" bindinput="onInput" />
+    <input class="input second" placeholder-class="placeholder" placeholder="我想换：开放脑洞" value="{{wantItem}}" bindinput="onWantInput" />
     <button class="btn-primary submit" bindtap="generateIdeas">生成脑洞方案</button>
   </view>
   <view wx:if="{{card}}" class="ai-card card">

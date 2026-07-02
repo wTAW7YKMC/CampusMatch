@@ -16,6 +16,11 @@
   border-radius: 16rpx;
   padding: 20rpx;
   font-size: 28rpx;
+  color: #1a1025;
+}
+
+.placeholder {
+  color: #6b5b8a;
 }
 
 .textarea {

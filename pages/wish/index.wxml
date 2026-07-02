@@ -2,8 +2,8 @@
   <view class="section-title">校园心愿池</view>
   <view class="section-subtitle">把“我想要”先丢进池子，AI 会把需求趋势反馈给拥有闲置的同学。</view>
   <view class="form card">
-    <input class="input" placeholder="我想要：计算器 / 雨伞 / 行李箱" value="{{wishName}}" bindinput="onNameInput" />
-    <input class="input second" placeholder="类别：学习用品 / 生活用品" value="{{category}}" bindinput="onCategoryInput" />
+    <input class="input" placeholder-class="placeholder" placeholder="我想要：计算器 / 雨伞 / 行李箱" value="{{wishName}}" bindinput="onNameInput" />
+    <input class="input second" placeholder-class="placeholder" placeholder="类别：学习用品 / 生活用品" value="{{category}}" bindinput="onCategoryInput" />
     <button class="btn-primary submit" bindtap="addWish">点亮心愿 +10脑洞</button>
   </view>
   <block wx:for="{{wishes}}" wx:key="wishId">

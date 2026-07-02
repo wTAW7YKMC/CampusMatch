@@ -4,6 +4,23 @@
   margin-bottom: 22rpx;
 }
 
+page {
+  background: #f8f5f2;
+}
+
+.badge-title {
+  color: #1a1025;
+}
+
+.menu-item {
+  color: #1a1025;
+}
+
+.muted {
+  color: #6b5b8a;
+  opacity: 1;
+}
+
 .name-row {
   display: flex;
   justify-content: center;
@@ -15,6 +32,7 @@
 .name {
   font-size: 34rpx;
   font-weight: 700;
+  color: #1a1025;
 }
 
 .avatar {

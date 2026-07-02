@@ -16,10 +16,10 @@
     "pages/verify/index"
   ],
   "window": {
-    "backgroundColor": "#0F0A1A",
-    "backgroundTextStyle": "light",
-    "navigationBarBackgroundColor": "#0F0A1A",
-    "navigationBarTextStyle": "white",
+    "backgroundColor": "#f8f5f2",
+    "backgroundTextStyle": "dark",
+    "navigationBarBackgroundColor": "#f8f5f2",
+    "navigationBarTextStyle": "black",
     "navigationBarTitleText": "换个啥"
   },
   "tabBar": {

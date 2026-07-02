@@ -7,61 +7,91 @@ const {
   refreshTasks,
 } = require('../../utils/mock-data');
 
+const MAX_IMAGES = 3;
+const DEFAULT_IMAGE = '../../assets/mock-posts/post-calculator.png';
+
 Page({
   data: {
-    haveItem: '',
-    wantItem: '',
-    story: '',
-    images: ['../../assets/mock-posts/post-calculator.png'],
+    form: {
+      haveItem: '',
+      wantItem: '',
+      story: '',
+      images: [],
+      acceptBrain: true,
+    },
     aiCard: null,
   },
 
-  onHaveInput(e) { this.setData({ haveItem: e.detail.value }); },
-  onWantInput(e) { this.setData({ wantItem: e.detail.value }); },
-  onStoryInput(e) { this.setData({ story: e.detail.value }); },
-
-  generateCard() {
-    const { haveItem, wantItem, story } = this.data;
-    if (!haveItem || !wantItem) {
-      wx.showToast({ title: '先填上“有什么”和“想换什么”', icon: 'none' });
-      return;
-    }
-    const aiCard = generateSwapCard({ haveItem, wantItem, story });
-    this.setData({ aiCard });
+  onLoad() {
+    this.setData({ 'form.acceptBrain': true });
   },
 
-  addPreviewImage() {
-    const previews = [
-      '../../assets/mock-posts/post-calculator.png',
-      '../../assets/mock-posts/post-cup.png',
-      '../../assets/mock-posts/post-suitcase.png',
-      '../../assets/mock-posts/post-books.png',
-      '../../assets/mock-posts/post-art.png',
-    ];
-    const { images } = this.data;
-    if (images.length >= 3) {
-      wx.showToast({ title: '最多 3 张预览图', icon: 'none' });
+  updateFormField(key, value) {
+    this.setData({ [`form.${key}`]: value });
+  },
+
+  onHaveInput(e) { this.updateFormField('haveItem', e.detail.value); },
+  onWantInput(e) { this.updateFormField('wantItem', e.detail.value); },
+  onStoryInput(e) { this.updateFormField('story', e.detail.value); },
+  onBrainChange(e) { this.updateFormField('acceptBrain', e.detail.value); },
+
+  addImage() {
+    const { images } = this.data.form;
+    const remain = MAX_IMAGES - images.length;
+    if (remain <= 0) {
+      wx.showToast({ title: '最多 3 张图片', icon: 'none' });
       return;
     }
-    const next = [...images, previews[Math.floor(Math.random() * previews.length)]];
-    this.setData({ images: next });
+    wx.chooseMedia({
+      count: remain,
+      mediaType: ['image'],
+      sourceType: ['album', 'camera'],
+      sizeType: ['compressed'],
+      success: (res) => {
+        const newPaths = res.tempFiles.map((file) => file.tempFilePath);
+        this.setData({ 'form.images': images.concat(newPaths).slice(0, MAX_IMAGES) });
+      },
+      fail: (err) => {
+        console.log('选择图片失败', err);
+      },
+    });
   },
 
   removeImage(e) {
     const { index } = e.currentTarget.dataset;
-    const next = [...this.data.images];
+    const next = [...this.data.form.images];
     next.splice(index, 1);
-    this.setData({ images: next.length ? next : ['../../assets/mock-posts/post-calculator.png'] });
+    this.setData({ 'form.images': next });
+  },
+
+  previewImage(e) {
+    const { src } = e.currentTarget.dataset;
+    wx.previewImage({
+      current: src,
+      urls: this.data.form.images,
+    });
+  },
+
+  generateAiCard() {
+    const { haveItem, wantItem } = this.data.form;
+    if (!haveItem || !wantItem) {
+      wx.showToast({ title: '先填上“有什么”和“想换什么”', icon: 'none' });
+      return;
+    }
+    const aiCard = generateSwapCard(this.data.form);
+    this.setData({ aiCard });
   },
 
   submitPost() {
-    const { haveItem, wantItem, story, images, aiCard } = this.data;
+    const { form, aiCard } = this.data;
+    const { haveItem, wantItem, story, images } = form;
     if (!haveItem || !wantItem) {
       wx.showToast({ title: '请填写完整信息', icon: 'none' });
       return;
     }
     const state = app.restoreState();
-    const card = aiCard || generateSwapCard({ haveItem, wantItem, story });
+    const card = aiCard || generateSwapCard(form);
+    const finalImages = images.length ? images : [DEFAULT_IMAGE];
     const newPost = {
       postId: createPostId(state),
       userId: state.currentUser.userId,
@@ -69,7 +99,7 @@ Page({
       haveItem,
       wantItem,
       story: story || '快来和我交换吧！',
-      images: images.length ? images : ['../../assets/mock-posts/post-calculator.png'],
+      images: finalImages,
       proposalCount: 0,
       likeCount: 0,
       status: 'open',

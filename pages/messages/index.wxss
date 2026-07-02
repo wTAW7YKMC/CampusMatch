@@ -1,3 +1,19 @@
+page {
+  background: #f8f5f2;
+}
+
+.section-title {
+  color: #1a1025;
+}
+
+.section-subtitle {
+  color: #6b5b8a;
+}
+
+.chat-title {
+  color: #1a1025;
+}
+
 .msg {
   padding: 22rpx;
   margin-bottom: 18rpx;
@@ -6,6 +22,7 @@
 .msg-title {
   font-size: 28rpx;
   font-weight: 700;
+  color: #1a1025;
 }
 
 .msg-desc {

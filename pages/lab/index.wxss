@@ -2,7 +2,8 @@
 .submit { margin-top: 16rpx; height: 92rpx; line-height: 92rpx; }
 .idea-list { margin-top: 20rpx; }
 .idea { padding: 22rpx; margin-bottom: 16rpx; font-size: 28rpx; line-height: 42rpx; }
-.input { width: 100%; box-sizing: border-box; background: #f7f8fc; border-radius: 16rpx; padding: 20rpx; font-size: 28rpx; }
+.input { width: 100%; box-sizing: border-box; background: #f7f8fc; border-radius: 16rpx; padding: 20rpx; font-size: 28rpx; color: #1a1025; }
+.placeholder { color: #6b5b8a; }
 .second { margin-top: 16rpx; }
 .ai-card { padding: 24rpx; margin-top: 20rpx; background: linear-gradient(135deg,#f5f4ff,#fff7e6); }
 .card-title { font-size: 30rpx; font-weight: 700; }

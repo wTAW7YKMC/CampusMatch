@@ -1,3 +1,5 @@
 {
-  "navigationBarTitleText": "发起交换"
+  "navigationBarTitleText": "发起交换",
+  "navigationBarBackgroundColor": "#f8f5f2",
+  "navigationBarTextStyle": "black"
 }
