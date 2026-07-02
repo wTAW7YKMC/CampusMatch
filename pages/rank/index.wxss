@@ -1,0 +1,44 @@
+.tabs {
+  display: flex;
+  gap: 14rpx;
+  margin: 20rpx 0;
+  flex-wrap: wrap;
+}
+
+.tab {
+  flex: 1 0 42%;
+  text-align: center;
+  padding: 18rpx 0;
+  border-radius: 999rpx;
+  background: #fff;
+  color: #6c63ff;
+  border: 2rpx solid #6c63ff;
+  font-size: 26rpx;
+}
+
+.tab.on {
+  background: #6c63ff;
+  color: #fff;
+}
+
+.rank {
+  padding: 22rpx;
+  margin-bottom: 16rpx;
+}
+
+.rank-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8rpx;
+}
+
+.rank-name {
+  font-size: 30rpx;
+  font-weight: 700;
+}
+
+.rank-score {
+  color: #ffb84d;
+  font-weight: 700;
+}

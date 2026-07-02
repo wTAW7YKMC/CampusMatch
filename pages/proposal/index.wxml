@@ -1,0 +1,19 @@
+<view class="container">
+  <view class="section-title">提交交换提案</view>
+  <view class="section-subtitle">把你的脑洞写出来，也许就是别人最想要的交换方案。</view>
+
+  <view class="target card" wx:if="{{targetPost.postId}}">
+    <view class="target-title">正在提案：{{targetPost.title}}</view>
+    <view class="muted">对方有 {{targetPost.haveItem}}，想换 {{targetPost.wantItem}}</view>
+  </view>
+
+  <view class="card form">
+    <view class="field-label">我愿意拿什么交换</view>
+    <input class="input" placeholder="例如：奶茶券 / 早餐 / 摄影服务" value="{{offerItem}}" bindinput="onOfferInput" />
+    <button class="btn-secondary ai-btn" bindtap="generateProposal">✨ 让 AI 帮我润色提案</button>
+    <view wx:if="{{aiText}}" class="ai-box">{{aiText}}</view>
+    <view class="field-label">补充说明</view>
+    <textarea class="textarea" placeholder="例如：我还可以请你喝奶茶" value="{{description}}" bindinput="onDescInput"></textarea>
+    <button class="btn-primary submit" bindtap="submitProposal">提交提案</button>
+  </view>
+</view>

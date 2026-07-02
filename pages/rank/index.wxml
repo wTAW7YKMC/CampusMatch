@@ -1,0 +1,21 @@
+<view class="container">
+  <view class="section-title">排行榜</view>
+  <view class="section-subtitle">脑洞王、交换达人、信用达人、闲置能量榜，看看谁最会玩交换。</view>
+
+  <view class="tabs">
+    <view class="tab {{active === 'brain' ? 'on' : ''}}" data-type="brain" bindtap="switchTab">脑洞王</view>
+    <view class="tab {{active === 'exchange' ? 'on' : ''}}" data-type="exchange" bindtap="switchTab">交换达人</view>
+    <view class="tab {{active === 'energy' ? 'on' : ''}}" data-type="energy" bindtap="switchTab">能量榜</view>
+    <view class="tab {{active === 'credit' ? 'on' : ''}}" data-type="credit" bindtap="switchTab">信用达人</view>
+  </view>
+
+  <block wx:for="{{list}}" wx:key="nickName">
+    <view class="rank card">
+      <view class="rank-top">
+        <view class="rank-name">{{index + 1}}. {{item.nickName}}</view>
+        <view class="rank-score">{{item.value}}{{active === 'brain' ? '脑洞值' : active === 'exchange' ? '次' : active === 'energy' ? '能量' : '分'}}</view>
+      </view>
+      <view class="muted">{{item.school}}</view>
+    </view>
+  </block>
+</view>

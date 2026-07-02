@@ -1,3 +1,4 @@
+# Android / Gradle
 *.iml
 .gradle
 /local.properties
@@ -7,9 +8,30 @@
 /.idea/workspace.xml
 /.idea/navEditor.xml
 /.idea/assetWizardSettings.xml
-.DS_Store
 /build
 /captures
 .externalNativeBuild
 .cxx
 local.properties
+
+# Dependencies
+node_modules/
+miniprogram_npm/
+
+# IDE / Editor
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Temp / Cache
+.temp/
+.cache/

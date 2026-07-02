@@ -1,0 +1,125 @@
+.form {
+  padding: 24rpx;
+}
+
+.field {
+  margin-bottom: 22rpx;
+}
+
+.field-label {
+  font-size: 28rpx;
+  font-weight: 700;
+  margin-bottom: 12rpx;
+}
+
+.input,
+.textarea {
+  width: 100%;
+  box-sizing: border-box;
+  background: #f7f8fc;
+  border-radius: 16rpx;
+  padding: 20rpx;
+  font-size: 28rpx;
+}
+
+.textarea {
+  min-height: 180rpx;
+}
+
+.upload-grid {
+  display: flex;
+  gap: 14rpx;
+  flex-wrap: wrap;
+}
+
+.upload-img,
+.upload-slot {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 16rpx;
+}
+
+.upload-slot {
+  background: #ecebff;
+  color: #6c63ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26rpx;
+  border: 2rpx dashed #6c63ff;
+}
+
+.switch-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 28rpx;
+  margin-bottom: 22rpx;
+}
+
+.submit {
+  height: 92rpx;
+  line-height: 92rpx;
+  font-size: 30rpx;
+}
+
+
+.ai-btn {
+  height: 84rpx;
+  line-height: 80rpx;
+  font-size: 28rpx;
+  margin-bottom: 20rpx;
+}
+
+.ai-card {
+  padding: 22rpx;
+  margin-bottom: 22rpx;
+  border-radius: 18rpx;
+  background: linear-gradient(135deg, #f5f4ff 0%, #fff7e6 100%);
+  border: 2rpx solid #ecebff;
+}
+
+.ai-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16rpx;
+}
+
+.ai-title {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: #222;
+}
+
+.ai-subtitle {
+  margin-top: 8rpx;
+  color: #6c63ff;
+  font-size: 24rpx;
+}
+
+.ai-value {
+  flex-shrink: 0;
+  padding: 8rpx 14rpx;
+  border-radius: 999rpx;
+  background: #ffb84d;
+  color: #fff;
+  font-weight: 700;
+  font-size: 24rpx;
+}
+
+.ai-tags {
+  margin-top: 16rpx;
+}
+
+.ai-reason {
+  margin-top: 12rpx;
+  color: #555;
+  font-size: 25rpx;
+  line-height: 38rpx;
+}
+
+.suggest-box { margin-top: 16rpx; padding: 16rpx; border-radius: 16rpx; background: rgba(255,255,255,0.7); }
+.suggest-title { font-size: 24rpx; color: #666; margin-bottom: 10rpx; }
+.alt-chip { display: inline-block; padding: 8rpx 14rpx; margin: 0 10rpx 10rpx 0; border-radius: 999rpx; background: #e9f7ee; color: #2e8b57; font-size: 22rpx; }
+.quest { margin-top: 12rpx; color: #d98200; font-size: 24rpx; font-weight: 700; }

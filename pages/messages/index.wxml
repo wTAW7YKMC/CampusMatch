@@ -1,0 +1,17 @@
+<view class="container">
+  <view class="section-title">消息中心</view>
+  <view class="section-subtitle">提案、交换成功、任务奖励和故事上新都会在这里出现。</view>
+  <block wx:for="{{messages}}" wx:key="id">
+    <view class="msg card">
+      <view class="msg-title"><text class="msg-icon">{{item.icon}}</text>{{item.title}}</view>
+      <view class="msg-desc">{{item.desc}}</view>
+      <view class="msg-time">{{item.time}}</view>
+    </view>
+  </block>
+  <view class="chat card">
+    <view class="chat-title">聊天预览</view>
+    <view class="bubble left">你想用什么交换计算器？</view>
+    <view class="bubble right">我愿意拿奶茶券试试。</view>
+    <view class="bubble left">可以，图书馆门口更安全。</view>
+  </view>
+</view>

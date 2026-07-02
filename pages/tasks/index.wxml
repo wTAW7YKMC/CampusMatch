@@ -1,0 +1,18 @@
+<view class="container">
+  <view class="section-title">任务中心</view>
+  <view class="section-subtitle">把换物变成闯关：发布、提案、心愿、多边交换和故事点赞都能获得奖励。</view>
+  <view class="summary card">
+    <view><text>{{user.brainPower}}</text><text>脑洞值</text></view>
+    <view><text>{{user.energy}}</text><text>闲置能量</text></view>
+    <view><text>{{user.badges ? user.badges.length : 0}}</text><text>徽章</text></view>
+  </view>
+  <block wx:for="{{tasks}}" wx:key="taskId">
+    <view class="task card">
+      <view class="task-head"><view class="task-title">{{item.title}}</view><view class="reward">+{{item.rewardBrain}}脑洞 / +{{item.rewardEnergy}}能量</view></view>
+      <view class="task-desc">{{item.desc}}</view>
+      <view class="bar"><view class="bar-inner" style="width: {{item.percent}}%;"></view></view>
+      <view class="task-foot"><text>{{item.progress}}/{{item.target}} · {{item.badge}}</text><button wx:if="{{item.done && !item.claimed}}" data-id="{{item.taskId}}" bindtap="claim">领取</button><text wx:elif="{{item.claimed}}" class="claimed">已领取</text><text wx:else class="todo">进行中</text></view>
+    </view>
+  </block>
+  <view class="actions"><button class="btn-secondary" bindtap="goPublish">去发布</button><button class="btn-secondary" bindtap="goWish">去心愿池</button><button class="btn-secondary" bindtap="goChain">去挑战局</button><button class="btn-secondary" bindtap="goStories">去点赞</button></view>
+</view>

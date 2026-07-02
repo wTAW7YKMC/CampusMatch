@@ -1,0 +1,19 @@
+<view class="tab-bar otaku-scanline">
+  <view class="tab-list">
+    <block wx:for="{{list}}" wx:key="index">
+      <view
+        class="tab-item {{selected === index ? 'tab-active' : ''}}"
+        bindtap="switchTab"
+        data-index="{{index}}"
+        data-path="{{item.pagePath}}"
+      >
+        <view class="tab-icon-wrap">
+          <text class="tab-icon">{{item.icon}}</text>
+          <view wx:if="{{index === 2 && unreadCount > 0}}" class="tab-badge">NEW</view>
+        </view>
+        <text class="tab-text">{{item.text}}</text>
+        <view wx:if="{{selected === index}}" class="tab-indicator"></view>
+      </view>
+    </block>
+  </view>
+</view>

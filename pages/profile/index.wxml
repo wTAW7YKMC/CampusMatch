@@ -1,0 +1,36 @@
+<view class="container">
+  <view class="profile card">
+    <image class="avatar" src="{{user.avatar}}" mode="aspectFill"></image>
+    <view class="name-row"><text class="name">{{user.nickName}}</text><text class="badge">{{user.level}}</text></view>
+    <view class="muted">{{user.school}} · {{user.grade}} · {{user.title}}</view>
+    <view class="score-row"><view>信用分 {{user.creditScore}}</view><view>交换 {{user.exchangeCount}} 次</view><view>{{user.verified ? '已认证大学生' : '未认证'}}</view></view>
+    <view class="play-metrics">
+      <view class="metric"><view class="metric-value">{{user.brainPower}}</view><view class="metric-label">脑洞值</view></view>
+      <view class="metric"><view class="metric-value">{{user.energy || 0}}</view><view class="metric-label">闲置能量</view></view>
+      <view class="metric"><view class="metric-value">{{user.badges ? user.badges.length : 0}}</view><view class="metric-label">徽章</view></view>
+    </view>
+  </view>
+
+  <view class="badges card">
+    <view class="badge-title">我的徽章</view>
+    <view class="badge-list"><block wx:for="{{user.badges}}" wx:key="*this"><text class="fun-badge">{{item}}</text></block></view>
+  </view>
+
+  <view class="badges card">
+    <view class="badge-title">任务进度</view>
+    <block wx:for="{{tasks}}" wx:key="taskId"><view class="task-line"><text>{{item.title}}</text><text>{{item.progress}}/{{item.target}}</text></view></block>
+  </view>
+
+  <view class="menu card">
+    <view class="menu-item">我的发布</view>
+    <view class="menu-item">我的提案</view>
+    <view class="menu-item">我的交换</view>
+    <view class="menu-item" bindtap="goTasks">任务中心</view>
+    <view class="menu-item" bindtap="goWish">校园心愿池</view>
+    <view class="menu-item" bindtap="goChain">交换挑战局</view>
+    <view class="menu-item" bindtap="goMap">安全交易点</view>
+    <view class="menu-item" bindtap="goVerify">学生认证</view>
+    <view class="menu-item" bindtap="goRank">排行榜</view>
+    <view class="menu-item reset" bindtap="resetDemo">重置演示数据</view>
+  </view>
+</view>

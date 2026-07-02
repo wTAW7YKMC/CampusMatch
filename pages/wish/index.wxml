@@ -1,0 +1,17 @@
+<view class="container">
+  <view class="section-title">校园心愿池</view>
+  <view class="section-subtitle">把“我想要”先丢进池子，AI 会把需求趋势反馈给拥有闲置的同学。</view>
+  <view class="form card">
+    <input class="input" placeholder="我想要：计算器 / 雨伞 / 行李箱" value="{{wishName}}" bindinput="onNameInput" />
+    <input class="input second" placeholder="类别：学习用品 / 生活用品" value="{{category}}" bindinput="onCategoryInput" />
+    <button class="btn-primary submit" bindtap="addWish">点亮心愿 +10脑洞</button>
+  </view>
+  <block wx:for="{{wishes}}" wx:key="wishId">
+    <view class="wish card">
+      <view class="wish-head"><view class="wish-name">{{item.name}}</view><view class="count">{{item.count}} 人想要</view></view>
+      <view class="muted">{{item.category}} · {{item.tag}} · {{item.trend}}</view>
+      <view class="tip">如果你有相关闲置，现在发布更容易被匹配。</view>
+      <button class="btn-secondary go" data-name="{{item.name}}" bindtap="publishForWish">我要换这个</button>
+    </view>
+  </block>
+</view>

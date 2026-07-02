@@ -1,0 +1,10 @@
+.chain { padding:24rpx; margin-bottom:20rpx; }
+.chain-head { display:flex; justify-content:space-between; align-items:center; }
+.chain-title { font-size:30rpx; font-weight:700; }
+.score { color:#ff8a00; font-weight:700; }
+.reason { margin-top:10rpx; color:#666; font-size:24rpx; line-height:36rpx; }
+.nodes { margin-top:18rpx; }
+.node { padding:16rpx; margin-bottom:10rpx; border-radius:16rpx; background:#f7f8fc; font-size:25rpx; display:flex; justify-content:space-between; gap:12rpx; }
+.node-user { color:#6c63ff; font-weight:700; }
+.reward { margin-top:14rpx; color:#2e8b57; font-size:24rpx; font-weight:700; }
+.join { margin-top:18rpx; height:82rpx; line-height:82rpx; }

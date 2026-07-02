@@ -1,0 +1,12 @@
+<view class="container">
+  <view class="section-title">交换故事广场</view>
+  <view class="section-subtitle">最离谱、最赚、最暖的交换故事都在这里，点赞也能完成任务。</view>
+  <block wx:for="{{stories}}" wx:key="storyId">
+    <view class="story card">
+      <view class="story-type">{{item.type === 'crazy' ? '离谱交换' : item.type === 'profit' ? '高价值交换' : item.type === 'warm' ? '暖心交换' : '校园交换'}}</view>
+      <view class="story-title">{{item.title}}</view>
+      <view class="story-flow">{{item.beforeItem}}  →  {{item.afterItem}}</view>
+      <button class="like-btn {{item.liked ? 'liked' : ''}}" data-id="{{item.storyId}}" bindtap="likeStory">❤️ {{item.likeCount}}</button>
+    </view>
+  </block>
+</view>

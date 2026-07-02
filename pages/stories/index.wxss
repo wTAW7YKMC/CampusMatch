@@ -1,0 +1,6 @@
+.story { padding: 24rpx; margin-bottom: 18rpx; }
+.story-type { display: inline-block; padding: 8rpx 14rpx; border-radius: 999rpx; background: #ecebff; color: #5d54ff; font-size: 22rpx; margin-bottom: 12rpx; }
+.story-title { font-size: 30rpx; font-weight: 700; }
+.story-flow { margin-top: 14rpx; font-size: 28rpx; color: #333; line-height: 42rpx; }
+.like-btn { margin-top: 18rpx; height: 70rpx; line-height: 66rpx; border-radius: 999rpx; background: #fff7e6; color: #d98200; font-size: 25rpx; }
+.like-btn.liked { background: #ffe3e3; color: #ff5c5c; }

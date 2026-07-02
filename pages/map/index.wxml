@@ -1,0 +1,11 @@
+<view class="container">
+  <view class="section-title">校园安全交易点</view>
+  <view class="section-subtitle">推荐公共、熟悉、便于验货的位置完成面交。</view>
+  <map class="map card" latitude="{{latitude}}" longitude="{{longitude}}" markers="{{markers}}" scale="16"></map>
+  <block wx:for="{{spots}}" wx:key="id">
+    <view class="spot card" data-id="{{item.id}}" bindtap="chooseSpot">
+      <view class="spot-head"><view class="spot-name">{{item.name}}</view><view class="spot-type">{{item.type}}</view></view>
+      <view class="desc">{{item.desc}}</view>
+    </view>
+  </block>
+</view>

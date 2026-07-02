@@ -1,0 +1,55 @@
+<view class="container">
+  <view class="section-title">发起交换</view>
+  <view class="section-subtitle">填写你有什么、想换什么，生成一张可分享的 AI 交换卡。</view>
+
+  <view class="form card">
+    <view class="field">
+      <view class="field-label">我有什么</view>
+      <input class="input" placeholder="例如：保温杯 / 计算器 / 手绘头像服务" value="{{form.haveItem}}" bindinput="onHaveInput" />
+    </view>
+    <view class="field">
+      <view class="field-label">上传图片</view>
+      <view class="upload-grid">
+        <block wx:for="{{form.images}}" wx:key="*this">
+          <image class="upload-img" src="{{item}}" mode="aspectFill"></image>
+        </block>
+        <view class="upload-slot" bindtap="addMockImage">+ 添加</view>
+      </view>
+    </view>
+    <view class="field">
+      <view class="field-label">我想换什么</view>
+      <input class="input" placeholder="例如：奶茶 / 教材 / 任何有趣的东西" value="{{form.wantItem}}" bindinput="onWantInput" />
+    </view>
+    <view class="field">
+      <view class="field-label">交换故事</view>
+      <textarea class="textarea" placeholder="介绍一下这个物品的来历，让它更容易被提案" value="{{form.story}}" bindinput="onStoryInput"></textarea>
+    </view>
+    <view class="switch-row">
+      <text>接受脑洞提案</text>
+      <switch checked="{{form.acceptBrain}}" bindchange="onBrainChange" color="#6c63ff" />
+    </view>
+
+    <button class="btn-secondary ai-btn" bindtap="generateAiCard">✨ 生成 AI 交换卡</button>
+
+    <view wx:if="{{aiCard}}" class="ai-card">
+      <view class="ai-card-head">
+        <view>
+          <view class="ai-title">{{aiCard.title}}</view>
+          <view class="ai-subtitle">{{aiCard.rarity}} · 脑洞分 {{aiCard.brainScore}} · 匹配 {{aiCard.matchScore}}%</view>
+        </view>
+        <view class="ai-value">约{{aiCard.estimatedValue}}元</view>
+      </view>
+      <view class="ai-tags">
+        <block wx:for="{{aiCard.tags}}" wx:key="*this"><text class="tag">{{item}}</text></block>
+      </view>
+      <view class="ai-reason">{{aiCard.reason}}</view>
+      <view class="suggest-box">
+        <view class="suggest-title">可接受替代品</view>
+        <block wx:for="{{aiCard.alternatives}}" wx:key="*this"><text class="alt-chip">{{item}}</text></block>
+      </view>
+      <view class="quest">🎯 {{aiCard.quest}}</view>
+    </view>
+
+    <button class="btn-primary submit" bindtap="submitPost">立即发起交换</button>
+  </view>
+</view>

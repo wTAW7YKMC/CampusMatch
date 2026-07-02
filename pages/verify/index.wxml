@@ -1,0 +1,11 @@
+<view class="container">
+  <view class="section-title">学生认证</view>
+  <view class="section-subtitle">支持学生证上传或校园邮箱认证，认证后会显示绿色标识。</view>
+
+  <view class="card auth">
+    <view class="auth-row">当前状态：<text class="badge">已认证大学生</text></view>
+    <view class="auth-row">认证方式：校园邮箱</view>
+    <view class="auth-row">信用分：95</view>
+    <button class="btn-primary submit">提交认证</button>
+  </view>
+</view>

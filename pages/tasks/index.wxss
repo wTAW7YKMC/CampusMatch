@@ -1,0 +1,18 @@
+.summary { display:flex; gap:14rpx; padding:22rpx; margin:20rpx 0; }
+.summary view { flex:1; text-align:center; background:#f7f8fc; border-radius:16rpx; padding:16rpx 8rpx; }
+.summary text { display:block; }
+.summary text:first-child { font-size:32rpx; font-weight:700; color:#6c63ff; }
+.summary text:last-child { font-size:22rpx; color:#777; margin-top:4rpx; }
+.task { padding:24rpx; margin-bottom:18rpx; }
+.task-head { display:flex; justify-content:space-between; gap:16rpx; }
+.task-title { font-size:29rpx; font-weight:700; }
+.reward { color:#ff8a00; font-size:22rpx; flex-shrink:0; }
+.task-desc { margin-top:10rpx; color:#666; font-size:24rpx; line-height:36rpx; }
+.bar { height:14rpx; background:#eef0f4; border-radius:999rpx; overflow:hidden; margin:18rpx 0; }
+.bar-inner { height:14rpx; background:linear-gradient(90deg,#6c63ff,#ffb84d); }
+.task-foot { display:flex; justify-content:space-between; align-items:center; font-size:23rpx; color:#777; }
+.task-foot button { margin:0; height:60rpx; line-height:56rpx; padding:0 28rpx; border-radius:999rpx; background:#6c63ff; color:#fff; font-size:24rpx; }
+.claimed { color:#2e8b57; font-weight:700; }
+.todo { color:#999; }
+.actions { display:grid; grid-template-columns:repeat(2,1fr); gap:12rpx; margin-top:10rpx; }
+.actions button { height:76rpx; line-height:72rpx; font-size:25rpx; }

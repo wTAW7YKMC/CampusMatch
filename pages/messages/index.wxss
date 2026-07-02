@@ -1,0 +1,53 @@
+.msg {
+  padding: 22rpx;
+  margin-bottom: 18rpx;
+}
+
+.msg-title {
+  font-size: 28rpx;
+  font-weight: 700;
+}
+
+.msg-desc {
+  margin-top: 8rpx;
+  font-size: 24rpx;
+  color: #666;
+}
+
+.msg-time {
+  margin-top: 10rpx;
+  font-size: 22rpx;
+  color: #999;
+}
+
+.chat {
+  padding: 22rpx;
+  margin-top: 10rpx;
+}
+
+.chat-title {
+  font-size: 28rpx;
+  font-weight: 700;
+  margin-bottom: 18rpx;
+}
+
+.bubble {
+  max-width: 78%;
+  padding: 18rpx 20rpx;
+  border-radius: 18rpx;
+  margin-bottom: 14rpx;
+  font-size: 26rpx;
+}
+
+.bubble.left {
+  background: #f0f1f7;
+  color: #222;
+}
+
+.bubble.right {
+  background: #6c63ff;
+  color: #fff;
+  margin-left: auto;
+}
+
+.msg-icon { margin-right: 8rpx; }

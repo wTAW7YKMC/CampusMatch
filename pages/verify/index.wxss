@@ -1,0 +1,14 @@
+.auth {
+  padding: 24rpx;
+}
+
+.auth-row {
+  font-size: 28rpx;
+  margin-bottom: 18rpx;
+}
+
+.submit {
+  margin-top: 18rpx;
+  height: 92rpx;
+  line-height: 92rpx;
+}

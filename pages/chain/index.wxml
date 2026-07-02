@@ -1,0 +1,17 @@
+<view class="container">
+  <view class="section-title">多边交换挑战局</view>
+  <view class="section-subtitle">当一对一换不成，AI 会寻找 A→B→C→A 的交换闭环。</view>
+  <block wx:for="{{chains}}" wx:key="chainId">
+    <view class="chain card">
+      <view class="chain-head"><view class="chain-title">{{item.title}}</view><view class="score">{{item.score}}%</view></view>
+      <view class="reason">{{item.reason}}</view>
+      <view class="nodes">
+        <block wx:for="{{item.nodes}}" wx:for-item="node" wx:key="user">
+          <view class="node"><view class="node-user">{{node.user}}</view><view>{{node.have}} → {{node.want}}</view></view>
+        </block>
+      </view>
+      <view class="reward">奖励：+{{item.rewardBrain}} 脑洞值 / +{{item.rewardEnergy}} 闲置能量</view>
+      <button class="btn-primary join" data-id="{{item.chainId}}" bindtap="joinChain">{{item.status === 'joined' ? '已参与' : '开启挑战局'}}</button>
+    </view>
+  </block>
+</view>

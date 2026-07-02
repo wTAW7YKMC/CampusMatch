@@ -1,0 +1,128 @@
+<view class="home-container">
+  <!-- L1 自定义导航 -->
+  <view class="custom-nav">
+    <view class="status-bar">
+      <view class="status-time font-number">{{currentTime}}</view>
+      <view class="status-hud">
+        <text class="hud-icon">📶</text>
+        <text class="hud-text">HP</text>
+        <view class="battery"><view class="battery-fill"></view></view>
+      </view>
+    </view>
+    <view class="nav-title-row">
+      <view class="nav-title">交换广场</view>
+      <text class="cursor">▌</text>
+    </view>
+  </view>
+
+  <view class="home-body">
+    <!-- 7.2 核心行动区（磁带/卡带） -->
+    <view class="cassette" bindtap="goPublish">
+      <view class="cassette-title otaku-glitch" data-text="换个啥">换个啥</view>
+      <view class="cassette-subtitle">你的闲置，可能正是别人眼里的宝藏。</view>
+      <view class="cassette-actions">
+        <button class="otaku-btn cassette-btn" bindtap="goPublish">
+          <text class="otaku-btn-text">➕ 挂个闲置</text>
+        </button>
+        <button class="otaku-btn otaku-btn-ghost cassette-btn" bindtap="goLab">
+          <text class="otaku-btn-text">AI 撮合 ✦</text>
+        </button>
+      </view>
+      <view class="cassette-counter">
+        <text>今日已撮合 </text>
+        <text class="font-number counter-num">{{matchCount}}</text>
+        <text> 次</text>
+      </view>
+    </view>
+
+    <!-- 7.3 搜索区 -->
+    <view class="search-box" bindtap="onSearchTap">
+      <text class="search-icon">🔍</text>
+      <text class="search-placeholder">搜点啥？</text>
+    </view>
+
+    <!-- 7.4 话题标签行 -->
+    <scroll-view scroll-x class="topic-scroll" show-scrollbar="false">
+      <view class="topic-list">
+        <block wx:for="{{topicTags}}" wx:key="*this">
+          <view class="topic-tag" bindtap="onTagTap" data-tag="{{item}}">{{item}}</view>
+        </block>
+      </view>
+    </scroll-view>
+
+    <!-- 7.5 快捷入口 -->
+    <view class="quick-row">
+      <view class="quick-item" bindtap="goRank">
+        <view class="quick-icon-wrap">🏆</view>
+        <text class="quick-text">排行榜</text>
+        <view class="otaku-new-badge">NEW</view>
+      </view>
+      <view class="quick-item" bindtap="randomStory">
+        <view class="quick-icon-wrap">🔥</view>
+        <text class="quick-text">今日离谱</text>
+      </view>
+      <view class="quick-item" bindtap="goStories">
+        <view class="quick-icon-wrap">📖</view>
+        <text class="quick-text">交换物语</text>
+      </view>
+    </view>
+
+    <!-- 7.6 推荐交换卡片 -->
+    <view class="section-header">
+      <view class="section-tag">【推荐交换】</view>
+      <view class="section-sub">AI 正在派单…</view>
+    </view>
+    <view class="debug-path" wx:if="{{posts.length}}">DEBUG: {{posts[0].images[0]}}</view>
+
+    <block wx:for="{{posts}}" wx:key="postId">
+      <view class="swap-card" bindtap="goDetail" data-id="{{item.postId}}">
+        <view class="swap-head">
+          <view class="otaku-avatar">
+            <image src="{{item.avatar}}" mode="aspectFill"></image>
+          </view>
+          <view class="swap-user">
+            <view class="user-name">
+              {{item.nickName || '校换用户'}}
+              <text wx:if="{{item.verified}}" class="verified">★认证玩家</text>
+            </view>
+            <view class="user-meta">{{item.school}} Lv.3 · 2026.06.14 在线</view>
+          </view>
+        </view>
+
+        <view class="swap-image-wrap">
+          <image class="swap-image" src="{{item.images[0]}}" mode="aspectFill"></image>
+          <view class="torn-mask"></view>
+          <view wx:if="{{index === 0}}" class="sticker sticker-urgent">急出</view>
+          <view wx:if="{{index === 1}}" class="sticker sticker-face">仅面交</view>
+          <view wx:if="{{index === 2}}" class="sticker sticker-negotiable">可刀</view>
+        </view>
+
+        <view class="swap-title">◤{{item.title}}◢</view>
+        <view class="swap-line"><text class="swap-label">我有什么：</text>🧮 {{item.haveItem}}</view>
+        <view class="swap-line"><text class="swap-label">我想换：</text>🎮 {{item.wantItem}}</view>
+
+        <view class="badge-row">
+          <view class="otaku-badge otaku-badge-cyan">距{{item.distance || 200}}m</view>
+          <view class="otaku-badge otaku-badge-pink">匹配{{item.matchScore || 87}}%</view>
+          <view class="otaku-badge otaku-badge-orange">急出</view>
+        </view>
+
+        <view class="swap-actions">
+          <button class="chat-btn" bindtap="onChatTap" data-id="{{item.postId}}">
+            <text class="otaku-btn-text">💬 聊一聊</text>
+          </button>
+          <button class="swap-btn" bindtap="onSwapTap" data-id="{{item.postId}}">
+            <text class="otaku-btn-text">⚡ 立即交换</text>
+          </button>
+        </view>
+      </view>
+    </block>
+
+    <view class="otaku-divider">⋆ ｡˚ ☆ ˚ ｡⋆</view>
+
+    <view class="empty-hint">
+      <text>正在读取更多交换情报…</text>
+      <view class="pixel-bar"><view class="pixel-progress"></view></view>
+    </view>
+  </view>
+</view>
