@@ -7,7 +7,7 @@
   right: 0;
   padding-bottom: constant(safe-area-inset-bottom);
   padding-bottom: env(safe-area-inset-bottom);
-  background: rgba(15, 10, 26, 0.95);
+  background: rgba(248, 245, 242, 0.95);
   backdrop-filter: blur(20rpx);
   border-top: 2rpx solid rgba(139, 92, 246, 0.4);
   box-shadow: 0 -4rpx 24rpx rgba(139, 92, 246, 0.2);
@@ -69,8 +69,8 @@
 .tab-text {
   font-family: var(--font-display);
   font-size: 20rpx;
-  color: var(--paper-white);
-  opacity: 0.6;
+  color: #1a1025;
+  opacity: 0.7;
   transition: all 0.2s;
 }
 
@@ -103,7 +103,7 @@
 }
 
 .tab-active .tab-text {
-  color: var(--neon-violet);
+  color: #8b5cf6;
   opacity: 1;
   text-shadow: 0 0 8rpx var(--violet-80);
 }
@@ -115,7 +115,7 @@
   background: var(--gradient-cyan-violet);
   border-radius: 50%;
   margin-top: -24rpx;
-  box-shadow: 0 0 0 4rpx rgba(15, 10, 26, 0.9), 0 0 20rpx var(--cyan-80);
+  box-shadow: 0 0 0 4rpx rgba(248, 245, 242, 0.9), 0 0 20rpx var(--cyan-80);
 }
 
 .tab-item:nth-child(2) .tab-icon {
@@ -125,7 +125,7 @@
 
 .tab-item:nth-child(2).tab-active .tab-icon-wrap {
   transform: translateY(-8rpx) rotate(8deg);
-  box-shadow: 0 0 0 4rpx rgba(15, 10, 26, 0.9), 0 0 28rpx var(--neon-cyan);
+  box-shadow: 0 0 0 4rpx rgba(248, 245, 242, 0.9), 0 0 28rpx var(--neon-cyan);
 }
 
 /* NEW 角标 */
