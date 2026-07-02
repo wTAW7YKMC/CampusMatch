@@ -1131,9 +1131,9 @@
       { pos: 'left', anim: 'rotate', texts: ['校园实名认证', '信用分 92'] },
       { pos: 'bottom', anim: 'elastic', texts: ['交换成功', '闲置变有用'] }
     ];
-    const sceneDurations = [0, 9000, 9000, 14000, 14000, 9000, 9000]; // 每个 Scene 内容展示时长（ms）
-    const sceneTimes = [0, 10714, 21428, 32142, 42857, 53571, 64285]; // 7 等分 75s，用于拖拽跳转
-    const totalTime = 75000;
+    const sceneDurations = [0, 5000, 6000, 8000, 8000, 6000, 6000]; // 每个 Scene 内容展示时长（ms）
+    const sceneTimes = [0, 5000, 11600, 20200, 28800, 35400, 42000]; // 对应加速后的总时间轴，用于拖拽跳转
+    const totalTime = 48000;
     const sceneTransitions = [null, 'push', 'push', 'push', 'dissolve', 'flip', 'scaleblur'];
     function resetScenes() {
       scenes.forEach(s => {
@@ -1352,7 +1352,7 @@
         setupScene01(); scenes[0].classList.add('active');
         if (!await wait(200, token)) return;
         showCaption(1);
-        if (!await wait(3800, token)) return;
+        if (!await wait(4200, token)) return;
         hideCaption();
       } else if (startScene === 2) {
         setupScene02(); scenes[1].classList.add('active');
