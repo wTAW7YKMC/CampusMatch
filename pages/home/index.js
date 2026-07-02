@@ -20,7 +20,12 @@ Page({
       '#以技换物',
       '#本周热榜',
     ],
+    searchKeyword: '',
+    isSearching: false,
+    allPosts: [],
+    filteredPosts: [],
   },
+
 
   onShow() {
     const state = app.resetState();
@@ -38,6 +43,8 @@ Page({
     this.setData({
       user: state.currentUser,
       posts: localPosts,
+      allPosts: localPosts,
+      filteredPosts: localPosts,
       wishes: state.wishes.slice(0, 4),
       tasks: state.tasks.slice(0, 2),
       chains: state.chains.slice(0, 1),
@@ -81,8 +88,55 @@ Page({
   randomStory() { wx.navigateTo({ url: '/pages/stories/index?focus=random' }); },
 
   onSearchTap() {
-    wx.showToast({ title: '搜索功能即将上线', icon: 'none' });
+    this.setData({ isSearching: true });
   },
+
+  onSearchInput(e) {
+    const keyword = e.detail.value || '';
+    this.setData({ searchKeyword: keyword });
+    this.filterPosts(keyword);
+  },
+
+  onSearchConfirm(e) {
+    const keyword = e.detail.value || '';
+    this.setData({ searchKeyword: keyword });
+    this.filterPosts(keyword);
+  },
+
+  clearSearch() {
+    this.setData({ searchKeyword: '' });
+    this.filterPosts('');
+  },
+
+  cancelSearch() {
+    this.setData({ isSearching: false, searchKeyword: '' });
+    this.filterPosts('');
+  },
+
+  filterPosts(keyword) {
+    const kw = (keyword || '').toLowerCase().trim();
+    if (!kw) {
+      this.setData({ filteredPosts: this.data.allPosts });
+      return;
+    }
+    // 支持空格分隔的多关键词，任一关键词命中即可
+    const kws = kw.split(/\s+/).filter((s) => s.length > 0);
+    const filtered = this.data.allPosts.filter((post) => {
+      const haystack = [
+        post.title || '',
+        post.haveItem || '',
+        post.wantItem || '',
+        post.nickName || '',
+        post.school || '',
+        post.story || '',
+        (post.tags || []).join(' '),
+      ].join(' ').toLowerCase();
+      return kws.some((w) => haystack.includes(w));
+    });
+    this.setData({ filteredPosts: filtered });
+  },
+
+
 
   onTagTap(e) {
     const { tag } = e.currentTarget.dataset;

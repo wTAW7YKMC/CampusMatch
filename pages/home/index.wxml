@@ -36,10 +36,27 @@
     </view>
 
     <!-- 7.3 搜索区 -->
-    <view class="search-box" bindtap="onSearchTap">
+    <view class="search-box" wx:if="{{!isSearching}}" bindtap="onSearchTap">
       <text class="search-icon">🔍</text>
       <text class="search-placeholder">搜点啥？</text>
     </view>
+
+    <view class="search-box search-active" wx:if="{{isSearching}}">
+      <text class="search-icon">🔍</text>
+      <input
+        class="search-input"
+        value="{{searchKeyword}}"
+        focus="{{isSearching}}"
+        placeholder="搜点啥？"
+        placeholder-class="search-placeholder"
+        confirm-type="search"
+        bindinput="onSearchInput"
+        bindconfirm="onSearchConfirm"
+      />
+      <text class="search-clear" wx:if="{{searchKeyword}}" bindtap="clearSearch">✕</text>
+      <text class="search-cancel" bindtap="cancelSearch">取消</text>
+    </view>
+
 
     <!-- 7.4 话题标签行 -->
     <scroll-view scroll-x class="topic-scroll" show-scrollbar="false">
@@ -72,9 +89,9 @@
       <view class="section-tag">【推荐交换】</view>
       <view class="section-sub">AI 正在派单…</view>
     </view>
-    <view class="debug-path" wx:if="{{posts.length}}">DEBUG: {{posts[0].images[0]}}</view>
+    <view class="debug-path" wx:if="{{filteredPosts.length}}">DEBUG: {{filteredPosts[0].images[0]}}</view>
 
-    <block wx:for="{{posts}}" wx:key="postId">
+    <block wx:for="{{filteredPosts}}" wx:key="postId">
       <view class="swap-card" bindtap="goDetail" data-id="{{item.postId}}">
         <view class="swap-head">
           <view class="otaku-avatar">
@@ -117,6 +134,13 @@
         </view>
       </view>
     </block>
+
+    <view class="empty-search" wx:if="{{isSearching && !filteredPosts.length}}">
+      <text class="empty-search-icon">🕳️</text>
+      <text class="empty-search-text">没找到「{{searchKeyword}}」相关交换</text>
+      <text class="empty-search-tip">换个关键词试试</text>
+    </view>
+
 
     <view class="otaku-divider">⋆ ｡˚ ☆ ˚ ｡⋆</view>
 
