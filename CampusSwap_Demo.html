@@ -1047,6 +1047,8 @@
     <button class="audio-control" id="audioControl" aria-label="Toggle sound">🔊</button>
   </div>
 
+  <audio id="bgm" src="bgm.mp3" loop preload="auto"></audio>
+
   <script>
     const $ = (sel) => document.querySelector(sel);
     const $$ = (sel) => Array.from(document.querySelectorAll(sel));
@@ -1077,58 +1079,44 @@
     window.addEventListener('resize', fitStage); fitStage();
 
     /* =========================
-       音频系统（Web Audio 程序生成）
+       音频系统（MP3 BGM + Web Audio 音效）
        ========================= */
-    let audioCtx = null, bgmGain = null, sfxGain = null, isMuted = false, bgmInterval = null;
+    let audioCtx = null, sfxGain = null, isMuted = false;
+    const bgm = $('#bgm');
     function initAudio() {
       if (audioCtx) return;
       try {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        bgmGain = audioCtx.createGain(); sfxGain = audioCtx.createGain();
-        bgmGain.connect(audioCtx.destination); sfxGain.connect(audioCtx.destination);
-        bgmGain.gain.value = 0.3; sfxGain.gain.value = 0.5;
+        sfxGain = audioCtx.createGain();
+        sfxGain.connect(audioCtx.destination);
+        sfxGain.gain.value = 0.5;
       } catch (e) { console.warn('Audio init failed', e); }
     }
-    function playTone(freq, duration, type = 'sine', when = 0, gainNode = sfxGain) {
+    function playTone(freq, duration, type = 'sine', when = 0) {
       if (!audioCtx || isMuted) return;
       const osc = audioCtx.createOscillator(), g = audioCtx.createGain();
-      osc.type = type; osc.frequency.value = freq; osc.connect(g); g.connect(gainNode);
+      osc.type = type; osc.frequency.value = freq; osc.connect(g); g.connect(sfxGain);
       const t = audioCtx.currentTime + when;
       g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(0.35, t + 0.02);
       g.gain.exponentialRampToValueAtTime(0.001, t + duration);
       osc.start(t); osc.stop(t + duration + 0.05);
     }
-    function playAmbientChord() {
-      if (!audioCtx || isMuted) return;
-      [261.63, 329.63, 392.00].forEach((f) => {
-        const osc = audioCtx.createOscillator(), g = audioCtx.createGain();
-        osc.type = 'sine'; osc.frequency.value = f; osc.connect(g); g.connect(bgmGain);
-        g.gain.setValueAtTime(0, audioCtx.currentTime); g.gain.linearRampToValueAtTime(0.05, audioCtx.currentTime + 0.8);
-        g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 3.2);
-        osc.start(); osc.stop(audioCtx.currentTime + 3.3);
-      });
-    }
-    function playArpeggioNote() {
-      if (!audioCtx || isMuted) return;
-      const scale = [261.63, 293.66, 329.63, 349.23, 392.00, 440.00, 493.88, 523.25];
-      playTone(scale[Math.floor(Math.random() * scale.length)], 1.2, 'triangle', 0, bgmGain);
-    }
-    function startBGM() {
-      if (!audioCtx || bgmInterval) return;
-      playAmbientChord();
-      bgmInterval = setInterval(() => { playAmbientChord(); if (Math.random() > 0.4) setTimeout(playArpeggioNote, 800); }, 4000);
-    }
-    function stopBGM() { if (bgmInterval) { clearInterval(bgmInterval); bgmInterval = null; } }
     function playSuccessSfx() { if (!audioCtx || isMuted) return; playTone(523.25, 0.12, 'sine'); setTimeout(() => playTone(659.25, 0.18, 'sine'), 80); }
-    function toggleMute() {
-      isMuted = !isMuted;
+    function setMuted(muted) {
+      isMuted = muted;
+      bgm.muted = isMuted;
       const btn = $('#audioControl'); btn.textContent = isMuted ? '🔇' : '🔊'; btn.classList.toggle('muted', isMuted);
-      if (bgmGain) bgmGain.gain.setTargetAtTime(isMuted ? 0 : 0.3, audioCtx.currentTime, 0.05);
       if (sfxGain) sfxGain.gain.setTargetAtTime(isMuted ? 0 : 0.5, audioCtx.currentTime, 0.05);
-      if (!isMuted && !bgmInterval) startBGM();
     }
-    $('#audioControl').addEventListener('click', () => { initAudio(); if (audioCtx.state === 'suspended') audioCtx.resume(); startBGM(); toggleMute(); });
-    document.body.addEventListener('click', function firstInteract() { initAudio(); if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume(); startBGM(); document.body.removeEventListener('click', firstInteract); }, { once: true });
+    function toggleAudio() {
+      if (bgm.paused) {
+        bgm.play().catch(e => console.warn('BGM play failed', e));
+      } else {
+        setMuted(!isMuted);
+      }
+    }
+    $('#audioControl').addEventListener('click', () => { initAudio(); if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume(); toggleAudio(); });
+    document.body.addEventListener('click', function firstInteract() { initAudio(); if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume(); if (bgm.paused) bgm.play().catch(e => {}); document.body.removeEventListener('click', firstInteract); }, { once: true });
 
     /* =========================
        Scene 引擎
