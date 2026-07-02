@@ -382,10 +382,16 @@ page {
 /* ===== 推荐区标题 ===== */
 .section-header {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
   margin-bottom: 20rpx;
   margin-top: 8rpx;
+}
+
+.section-title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
 }
 
 .section-tag {
@@ -400,6 +406,30 @@ page {
   font-size: 22rpx;
   color: #6b5b8a;
 }
+
+.sort-tabs {
+  display: flex;
+  align-items: center;
+  background: rgba(15, 10, 26, 0.06);
+  border-radius: 32rpx;
+  padding: 4rpx;
+}
+
+.sort-tab {
+  font-size: 24rpx;
+  color: #6b5b8a;
+  padding: 10rpx 22rpx;
+  border-radius: 28rpx;
+  transition: all 0.2s ease;
+}
+
+.sort-active {
+  background: var(--gradient-paper);
+  color: var(--dark-base);
+  font-weight: 700;
+  box-shadow: 0 2rpx 8rpx rgba(15, 10, 26, 0.12);
+}
+
 
 /* ===== 交换卡片 ===== */
 .swap-card {

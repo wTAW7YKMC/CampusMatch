@@ -86,8 +86,14 @@
 
     <!-- 7.6 推荐交换卡片 -->
     <view class="section-header">
-      <view class="section-tag">【推荐交换】</view>
-      <view class="section-sub">AI 正在派单…</view>
+      <view class="section-title-group">
+        <view class="section-tag">【交换广场】</view>
+        <view class="section-sub">发现校园闲置</view>
+      </view>
+      <view class="sort-tabs">
+        <view class="sort-tab {{sortBy === 'latest' ? 'sort-active' : ''}}" bindtap="onSortTap" data-type="latest">最新</view>
+        <view class="sort-tab {{sortBy === 'hot' ? 'sort-active' : ''}}" bindtap="onSortTap" data-type="hot">最热</view>
+      </view>
     </view>
     <view class="debug-path" wx:if="{{filteredPosts.length}}">DEBUG: {{filteredPosts[0].images[0]}}</view>
 
@@ -106,14 +112,6 @@
           </view>
         </view>
 
-        <view class="swap-image-wrap">
-          <image class="swap-image" src="{{item.images[0]}}" mode="aspectFill"></image>
-          <view class="torn-mask"></view>
-          <view wx:if="{{index === 0}}" class="sticker sticker-urgent">急出</view>
-          <view wx:if="{{index === 1}}" class="sticker sticker-face">仅面交</view>
-          <view wx:if="{{index === 2}}" class="sticker sticker-negotiable">可刀</view>
-        </view>
-
         <view class="swap-title">◤{{item.title}}◢</view>
         <view class="swap-line"><text class="swap-label">我有什么：</text>🧮 {{item.haveItem}}</view>
         <view class="swap-line"><text class="swap-label">我想换：</text>🎮 {{item.wantItem}}</view>
@@ -121,7 +119,7 @@
         <view class="badge-row">
           <view class="otaku-badge otaku-badge-cyan">距{{item.distance || 200}}m</view>
           <view class="otaku-badge otaku-badge-pink">匹配{{item.matchScore || 87}}%</view>
-          <view class="otaku-badge otaku-badge-orange">急出</view>
+          <view class="otaku-badge otaku-badge-orange">{{item.createdAt === '刚刚' ? 'NEW' : '急出'}}</view>
         </view>
 
         <view class="swap-actions">
@@ -134,6 +132,7 @@
         </view>
       </view>
     </block>
+
 
     <view class="empty-search" wx:if="{{isSearching && !filteredPosts.length}}">
       <text class="empty-search-icon">🕳️</text>

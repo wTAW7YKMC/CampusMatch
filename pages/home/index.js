@@ -24,11 +24,13 @@ Page({
     isSearching: false,
     allPosts: [],
     filteredPosts: [],
+    sortBy: 'latest',
   },
 
 
+
   onShow() {
-    const state = app.resetState();
+    const state = app.restoreState();
     refreshTasks(state);
     this.updateTime();
 
@@ -37,14 +39,18 @@ Page({
     const localPosts = state.posts.map((post, idx) => ({
       ...post,
       avatar: `./images/avatar-${(idx % 6) + 2}.png`,
-      images: [`./images/post-${['calculator','cup','suitcase','books','art'][idx % 5]}.png`],
+      images: post.images && post.images.length
+        ? [`./images/post-${['calculator','cup','suitcase','books','art'][idx % 5]}.png`]
+        : [],
     }));
+
+    const sortedPosts = this.sortPosts(localPosts, this.data.sortBy);
 
     this.setData({
       user: state.currentUser,
       posts: localPosts,
       allPosts: localPosts,
-      filteredPosts: localPosts,
+      filteredPosts: sortedPosts,
       wishes: state.wishes.slice(0, 4),
       tasks: state.tasks.slice(0, 2),
       chains: state.chains.slice(0, 1),
@@ -54,6 +60,7 @@ Page({
     console.log('DEBUG state.version', state.version);
     this.syncTabBar();
   },
+
 
   syncTabBar() {
     if (typeof this.getTabBar === 'function' && this.getTabBar()) {
@@ -115,26 +122,52 @@ Page({
 
   filterPosts(keyword) {
     const kw = (keyword || '').toLowerCase().trim();
-    if (!kw) {
-      this.setData({ filteredPosts: this.data.allPosts });
-      return;
+    let base = this.data.allPosts;
+    if (kw) {
+      // 支持空格分隔的多关键词，任一关键词命中即可
+      const kws = kw.split(/\s+/).filter((s) => s.length > 0);
+      base = this.data.allPosts.filter((post) => {
+        const haystack = [
+          post.title || '',
+          post.haveItem || '',
+          post.wantItem || '',
+          post.nickName || '',
+          post.school || '',
+          post.story || '',
+          (post.tags || []).join(' '),
+        ].join(' ').toLowerCase();
+        return kws.some((w) => haystack.includes(w));
+      });
     }
-    // 支持空格分隔的多关键词，任一关键词命中即可
-    const kws = kw.split(/\s+/).filter((s) => s.length > 0);
-    const filtered = this.data.allPosts.filter((post) => {
-      const haystack = [
-        post.title || '',
-        post.haveItem || '',
-        post.wantItem || '',
-        post.nickName || '',
-        post.school || '',
-        post.story || '',
-        (post.tags || []).join(' '),
-      ].join(' ').toLowerCase();
-      return kws.some((w) => haystack.includes(w));
-    });
-    this.setData({ filteredPosts: filtered });
+    this.setData({ filteredPosts: this.sortPosts(base, this.data.sortBy) });
   },
+
+  sortPosts(list, sortBy) {
+    const posts = (list || []).slice();
+    if (sortBy === 'hot') {
+      posts.sort((a, b) => {
+        const hotA = (a.likeCount || 0) + (a.proposalCount || 0) * 2;
+        const hotB = (b.likeCount || 0) + (b.proposalCount || 0) * 2;
+        return hotB - hotA;
+      });
+    } else {
+      // 最新：新发布（createdAt 为 '刚刚'）置顶，其余按 createdAt 字符串降序
+      posts.sort((a, b) => {
+        if (a.createdAt === '刚刚' && b.createdAt !== '刚刚') return -1;
+        if (b.createdAt === '刚刚' && a.createdAt !== '刚刚') return 1;
+        return String(b.createdAt || '').localeCompare(String(a.createdAt || ''));
+      });
+    }
+    return posts;
+  },
+
+  onSortTap(e) {
+    const { type } = e.currentTarget.dataset;
+    if (type === this.data.sortBy) return;
+    this.setData({ sortBy: type });
+    this.filterPosts(this.data.searchKeyword);
+  },
+
 
 
 
