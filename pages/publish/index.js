@@ -26,6 +26,16 @@ Page({
     this.setData({ 'form.acceptBrain': true });
   },
 
+  onShow() {
+    this.syncTabBar();
+  },
+
+  syncTabBar() {
+    if (typeof this.getTabBar === 'function' && this.getTabBar()) {
+      this.getTabBar().setData({ selected: 1 });
+    }
+  },
+
   updateFormField(key, value) {
     this.setData({ [`form.${key}`]: value });
   },

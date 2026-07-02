@@ -15,7 +15,7 @@ Component({
       const { index, path } = e.currentTarget.dataset;
       const current = this.data.selected;
       if (current === index) return;
-      this.setData({ selected: index });
+      // 切换交给页面 onShow 同步高亮，避免状态不一致导致点击无响应
       wx.switchTab({ url: path });
     },
   },

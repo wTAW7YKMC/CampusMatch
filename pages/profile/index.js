@@ -8,6 +8,13 @@ Page({
     const state = app.restoreState();
     refreshTasks(state);
     this.setData({ user: state.currentUser, tasks: state.tasks.slice(0, 3) });
+    this.syncTabBar();
+  },
+
+  syncTabBar() {
+    if (typeof this.getTabBar === 'function' && this.getTabBar()) {
+      this.getTabBar().setData({ selected: 3 });
+    }
   },
 
   goVerify() { wx.navigateTo({ url: '/pages/verify/index' }); },
