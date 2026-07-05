@@ -1,14 +1,6 @@
 <view class="home-container">
   <!-- L1 自定义导航 -->
   <view class="custom-nav">
-    <view class="status-bar">
-      <view class="status-time font-number">{{currentTime}}</view>
-      <view class="status-hud">
-        <text class="hud-icon">📶</text>
-        <text class="hud-text">HP</text>
-        <view class="battery"><view class="battery-fill"></view></view>
-      </view>
-    </view>
     <view class="nav-title-row">
       <view class="nav-title">交换广场</view>
       <text class="cursor">▌</text>
@@ -95,7 +87,6 @@
         <view class="sort-tab {{sortBy === 'hot' ? 'sort-active' : ''}}" bindtap="onSortTap" data-type="hot">最热</view>
       </view>
     </view>
-    <view class="debug-path" wx:if="{{filteredPosts.length}}">DEBUG: {{filteredPosts[0].images[0]}}</view>
 
     <block wx:for="{{filteredPosts}}" wx:key="postId">
       <view class="swap-card" bindtap="goDetail" data-id="{{item.postId}}">

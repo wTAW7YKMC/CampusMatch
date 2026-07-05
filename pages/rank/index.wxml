@@ -1,21 +1,55 @@
 <view class="container">
-  <view class="section-title">排行榜</view>
-  <view class="section-subtitle">脑洞王、交换达人、信用达人、闲置能量榜，看看谁最会玩交换。</view>
+  <view class="hero-card">
+    <view>
+      <view class="hero-title">校园排行榜</view>
+      <view class="hero-subtitle">根据 Supabase 云端数据实时生成</view>
+    </view>
 
-  <view class="tabs">
-    <view class="tab {{active === 'brain' ? 'on' : ''}}" data-type="brain" bindtap="switchTab">脑洞王</view>
-    <view class="tab {{active === 'exchange' ? 'on' : ''}}" data-type="exchange" bindtap="switchTab">交换达人</view>
-    <view class="tab {{active === 'energy' ? 'on' : ''}}" data-type="energy" bindtap="switchTab">能量榜</view>
-    <view class="tab {{active === 'credit' ? 'on' : ''}}" data-type="credit" bindtap="switchTab">信用达人</view>
+    <button class="refresh-btn" bindtap="refreshRank">刷新</button>
   </view>
 
-  <block wx:for="{{list}}" wx:key="nickName">
-    <view class="rank card">
-      <view class="rank-top">
-        <view class="rank-name">{{index + 1}}. {{item.nickName}}</view>
-        <view class="rank-score">{{item.value}}{{active === 'brain' ? '脑洞值' : active === 'exchange' ? '次' : active === 'energy' ? '能量' : '分'}}</view>
+  <view class="tabs">
+    <block wx:for="{{tabs}}" wx:key="key">
+      <view
+        class="tab {{activeType === item.key ? 'active' : ''}}"
+        data-type="{{item.key}}"
+        bindtap="switchRank"
+      >
+        {{item.label}}
       </view>
-      <view class="muted">{{item.school}}</view>
-    </view>
+    </block>
+  </view>
+
+  <view class="section-title">{{currentTitle}}</view>
+
+  <view wx:if="{{loading}}" class="empty-card">
+    <view class="empty-icon">⏳</view>
+    <view class="empty-title">加载中</view>
+  </view>
+
+  <view wx:elif="{{!rankRows.length}}" class="empty-card">
+    <view class="empty-icon">🏆</view>
+    <view class="empty-title">{{emptyText}}</view>
+    <view class="empty-text">发布、提案、认证和完成交换后，排行榜会自动变化。</view>
+  </view>
+
+  <block wx:else>
+    <block wx:for="{{rankRows}}" wx:key="rank">
+      <view class="rank-card {{item.rank <= 3 ? 'top-card' : ''}}">
+        <view class="rank-left">
+          <view class="medal">{{item.medal}}</view>
+
+          <view>
+            <view class="name">{{item.nickName}}</view>
+            <view class="school">{{item.school}}</view>
+          </view>
+        </view>
+
+        <view class="rank-value">
+          <view class="value">{{item.value}}</view>
+          <view class="unit">{{item.unit}}</view>
+        </view>
+      </view>
+    </block>
   </block>
 </view>

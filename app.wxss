@@ -1,55 +1,19 @@
-/* 全局设计系统 —— 校园换物 / 换个啥 v2.0 */
-
 page {
-  --neon-violet: #8B5CF6;
-  --neon-pink: #EC4899;
-  --neon-cyan: #06B6D4;
-  --neon-orange: #F59E0B;
-  --dark-base: #0F0A1A;
-  --paper-white: #F5F0EB;
-  --glitch-red: #EF4444;
-  --violet-80: rgba(139, 92, 246, 0.8);
-  --violet-60: rgba(139, 92, 246, 0.6);
-  --violet-40: rgba(139, 92, 246, 0.4);
-  --pink-80: rgba(236, 72, 153, 0.8);
-  --cyan-80: rgba(6, 182, 212, 0.8);
-  --orange-80: rgba(245, 158, 11, 0.8);
-  --paper-80: rgba(245, 240, 235, 0.8);
-  --paper-60: rgba(245, 240, 235, 0.6);
-
-  --gradient-violet-pink: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%);
-  --gradient-cyan-violet: linear-gradient(135deg, #06B6D4 0%, #8B5CF6 100%);
-  --gradient-orange-pink: linear-gradient(135deg, #F59E0B 0%, #EC4899 100%);
-  --gradient-dark: linear-gradient(135deg, #1A1025 0%, #0F0A1A 100%);
-  --gradient-paper: linear-gradient(135deg, #F5F0EB 0%, #EDE6DE 100%);
-
-  --font-display: "ZCOOL KuaiLe", "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", sans-serif;
-  --font-body: "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", sans-serif;
-  --font-number: "DSEG14 Classic", "LCD", monospace;
-
-  --radius-lg: 32rpx;
-  --radius-xl: 48rpx;
-
-  background: #f8f5f2;
-  color: #1a1025;
-  font-family: var(--font-body);
+  background: #ffffff;
+  color: #111111;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, "PingFang SC", "Noto Sans SC", sans-serif;
   font-size: 26rpx;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
 }
 
-/* 网点纸纹理背景（5% 透明度） */
 page::before {
   content: "";
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   pointer-events: none;
   z-index: 0;
-  background-image: radial-gradient(circle, rgba(139, 92, 246, 0.05) 1px, transparent 1px);
-  background-size: 8rpx 8rpx;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.02), rgba(0, 0, 0, 0.01));
 }
 
 .container {
@@ -60,484 +24,95 @@ page::before {
   z-index: 1;
 }
 
-/* ===== 字体工具 ===== */
-.font-display {
-  font-family: var(--font-display);
+.card,
+.otaku-card,
+.swap-card,
+.message-card,
+.summary-card,
+.login-card,
+.empty-card,
+.cassette,
+.ai-card,
+.header-card,
+.quick-item,
+.metric,
+.badges,
+.field,
+.form,
+.section-card {
+  background: #ffffff;
+  color: #111111;
+  border: 1rpx solid #ececec;
+  box-shadow: 0 10rpx 30rpx rgba(0, 0, 0, 0.05);
 }
 
-.font-body {
-  font-family: var(--font-body);
+.section-title,
+.section-tag,
+.title,
+.login-title,
+.user-name,
+.message-title,
+.field-label,
+.badge-title,
+.list-title,
+.nav-title,
+.cassette-title,
+.swap-title,
+.ai-title {
+  color: #111111;
+  text-shadow: none;
 }
 
-.font-number {
-  font-family: var(--font-number);
-  letter-spacing: 2rpx;
-}
-
-/* ===== 标题系统 ===== */
-.otaku-h1 {
-  font-family: var(--font-display);
-  font-size: 48rpx;
-  font-weight: 700;
-  line-height: 1.2;
-  letter-spacing: 2rpx;
-  color: #ffffff;
-  text-shadow:
-    0 2rpx 0 var(--neon-pink),
-    0 4rpx 0 var(--neon-pink),
-    0 6rpx 8rpx rgba(0, 0, 0, 0.3);
-}
-
-.otaku-h2 {
-  font-family: var(--font-display);
-  font-size: 36rpx;
-  font-weight: 700;
-  line-height: 1.3;
-  letter-spacing: 1rpx;
-  color: var(--neon-violet);
-  transform: rotate(-2deg);
-  transform-origin: left center;
-}
-
-.otaku-h3 {
-  font-family: var(--font-display);
-  font-size: 28rpx;
-  font-weight: 600;
-  line-height: 1.4;
-  color: #1a1025;
-}
-
+.section-subtitle,
+.section-sub,
+.section-subtitle,
+.sub-title,
+.login-subtitle,
+.user-meta,
+.muted,
+.list-desc,
+.message-desc,
+.message-status,
+.cassette-subtitle,
+.empty-text,
+.empty-hint,
 .otaku-caption {
-  font-size: 22rpx;
-  line-height: 1.5;
-  color: #6b5b8a;
-  opacity: 0.8;
-}
-
-.otaku-number {
-  font-family: var(--font-number);
-  font-size: 32rpx;
-  letter-spacing: 2rpx;
-  color: var(--neon-cyan);
-}
-
-/* 故障文字效果：三层偏移 */
-.otaku-glitch {
-  position: relative;
-  display: inline-block;
-  color: #ffffff;
-  font-family: var(--font-display);
-}
-
-.otaku-glitch::before,
-.otaku-glitch::after {
-  content: attr(data-text);
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-}
-
-.otaku-glitch::before {
-  color: var(--glitch-red);
-  transform: translate(-2rpx, 0);
-  opacity: 0.8;
-}
-
-.otaku-glitch::after {
-  color: var(--neon-cyan);
-  transform: translate(2rpx, 0);
-  opacity: 0.8;
-}
-
-/* ===== 按钮系统 ===== */
-.otaku-btn {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 32rpx;
-  height: 88rpx;
-  border-radius: 28rpx;
-  background: var(--gradient-cyan-violet);
-  color: #ffffff;
-  font-family: var(--font-display);
-  font-size: 28rpx;
-  font-weight: 700;
-  border: none;
-  box-shadow:
-    0 0 0 2rpx rgba(255, 255, 255, 0.2) inset,
-    0 8rpx 0 var(--neon-violet),
-    0 12rpx 24rpx rgba(139, 92, 246, 0.4);
-  transform: skewX(-6deg) rotate(-1deg);
-  transition: all 0.1s;
-}
-
-.otaku-btn::after {
-  border: none;
-}
-
-.otaku-btn:active {
-  transform: skewX(-6deg) rotate(-1deg) translateY(4rpx);
-  box-shadow:
-    0 0 0 2rpx rgba(255, 255, 255, 0.2) inset,
-    0 4rpx 0 var(--neon-violet),
-    0 6rpx 12rpx rgba(139, 92, 246, 0.4);
-}
-
-.otaku-btn-violet {
-  background: var(--gradient-violet-pink);
-  box-shadow:
-    0 0 0 2rpx rgba(255, 255, 255, 0.2) inset,
-    0 8rpx 0 var(--neon-pink),
-    0 12rpx 24rpx rgba(236, 72, 153, 0.4);
-}
-
-.otaku-btn-violet:active {
-  box-shadow:
-    0 0 0 2rpx rgba(255, 255, 255, 0.2) inset,
-    0 4rpx 0 var(--neon-pink),
-    0 6rpx 12rpx rgba(236, 72, 153, 0.4);
-}
-
-.otaku-btn-ghost {
-  background: transparent;
-  color: var(--neon-cyan);
-  border: 2rpx solid var(--neon-cyan);
-  box-shadow:
-    0 0 12rpx var(--cyan-80),
-    0 6rpx 0 rgba(6, 182, 212, 0.3);
-}
-
-.otaku-btn-ghost:active {
-  box-shadow:
-    0 0 6rpx var(--cyan-80),
-    0 3rpx 0 rgba(6, 182, 212, 0.3);
-}
-
-.otaku-btn-text {
-  transform: skewX(6deg) rotate(1deg);
-}
-
-/* ===== 卡片系统 ===== */
-.otaku-card {
-  position: relative;
-  background: var(--gradient-paper);
-  border-radius: var(--radius-lg);
-  padding: 24rpx;
-  margin-bottom: 24rpx;
-  color: var(--dark-base);
-  box-shadow:
-    0 0 0 1rpx rgba(139, 92, 246, 0.3),
-    0 8rpx 24rpx rgba(15, 10, 26, 0.25);
-}
-
-/* 四角缺口装饰 */
-.otaku-card::before,
-.otaku-card::after {
-  content: "";
-  position: absolute;
-  width: 24rpx;
-  height: 24rpx;
-  border: 4rpx solid var(--neon-violet);
-  z-index: 2;
-}
-
-.otaku-card::before {
-  top: 12rpx;
-  left: 12rpx;
-  border-right: none;
-  border-bottom: none;
-}
-
-.otaku-card::after {
-  bottom: 12rpx;
-  right: 12rpx;
-  border-left: none;
-  border-top: none;
-}
-
-/* 悬浮态 */
-.otaku-card-hover {
-  box-shadow:
-    0 0 0 2rpx var(--neon-violet),
-    0 16rpx 40rpx rgba(139, 92, 246, 0.35);
-}
-
-/* ===== 标签/徽章系统 ===== */
-.otaku-tag {
-  display: inline-flex;
-  align-items: center;
-  padding: 8rpx 20rpx;
-  background: var(--gradient-violet-pink);
-  color: #ffffff;
-  font-family: var(--font-display);
-  font-size: 22rpx;
-  border-radius: 6rpx 20rpx 6rpx 20rpx;
-  box-shadow: 0 4rpx 8rpx rgba(236, 72, 153, 0.3);
-  transform: rotate(-2deg);
-  margin-right: 12rpx;
-  margin-bottom: 12rpx;
-}
-
-.otaku-tag-cyan {
-  background: var(--gradient-cyan-violet);
-  box-shadow: 0 4rpx 8rpx rgba(6, 182, 212, 0.3);
-}
-
-.otaku-tag-orange {
-  background: var(--gradient-orange-pink);
-  box-shadow: 0 4rpx 8rpx rgba(245, 158, 11, 0.3);
-}
-
-.otaku-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 88rpx;
-  padding: 8rpx 16rpx;
-  background: rgba(139, 92, 246, 0.12);
-  border: 2rpx solid var(--neon-violet);
-  border-radius: 12rpx;
-  font-family: var(--font-display);
-  font-size: 20rpx;
-  color: var(--neon-violet);
-  box-shadow: 0 0 8rpx var(--violet-40);
-}
-
-.otaku-badge-cyan {
-  background: rgba(6, 182, 212, 0.12);
-  border-color: var(--neon-cyan);
-  color: var(--neon-cyan);
-  box-shadow: 0 0 8rpx var(--cyan-80);
-}
-
-.otaku-badge-pink {
-  background: rgba(236, 72, 153, 0.12);
-  border-color: var(--neon-pink);
-  color: var(--neon-pink);
-  box-shadow: 0 0 8rpx var(--pink-80);
-}
-
-.otaku-badge-orange {
-  background: rgba(245, 158, 11, 0.12);
-  border-color: var(--neon-orange);
-  color: var(--neon-orange);
-  box-shadow: 0 0 8rpx var(--orange-80);
-}
-
-/* NEW 爆炸角标 */
-.otaku-new-badge {
-  position: absolute;
-  top: -12rpx;
-  right: -12rpx;
-  padding: 4rpx 10rpx;
-  background: var(--neon-pink);
-  color: #ffffff;
-  font-family: var(--font-display);
-  font-size: 18rpx;
-  font-weight: 700;
-  border-radius: 8rpx 16rpx 8rpx 16rpx;
-  transform: rotate(15deg);
-  box-shadow: 0 4rpx 12rpx rgba(236, 72, 153, 0.5);
-  z-index: 10;
-}
-
-/* ===== 输入框系统 ===== */
-.otaku-input {
-  display: flex;
-  align-items: center;
-  padding: 20rpx 28rpx;
-  background: var(--gradient-paper);
-  border-radius: 40rpx;
-  border: 2rpx solid transparent;
-  color: var(--dark-base);
-  font-size: 26rpx;
-  transform: rotate(-1deg);
-  box-shadow: 0 4rpx 16rpx rgba(15, 10, 26, 0.15);
-}
-
-.otaku-input:focus,
-.otaku-input-focus {
-  border-color: var(--neon-cyan);
-  box-shadow: 0 0 16rpx var(--cyan-80), 0 4rpx 16rpx rgba(15, 10, 26, 0.15);
-}
-
-.otaku-input-placeholder {
-  color: rgba(15, 10, 26, 0.5);
-}
-
-/* ===== 头像系统 ===== */
-.otaku-avatar {
-  position: relative;
-  width: 96rpx;
-  height: 96rpx;
-  border-radius: 50%;
-  background: var(--gradient-violet-pink);
-  padding: 4rpx;
-  box-shadow: 0 0 0 2rpx var(--paper-white), 0 0 16rpx var(--violet-60);
-}
-
-.otaku-avatar image {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  background: var(--paper-white);
-}
-
-/* 猫耳装饰 */
-.otaku-avatar::before,
-.otaku-avatar::after {
-  content: "";
-  position: absolute;
-  top: -10rpx;
-  width: 20rpx;
-  height: 24rpx;
-  background: var(--gradient-violet-pink);
-  border-radius: 50% 50% 0 0;
-  z-index: -1;
-}
-
-.otaku-avatar::before {
-  left: 16rpx;
-  transform: rotate(-20deg);
-}
-
-.otaku-avatar::after {
-  right: 16rpx;
-  transform: rotate(20deg);
-}
-
-/* ===== 分割线 ===== */
-.otaku-divider {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 24rpx 0;
-  color: var(--neon-violet);
-  font-size: 22rpx;
-  opacity: 0.7;
-  letter-spacing: 4rpx;
-}
-
-.otaku-divider::before,
-.otaku-divider::after {
-  content: "";
-  flex: 1;
-  height: 2rpx;
-  background: repeating-linear-gradient(
-    90deg,
-    var(--neon-violet) 0,
-    var(--neon-violet) 8rpx,
-    transparent 8rpx,
-    transparent 14rpx
-  );
-  margin: 0 16rpx;
-}
-
-/* ===== 扫描线/霓虹背景 ===== */
-.otaku-scanline {
-  position: relative;
-  overflow: hidden;
-}
-
-.otaku-scanline::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2rpx;
-  background: var(--neon-pink);
-  box-shadow: 0 0 8rpx var(--neon-pink), 0 0 16rpx var(--neon-pink);
-  opacity: 0.8;
-  pointer-events: none;
-}
-
-.otaku-neon-glow {
-  box-shadow: 0 0 12rpx var(--violet-80), 0 0 24rpx var(--violet-40);
-}
-
-/* ===== 悬浮态/按下态 ===== */
-.otaku-hover-float {
-  transition: transform 0.15s, box-shadow 0.15s;
-}
-
-.otaku-hover-float:active {
-  transform: translateY(-4rpx) scale(1.02);
-}
-
-.otaku-press:active {
-  transform: scale(0.98);
-  opacity: 0.9;
-}
-
-/* ===== 滚动条隐藏 ===== */
-::-webkit-scrollbar {
-  display: none;
-}
-
-/* ===== 旧版兼容类（避免直接引用旧样式失效） ===== */
-.section-title {
-  font-family: var(--font-display);
-  font-size: 34rpx;
-  font-weight: 700;
-  color: #1a1025;
-}
-
-.section-subtitle {
-  margin-top: 8rpx;
-  font-size: 24rpx;
-  color: #6b5b8a;
-}
-
-.card {
-  background: var(--gradient-paper);
-  border-radius: var(--radius-lg);
-  box-shadow: 0 8rpx 24rpx rgba(15, 10, 26, 0.25);
-}
-
-.btn-primary {
-  background: var(--gradient-violet-pink);
-  color: #ffffff;
-  border-radius: var(--radius-lg);
-  font-family: var(--font-display);
-}
-
-.btn-secondary {
-  background: transparent;
-  color: var(--neon-cyan);
-  border: 2rpx solid var(--neon-cyan);
-  border-radius: var(--radius-lg);
-  font-family: var(--font-display);
-}
-
-.tag {
-  display: inline-flex;
-  padding: 8rpx 20rpx;
-  border-radius: 6rpx 20rpx 6rpx 20rpx;
-  background: var(--gradient-violet-pink);
-  color: #ffffff;
-  font-family: var(--font-display);
-  font-size: 22rpx;
-  transform: rotate(-2deg);
-  margin-right: 12rpx;
-  margin-bottom: 12rpx;
-}
-
-.badge {
-  display: inline-flex;
-  padding: 6rpx 14rpx;
-  border-radius: 12rpx;
-  font-size: 22rpx;
-  background: rgba(139, 92, 246, 0.12);
-  color: var(--neon-violet);
-  border: 2rpx solid var(--neon-violet);
-}
-
-.muted {
-  color: #6b5b8a;
+  color: #6b7280;
   opacity: 1;
 }
+
+.btn-primary,
+.otaku-btn,
+.otaku-btn-violet,
+.swap-btn,
+.login-btn,
+.submit,
+.read-btn,
+.cassette-btn,
+.ai-btn {
+  background: #111111;
+  color: #ffffff;
+  border: 1rpx solid #111111;
+  box-shadow: none;
+  transform: none;
+}
+
+.btn-secondary,
+.otaku-btn-ghost,
+.chat-btn,
+.logout-btn,
+.search-clear,
+.search-cancel,
+.auth-switch,
+.list-status,
+.badge,
+.otaku-badge,
+.otaku-tag,
+.topic-tag {
+  background: #f7f7f7;
+  color: #111111;
+  border-color: #d1d5db;
+  box-shadow: none;
+}
+
+::-webkit-scrollbar { display: none; }

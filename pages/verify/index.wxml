@@ -5,7 +5,82 @@
   <view class="card auth">
     <view class="auth-row">当前状态：<text class="badge">已认证大学生</text></view>
     <view class="auth-row">认证方式：校园邮箱</view>
-    <view class="auth-row">信用分：95</view>
+    <view class="auth-row">信用分：95</view><view class="container">
+  <view class="hero-card">
+    <view class="title">学生认证</view>
+    <view class="subtitle">
+      完成认证后，你的主页会显示“已认证大学生”，并提升初始信用分。
+    </view>
+  </view>
+
+  <view wx:if="{{verified}}" class="success-card">
+    <view class="success-icon">✅</view>
+    <view class="success-title">你已完成学生认证</view>
+    <view class="success-text">认证信息已同步到云端数据库。</view>
+  </view>
+
+  <view wx:else class="form-card">
+    <view class="field">
+      <view class="label">真实姓名</view>
+      <input
+        class="input"
+        placeholder="请输入真实姓名"
+        value="{{realName}}"
+        bindinput="onRealNameInput"
+      />
+    </view>
+
+    <view class="field">
+      <view class="label">学校</view>
+      <input
+        class="input"
+        placeholder="请输入学校"
+        value="{{school}}"
+        bindinput="onSchoolInput"
+      />
+    </view>
+
+    <view class="field">
+      <view class="label">年级</view>
+      <input
+        class="input"
+        placeholder="例如 2023级"
+        value="{{grade}}"
+        bindinput="onGradeInput"
+      />
+    </view>
+
+    <view class="field">
+      <view class="label">专业</view>
+      <input
+        class="input"
+        placeholder="例如 软件工程"
+        value="{{major}}"
+        bindinput="onMajorInput"
+      />
+    </view>
+
+    <view class="field">
+      <view class="label">学号</view>
+      <input
+        class="input"
+        placeholder="请输入学号"
+        value="{{studentId}}"
+        bindinput="onStudentIdInput"
+      />
+    </view>
+
+    <button
+      class="submit-btn"
+      loading="{{loading}}"
+      disabled="{{loading}}"
+      bindtap="submitVerify"
+    >
+      提交认证
+    </button>
+  </view>
+</view>
+
     <button class="btn-primary submit">提交认证</button>
   </view>
 </view>

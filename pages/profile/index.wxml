@@ -1,36 +1,172 @@
 <view class="container">
-  <view class="profile card">
+  <view wx:if="{{!isLoggedIn}}" class="login-card card">
     <image class="avatar" src="{{user.avatar}}" mode="aspectFill"></image>
-    <view class="name-row"><text class="name">{{user.nickName}}</text><text class="badge">{{user.level}}</text></view>
-    <view class="muted">{{user.school}} · {{user.grade}} · {{user.title}}</view>
-    <view class="score-row"><view>信用分 {{user.creditScore}}</view><view>交换 {{user.exchangeCount}} 次</view><view>{{user.verified ? '已认证大学生' : '未认证'}}</view></view>
-    <view class="play-metrics">
-      <view class="metric"><view class="metric-value">{{user.brainPower}}</view><view class="metric-label">脑洞值</view></view>
-      <view class="metric"><view class="metric-value">{{user.energy || 0}}</view><view class="metric-label">闲置能量</view></view>
-      <view class="metric"><view class="metric-value">{{user.badges ? user.badges.length : 0}}</view><view class="metric-label">徽章</view></view>
+
+    <view class="login-title">
+      {{authMode === 'login' ? '登录校换' : '注册校换'}}
+    </view>
+
+    <view class="login-subtitle">
+      {{authMode === 'login' ? '登录后同步你的发布、提案、认证和交换记录' : '创建账号，开启校园换物之旅'}}
+    </view>
+
+    <input
+      class="input"
+      placeholder="邮箱"
+      value="{{email}}"
+      bindinput="onEmailInput"
+    />
+
+    <input
+      class="input"
+      password
+      placeholder="密码，至少 6 位"
+      value="{{password}}"
+      bindinput="onPasswordInput"
+    />
+
+    <block wx:if="{{authMode === 'register'}}">
+      <input
+        class="input"
+        placeholder="昵称"
+        value="{{nickName}}"
+        bindinput="onNickInput"
+      />
+
+      <input
+        class="input"
+        placeholder="学校"
+        value="{{school}}"
+        bindinput="onSchoolInput"
+      />
+
+      <input
+        class="input"
+        placeholder="年级"
+        value="{{grade}}"
+        bindinput="onGradeInput"
+      />
+    </block>
+
+    <button
+      class="login-btn"
+      loading="{{loading}}"
+      disabled="{{loading}}"
+      bindtap="submitAuth"
+    >
+      {{authMode === 'login' ? '登录' : '注册'}}
+    </button>
+
+    <view class="auth-switch" bindtap="switchAuthMode">
+      {{authMode === 'login' ? '没有账号？立即注册' : '已有账号？去登录'}}
     </view>
   </view>
 
-  <view class="badges card">
-    <view class="badge-title">我的徽章</view>
-    <view class="badge-list"><block wx:for="{{user.badges}}" wx:key="*this"><text class="fun-badge">{{item}}</text></block></view>
-  </view>
+  <block wx:else>
+    <view class="profile card">
+      <image class="avatar" src="{{user.avatar}}" mode="aspectFill"></image>
 
-  <view class="badges card">
-    <view class="badge-title">任务进度</view>
-    <block wx:for="{{tasks}}" wx:key="taskId"><view class="task-line"><text>{{item.title}}</text><text>{{item.progress}}/{{item.target}}</text></view></block>
-  </view>
+      <view class="name-row">
+        <text class="name">{{user.nickName}}</text>
+        <text class="badge">{{user.level}}</text>
+      </view>
+
+      <view class="muted">{{user.schoolLine}}</view>
+
+      <view class="score-row">
+        <view>信用分 {{user.creditScore}}</view>
+        <view>交换 {{user.exchangeCount}} 次</view>
+        <view>{{user.verifiedLabel}}</view>
+      </view>
+
+      <view class="play-metrics">
+        <view class="metric">
+          <view class="metric-value">{{user.publishCount}}</view>
+          <view class="metric-label">发布</view>
+        </view>
+
+        <view class="metric">
+          <view class="metric-value">{{user.proposalCount}}</view>
+          <view class="metric-label">提案</view>
+        </view>
+
+        <view class="metric">
+          <view class="metric-value">{{user.exchangeCount}}</view>
+          <view class="metric-label">交换</view>
+        </view>
+      </view>
+
+      <view class="play-metrics second-row">
+        <view class="metric">
+          <view class="metric-value">{{user.brainPower}}</view>
+          <view class="metric-label">脑洞值</view>
+        </view>
+
+        <view class="metric">
+          <view class="metric-value">{{user.energy}}</view>
+          <view class="metric-label">闲置能量</view>
+        </view>
+
+        <view class="metric">
+          <view class="metric-value">{{user.badgeCount}}</view>
+          <view class="metric-label">徽章</view>
+        </view>
+      </view>
+
+      <button class="logout-btn" bindtap="logout">退出登录</button>
+    </view>
+
+    <view class="badges card">
+      <view class="badge-title">我的徽章</view>
+
+      <view class="badge-list">
+        <block wx:for="{{user.badges}}" wx:key="*this">
+          <text class="fun-badge">{{item}}</text>
+        </block>
+
+        <text wx:if="{{!user.badges.length}}" class="empty-text">暂无徽章</text>
+      </view>
+    </view>
+
+    <view class="badges card">
+      <view class="badge-title">我的发布</view>
+
+      <block wx:for="{{myPosts}}" wx:key="id">
+        <view class="list-row" data-id="{{item.id}}" bindtap="goPostDetail">
+          <view>
+            <view class="list-title">{{item.title}}</view>
+            <view class="list-desc">{{item.have_item}} 换 {{item.want_item}}</view>
+          </view>
+          <view class="list-status">{{item.status}}</view>
+        </view>
+      </block>
+
+      <view wx:if="{{!myPosts.length}}" class="empty-text">暂无发布</view>
+    </view>
+
+    <view class="badges card">
+      <view class="badge-title">我的提案</view>
+
+      <block wx:for="{{myProposals}}" wx:key="id">
+        <view class="list-row">
+          <view>
+            <view class="list-title">{{item.offer_item}}</view>
+            <view class="list-desc">提案状态：{{item.status}}</view>
+          </view>
+        </view>
+      </block>
+
+      <view wx:if="{{!myProposals.length}}" class="empty-text">暂无提案</view>
+    </view>
+  </block>
 
   <view class="menu card">
-    <view class="menu-item">我的发布</view>
-    <view class="menu-item">我的提案</view>
-    <view class="menu-item">我的交换</view>
+    <view class="menu-item" bindtap="goMessages">消息中心</view>
+    <view class="menu-item" bindtap="goVerify">学生认证</view>
+    <view class="menu-item" bindtap="goRank">排行榜</view>
     <view class="menu-item" bindtap="goTasks">任务中心</view>
     <view class="menu-item" bindtap="goWish">校园心愿池</view>
     <view class="menu-item" bindtap="goChain">交换挑战局</view>
     <view class="menu-item" bindtap="goMap">安全交易点</view>
-    <view class="menu-item" bindtap="goVerify">学生认证</view>
-    <view class="menu-item" bindtap="goRank">排行榜</view>
-    <view class="menu-item reset" bindtap="resetDemo">重置演示数据</view>
   </view>
 </view>

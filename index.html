@@ -10,19 +10,22 @@
        ========================= */
     * { margin: 0; padding: 0; box-sizing: border-box; }
     :root {
-      --neon-violet: #8B5CF6;
-      --neon-pink: #EC4899;
-      --neon-cyan: #06B6D4;
-      --neon-orange: #F59E0B;
-      --dark-base: #0F0A1A;
-      --dark-elevated: #1A1025;
-      --paper-white: #F5F0EB;
-      --paper-80: rgba(245, 240, 235, 0.8);
-      --paper-60: rgba(245, 240, 235, 0.6);
-      --glitch-red: #EF4444;
+      --bg: #f8f5f2;
+      --bg-white: #ffffff;
+      --text: #111111;
+      --text-purple: #1a1025;
+      --muted: #6b7280;
+      --muted-purple: #6b5b8a;
+      --muted-purple-light: #8b7ca8;
+      --border: #ececec;
+      --card-shadow: 0 5px 15px rgba(0,0,0,0.05);
+      --accent: #111111;
+      --accent-light: #f3f4f6;
+      --pill-bg: #f7f3ff;
+      --pill-text: #111111;
       --success: #34C759;
-      --text: #1A1A1A;
-      --muted: #9CA3AF;
+      --orange: #ffb84d;
+      --purple: #6c63ff;
       --expo: cubic-bezier(0.16, 1, 0.3, 1);
       --back: cubic-bezier(0.34, 1.56, 0.64, 1);
       --screen-w: 390px;
@@ -32,7 +35,7 @@
       width: 100%; height: 100%;
       overflow: hidden;
       background: #000;
-      font-family: "ZCOOL KuaiLe", "Noto Sans SC", "PingFang SC", "SF Pro Text", sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, "PingFang SC", "Noto Sans SC", sans-serif;
       -webkit-font-smoothing: antialiased;
     }
 
@@ -45,7 +48,7 @@
       overflow: hidden;
     }
 
-    /* 装饰进度条：二次元风格时间轴，位于设备下方，可拖拽跳转 */
+    /* 装饰进度条 */
     #progressTrack {
       position: absolute;
       left: 50%; bottom: 70px;
@@ -80,7 +83,7 @@
       position: relative;
       width: 0%; height: 100%;
       border-radius: 5px;
-      background: linear-gradient(90deg, var(--neon-violet), var(--neon-pink), var(--neon-cyan));
+      background: linear-gradient(90deg, #8B5CF6, #EC4899, #06B6D4);
       box-shadow:
         0 0 10px rgba(139,92,246,0.5),
         0 0 20px rgba(236,72,153,0.35),
@@ -102,7 +105,6 @@
       75% { opacity: 1; }
       100% { transform: translateX(-110px); opacity: 0; }
     }
-    /* 进度条拖拽按钮 */
     .progress-knob {
       position: absolute;
       top: 50%;
@@ -110,17 +112,15 @@
       transform: translate(50%, -50%) scale(0);
       width: 18px; height: 18px;
       border-radius: 50%;
-      background: var(--paper-white);
-      border: 3px solid var(--neon-violet);
-      box-shadow: 0 0 10px var(--neon-violet), 0 0 20px rgba(236,72,153,0.4);
+      background: #fff;
+      border: 3px solid #8B5CF6;
+      box-shadow: 0 0 10px #8B5CF6, 0 0 20px rgba(236,72,153,0.4);
       transition: transform 0.25s var(--back), opacity 0.2s ease;
       pointer-events: none;
       z-index: 3;
     }
     #progressTrack:hover .progress-knob,
     #progressTrack.dragging .progress-knob { transform: translate(50%, -50%) scale(1); }
-    #progressBar:hover .progress-knob { transform: translate(50%, -50%) scale(1); }
-    /* 左侧装饰图标 */
     .progress-icon {
       position: absolute;
       left: -32px; top: 50%;
@@ -128,12 +128,11 @@
       width: 22px; height: 22px;
       display: flex; align-items: center; justify-content: center;
       font-size: 12px;
-      color: var(--neon-violet);
+      color: #8B5CF6;
       text-shadow: 0 0 8px rgba(139,92,246,0.6);
       animation: iconPulse 1.6s ease-in-out infinite;
     }
     @keyframes iconPulse { 0%, 100% { opacity: 0.6; transform: translateY(-50%) scale(1); } 50% { opacity: 1; transform: translateY(-50%) scale(1.15); } }
-    /* 标签文字 */
     .progress-label {
       position: absolute;
       top: -20px; left: 50%;
@@ -146,10 +145,9 @@
       white-space: nowrap;
     }
     .progress-label strong {
-      color: var(--neon-pink);
+      color: #EC4899;
       font-weight: 400;
     }
-    /* 拖拽提示 */
     .progress-tooltip {
       position: absolute;
       top: -42px; left: 0;
@@ -158,7 +156,7 @@
       border-radius: 6px;
       background: rgba(15,10,26,0.9);
       border: 1px solid rgba(139,92,246,0.4);
-      color: var(--paper-white);
+      color: #fff;
       font-size: 12px;
       font-family: "SF Mono", "Roboto Mono", monospace;
       opacity: 0;
@@ -177,7 +175,6 @@
       border-right: 1px solid rgba(139,92,246,0.4);
       border-bottom: 1px solid rgba(139,92,246,0.4);
     }
-    /* 像素装饰点 */
     .pixel-dots {
       position: absolute; bottom: -16px; left: 50%;
       transform: translateX(-50%);
@@ -186,12 +183,12 @@
     }
     .pixel-dots i {
       width: 4px; height: 4px;
-      background: var(--neon-violet);
+      background: #8B5CF6;
       opacity: 0.5;
       animation: pixelBlink 1.2s ease-in-out infinite;
     }
-    .pixel-dots i:nth-child(2) { background: var(--neon-pink); animation-delay: 0.4s; }
-    .pixel-dots i:nth-child(3) { background: var(--neon-cyan); animation-delay: 0.8s; }
+    .pixel-dots i:nth-child(2) { background: #EC4899; animation-delay: 0.4s; }
+    .pixel-dots i:nth-child(3) { background: #06B6D4; animation-delay: 0.8s; }
     @keyframes pixelBlink { 0%, 100% { opacity: 0.25; transform: scale(1); } 50% { opacity: 0.8; transform: scale(1.3); } }
 
     /* =========================
@@ -233,15 +230,8 @@
       top: 24px; left: 24px;
       width: var(--screen-w); height: var(--screen-h);
       border-radius: 40px;
-      background: var(--dark-base);
+      background: var(--bg);
       overflow: hidden;
-    }
-    .screen::before {
-      content: "";
-      position: absolute; inset: 0;
-      pointer-events: none; z-index: 0;
-      background-image: radial-gradient(circle, rgba(139, 92, 246, 0.05) 1px, transparent 1px);
-      background-size: 8px 8px;
     }
 
     /* =========================
@@ -255,8 +245,10 @@
       transform: translateZ(0);
       will-change: transform, opacity, filter;
       z-index: 1;
+      background: var(--bg);
     }
     .scene.active { opacity: 1; pointer-events: auto; }
+    .scene-02 { background: #ffffff; }
 
     .push-enter { animation: pushIn 0.7s var(--expo) forwards; }
     .push-leave { animation: pushOut 0.7s var(--expo) forwards; }
@@ -274,154 +266,134 @@
     @keyframes flipIn { from { transform: perspective(1200px) rotateY(-90deg); opacity: 0; } to { transform: perspective(1200px) rotateY(0); opacity: 1; } }
     @keyframes flipOut { from { transform: perspective(1200px) rotateY(0); opacity: 1; } to { transform: perspective(1200px) rotateY(90deg); opacity: 0; } }
 
-    /* =========================
-       组件：自定义导航
-       ========================= */
-    .custom-nav {
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%);
-      padding: 48px 24px 44px;
-      border-radius: 0 0 36px 36px;
-      box-shadow: 0 12px 40px rgba(236, 72, 153, 0.35);
-      z-index: 50;
-      overflow: hidden;
+    /* 通用组件 */
+    .card {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      box-shadow: var(--card-shadow);
     }
-    .custom-nav::before {
-      content: "";
-      position: absolute; inset: 0;
-      background-image: radial-gradient(circle, rgba(255,255,255,0.08) 1px, transparent 1px);
-      background-size: 12px 12px;
-      pointer-events: none;
+    .btn-primary {
+      height: 46px;
+      display: flex; align-items: center; justify-content: center;
+      background: #111111; color: #fff;
+      border-radius: 14px;
+      font-size: 15px; font-weight: 700;
     }
-    .nav-status {
-      display: flex; justify-content: space-between; align-items: center;
-      margin-bottom: 16px;
-      position: relative; z-index: 1;
+    .btn-secondary {
+      height: 40px;
+      display: flex; align-items: center; justify-content: center;
+      background: #f7f7f7; color: var(--text);
+      border: 1px solid #d1d5db;
+      border-radius: 14px;
+      font-size: 14px; font-weight: 600;
     }
-    .nav-time {
-      font-family: "DSEG14 Classic", "LCD", monospace;
-      font-size: 14px; color: #fff;
-      text-shadow: 0 0 8px rgba(255,255,255,0.5);
-      letter-spacing: 1px;
-    }
-    .nav-hud { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #fff; }
-    .battery {
-      width: 22px; height: 11px;
-      border: 1px solid #fff; border-radius: 2px;
-      padding: 1px; position: relative;
-    }
-    .battery::after {
-      content: ""; position: absolute;
-      right: -3px; top: 3px;
-      width: 2px; height: 4px; background: #fff; border-radius: 0 1px 1px 0;
-    }
-    .battery-fill { width: 70%; height: 100%; background: var(--neon-cyan); border-radius: 1px; box-shadow: 0 0 6px var(--neon-cyan); }
-    .nav-title-row { display: flex; align-items: center; position: relative; z-index: 1; }
-    .nav-title {
-      font-size: 26px; font-weight: 700; color: #fff;
-      text-shadow: 0 2px 0 var(--glitch-red), 0 4px 0 var(--neon-pink), 0 6px 8px rgba(0,0,0,0.3);
-      letter-spacing: 1px;
-    }
-    .nav-cursor {
-      color: var(--neon-cyan); font-size: 22px; margin-left: 6px;
-      animation: blink 1s infinite;
-    }
-    @keyframes blink { 0%, 50% { opacity: 1; } 51%, 100% { opacity: 0; } }
-
-    .back-header {
-      position: absolute; top: 48px; left: 18px; right: 18px;
-      display: flex; align-items: center; gap: 10px; z-index: 50;
-    }
-    .back-btn-dark {
-      width: 34px; height: 34px; border-radius: 50%;
-      background: rgba(255,255,255,0.1); display: grid; place-items: center;
-      color: #fff; font-size: 20px; backdrop-filter: blur(8px);
-    }
-    .back-title { font-size: 17px; font-weight: 600; color: #fff; }
-
-    /* =========================
-       组件：卡片/按钮/标签
-       ========================= */
-    .otaku-card {
-      position: relative;
-      background: linear-gradient(135deg, #F5F0EB 0%, #EDE6DE 100%);
-      border-radius: 24px; padding: 20px;
-      color: var(--text);
-      box-shadow: 0 0 0 1px rgba(139, 92, 246, 0.3), 0 8px 24px rgba(15, 10, 26, 0.25);
-      overflow: hidden;
-    }
-    .otaku-card::before, .otaku-card::after {
-      content: ""; position: absolute; width: 20px; height: 20px; border: 3px solid var(--neon-violet); z-index: 2;
-    }
-    .otaku-card::before { top: 12px; left: 12px; border-right: none; border-bottom: none; }
-    .otaku-card::after { bottom: 12px; right: 12px; border-left: none; border-top: none; }
-
-    .otaku-btn {
-      display: inline-flex; align-items: center; justify-content: center;
-      height: 42px; border-radius: 16px;
-      background: linear-gradient(135deg, #06B6D4 0%, #8B5CF6 100%);
-      color: #fff; font-size: 14px; font-weight: 700;
-      border: none; box-shadow: 0 0 0 1px rgba(255,255,255,0.2) inset, 0 6px 0 var(--neon-violet), 0 8px 16px rgba(139,92,246,0.4);
-      transform: skewX(-6deg) rotate(-1deg);
-      padding: 0 20px;
-    }
-    .otaku-btn-violet { background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%); box-shadow: 0 0 0 1px rgba(255,255,255,0.2) inset, 0 6px 0 var(--neon-pink), 0 8px 16px rgba(236,72,153,0.4); }
-    .otaku-btn-ghost { background: transparent; color: var(--neon-cyan); border: 2px solid var(--neon-cyan); box-shadow: 0 0 8px rgba(6,182,212,0.4); }
-    .otaku-tag {
+    .topic-tag, .tag, .otaku-badge {
       display: inline-flex; align-items: center;
-      padding: 6px 14px; background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%);
-      color: #fff; font-size: 12px; border-radius: 6px 16px 6px 16px;
-      box-shadow: 0 3px 8px rgba(236,72,153,0.3); transform: rotate(-2deg);
+      padding: 6px 14px;
+      background: #f3f4f6;
+      color: var(--text);
+      border: 1px solid #e5e7eb;
+      border-radius: 999px;
+      font-size: 12px;
     }
-    .otaku-tag:nth-child(even) { background: linear-gradient(135deg, #06B6D4 0%, #8B5CF6 100%); transform: rotate(2deg); box-shadow: 0 3px 8px rgba(6,182,212,0.3); }
-    .otaku-badge {
-      display: inline-flex; align-items: center; justify-content: center;
-      padding: 4px 10px; background: rgba(139, 92, 246, 0.12);
-      border: 1px solid var(--neon-violet); border-radius: 8px;
-      font-size: 11px; color: var(--neon-violet); box-shadow: 0 0 6px rgba(139,92,246,0.3);
+    .topic-tag { margin-right: 8px; margin-bottom: 8px; flex-shrink: 0; }
+    .badge {
+      display: inline-flex; align-items: center;
+      padding: 4px 10px;
+      background: #f3f4f6;
+      color: var(--text);
+      border-radius: 8px;
+      font-size: 11px;
     }
-    .otaku-badge-cyan { background: rgba(6,182,212,0.12); border-color: var(--neon-cyan); color: var(--neon-cyan); }
-    .otaku-badge-pink { background: rgba(236,72,153,0.12); border-color: var(--neon-pink); color: var(--neon-pink); }
-    .otaku-badge-orange { background: rgba(245,158,11,0.12); border-color: var(--neon-orange); color: var(--neon-orange); }
-    .otaku-new-badge {
-      position: absolute; top: -8px; right: -8px;
-      padding: 3px 8px; background: var(--neon-pink); color: #fff;
-      font-size: 10px; font-weight: 700; border-radius: 6px 12px 6px 12px;
-      transform: rotate(15deg); box-shadow: 0 3px 10px rgba(236,72,153,0.5); z-index: 10;
-    }
-    .otaku-avatar {
-      position: relative; width: 44px; height: 44px; border-radius: 50%;
-      background: linear-gradient(135deg, #8B5CF6, #EC4899); padding: 2px;
-      box-shadow: 0 0 0 2px var(--paper-white), 0 0 12px rgba(139,92,246,0.5);
-      display: grid; place-items: center; font-size: 22px; color: #fff;
-    }
-    .otaku-avatar::before, .otaku-avatar::after {
-      content: ""; position: absolute; top: -6px; width: 10px; height: 12px;
-      background: linear-gradient(135deg, #8B5CF6, #EC4899); border-radius: 50% 50% 0 0; z-index: -1;
-    }
-    .otaku-avatar::before { left: 8px; transform: rotate(-20deg); }
-    .otaku-avatar::after { right: 8px; transform: rotate(20deg); }
-
-    /* =========================
-       底部 Home 指示条与 Tab 栏
-       ========================= */
+    .badge-cyan { background: #e0f7fa; color: #007c91; }
+    .badge-pink { background: #fce4ec; color: #c2185b; }
+    .badge-orange { background: #fff3e0; color: #ef6c00; }
     .pill {
-      position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%);
-      width: 134px; height: 5px; background: rgba(245,240,235,0.6); border-radius: 3px; z-index: 90;
+      display: inline-flex; align-items: center;
+      padding: 4px 10px;
+      background: #fff7e6;
+      color: #d98200;
+      border-radius: 999px;
+      font-size: 11px; font-weight: 700;
     }
+    .avatar {
+      border-radius: 50%;
+      background: #f3f4f6;
+      overflow: hidden;
+    }
+    .avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .input, .field-input, .wish-input {
+      width: 100%;
+      background: #f7f8fc;
+      border-radius: 12px;
+      padding: 12px;
+      font-size: 14px;
+      color: var(--text-purple);
+      font-family: inherit;
+      border: none;
+    }
+    .field-label {
+      font-size: 14px; font-weight: 700;
+      color: var(--text-purple);
+      margin-bottom: 6px;
+    }
+    .hero-card {
+      padding: 28px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, #111111, #9ca3af);
+      color: #fff;
+      box-shadow: 0 18px 60px rgba(31,20,71,0.12);
+    }
+    .hero-card .title { font-size: 22px; font-weight: 900; }
+    .hero-card .subtitle { margin-top: 8px; font-size: 13px; opacity: 0.92; }
+    .hero-card .refresh-btn {
+      margin: 0;
+      padding: 0 14px;
+      height: 32px;
+      line-height: 32px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.8);
+      color: #111111;
+      font-size: 12px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+    }
+
+    /* 底部 Tab 栏 */
     .tab-bar {
       position: absolute; bottom: 0; left: 0; right: 0;
-      height: 84px; background: rgba(15,10,26,0.92); backdrop-filter: blur(20px);
-      border-top: 0.5px solid rgba(255,255,255,0.08);
-      display: flex; justify-content: space-around; align-items: flex-start; padding-top: 12px; z-index: 80;
+      height: 48px;
+      background: rgba(255,255,255,0.98);
+      backdrop-filter: blur(18px);
+      border-top: 1px solid #e5e7eb;
+      box-shadow: 0 -6px 24px rgba(0,0,0,0.04);
+      display: flex; justify-content: space-around; align-items: flex-start;
+      padding-top: 8px; z-index: 80;
     }
-    .tab { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 10px; color: var(--muted); transition: color 0.2s; }
-    .tab.active { color: var(--neon-violet); }
-    .tab-icon { width: 24px; height: 24px; display: grid; place-items: center; font-size: 18px; }
+    .tab { display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 10px; color: #6b7280; transition: color 0.2s; }
+    .tab.active { color: #111111; }
+    .tab-icon-wrap {
+      width: 28px; height: 28px;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 10px;
+      font-size: 18px;
+      transition: all 0.2s;
+    }
+    .tab.active .tab-icon-wrap { background: #f3f4f6; }
+    .tab:nth-child(2) .tab-icon-wrap {
+      width: 32px; height: 32px;
+      margin-top: -10px;
+      background: #111111;
+      border-radius: 50%;
+      color: #fff;
+      font-size: 20px;
+    }
+    .tab:nth-child(2).active .tab-icon-wrap { background: #111111; }
 
     /* =========================
-       关键词弹幕（取代传统字幕）
+       关键词弹幕（字幕）
        ========================= */
     .caption {
       position: absolute;
@@ -470,7 +442,7 @@
       box-shadow:
         0 4px 18px rgba(0,0,0,0.45),
         0 0 16px rgba(139,92,246,0.25);
-      color: var(--paper-white);
+      color: #fff;
       font-size: 22px;
       font-weight: 500;
       letter-spacing: 0.02em;
@@ -479,14 +451,14 @@
     }
     .kw::before {
       content: "✦";
-      color: var(--neon-pink);
+      color: #EC4899;
       font-size: 14px;
       animation: iconSpin 2.5s linear infinite;
     }
     .kw:nth-child(2) { border-color: rgba(236,72,153,0.6); }
     .kw:nth-child(3) { border-color: rgba(6,182,212,0.6); }
-    .kw:nth-child(2)::before { color: var(--neon-cyan); }
-    .kw:nth-child(3)::before { color: var(--neon-orange); }
+    .kw:nth-child(2)::before { color: #06B6D4; }
+    .kw:nth-child(3)::before { color: #F59E0B; }
     @keyframes iconSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
     .kw.in { animation: kwIn 0.7s var(--back) forwards, kwFloat 2.1s ease-in-out infinite 0.7s; }
     .kw.out { animation: kwOut 0.5s var(--expo) forwards; }
@@ -544,333 +516,424 @@
     /* =========================
        Scene 01: 品牌启动页
        ========================= */
-    .scene-01 { background: var(--dark-base); display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .scene-01 { background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; }
     .logo-mark {
       width: 110px; height: 110px; border-radius: 26px;
-      background: linear-gradient(135deg, var(--neon-violet) 0%, var(--neon-pink) 100%);
+      background: linear-gradient(135deg, #111111 0%, #6b7280 100%);
       display: grid; place-items: center; font-size: 52px; color: #fff;
-      margin-bottom: 28px; box-shadow: 0 20px 50px rgba(139,92,246,0.45);
+      margin-bottom: 28px; box-shadow: 0 20px 50px rgba(0,0,0,0.15);
       transform: scale(0.8); opacity: 0; animation: logoMarkIn 0.8s var(--expo) 0.3s forwards;
     }
     @keyframes logoMarkIn { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
-    .brand-name { display: flex; gap: 6px; font-size: 40px; font-weight: 700; color: #fff; letter-spacing: 0.1em; }
+    .brand-name { display: flex; gap: 6px; font-size: 40px; font-weight: 700; color: var(--text); letter-spacing: 0.1em; }
     .brand-char { opacity: 0; transform: translateY(18px); animation: charIn 0.6s var(--expo) forwards; }
     @keyframes charIn { to { opacity: 1; transform: translateY(0); } }
-    .slogan { margin-top: 16px; font-size: 15px; color: var(--paper-60); font-weight: 400; opacity: 0; animation: fadeIn 0.8s ease 1.8s forwards; }
+    .slogan { margin-top: 16px; font-size: 15px; color: var(--muted); font-weight: 400; opacity: 0; animation: fadeIn 0.8s ease 1.8s forwards; }
     @keyframes fadeIn { to { opacity: 1; } }
 
     /* =========================
-       Scene 02: 首页交换广场
+       Scene 02: 首页交换广场（一比一复刻 pages/home/index）
        ========================= */
-    .scene-02 { background: var(--dark-base); }
-    .home-body {
-      position: absolute; top: 124px; left: 0; right: 0; bottom: 84px;
-      padding: 0 20px; overflow: hidden;
+    .scene-02 { background: #ffffff; }
+    .home-nav {
+      position: absolute; top: 0; left: 0; right: 0;
+      background: #ffffff;
+      padding: 48px 24px 16px;
+      border-bottom: 1px solid #ececec;
+      z-index: 50;
     }
-    .home-body-inner { will-change: transform; }
+    .home-nav-row {
+      display: flex; align-items: center;
+      position: relative; z-index: 1;
+    }
+    .home-nav-title { font-size: 22px; font-weight: 700; color: #111111; letter-spacing: 0.5px; }
+    .home-body {
+      position: absolute; top: 92px; left: 0; right: 0; bottom: 48px;
+      padding: 0 13px; overflow: hidden;
+    }
+    .home-body-inner { will-change: transform; padding-bottom: 24px; }
     .home-body.scrolling .home-body-inner { animation: gentleScroll 10s linear infinite; }
     @keyframes gentleScroll { from { transform: translateY(0); } to { transform: translateY(-220px); } }
 
     .cassette {
-      background: linear-gradient(135deg, #F5F0EB 0%, #EDE6DE 100%);
-      border-radius: 22px; padding: 22px 18px; margin-bottom: 18px;
-      position: relative; transform: rotate(-2deg);
-      box-shadow: 0 0 0 2px var(--neon-pink), 0 10px 28px rgba(236,72,153,0.25);
-      overflow: hidden;
+      background: #ffffff;
+      border: 1px solid #ececec;
+      border-radius: 22px;
+      padding: 22px 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
     }
-    .cassette::before, .cassette::after {
-      content: ""; position: absolute; left: 0; right: 0; height: 6px;
-      background: repeating-linear-gradient(90deg, var(--neon-violet) 0, var(--neon-violet) 9px, var(--neon-pink) 9px, var(--neon-pink) 18px);
-    }
-    .cassette::before { top: 0; } .cassette::after { bottom: 0; }
-    .cassette-title { font-size: 26px; font-weight: 700; color: var(--neon-violet); margin-bottom: 6px; position: relative; z-index: 1; }
-    .cassette-subtitle { font-size: 13px; color: var(--text); opacity: 0.7; margin-bottom: 16px; position: relative; z-index: 1; }
-    .cassette-actions { display: flex; gap: 12px; position: relative; z-index: 1; }
-    .cassette-btn { flex: 1; font-size: 13px; }
-    .cassette-counter { text-align: center; margin-top: 12px; font-size: 11px; color: var(--text); opacity: 0.7; position: relative; z-index: 1; }
-    .counter-num { color: var(--neon-pink); font-size: 14px; margin: 0 4px; font-weight: 700; }
+    .cassette-title { font-size: 24px; font-weight: 700; color: #111111; margin-bottom: 8px; }
+    .cassette-subtitle { font-size: 14px; color: #6b7280; margin-bottom: 20px; font-style: normal; }
+    .cassette-actions { display: flex; gap: 10px; }
+    .cassette-btn { flex: 1; height: 44px; font-size: 14px; display: flex; align-items: center; justify-content: center; font-weight: 600; border-radius: 16px; }
+    .cassette-btn.primary { background: #111111; color: #ffffff; }
+    .cassette-btn.ghost { background: #ffffff; color: #111111; border: 1px solid #d1d5db; }
+    .cassette-counter { text-align: center; margin-top: 14px; font-size: 13px; color: #6b7280; }
+    .counter-num { color: #111111; font-size: 15px; margin: 0 4px; font-weight: 700; }
 
     .search-box {
       display: flex; align-items: center;
-      padding: 12px 16px; background: linear-gradient(135deg, #F5F0EB 0%, #EDE6DE 100%);
-      border-radius: 28px; margin-bottom: 14px; transform: rotate(-1deg);
-      box-shadow: 0 4px 16px rgba(15,10,26,0.15), 0 0 0 1px rgba(6,182,212,0.2);
+      padding: 12px 16px; background: #ffffff;
+      border-radius: 18px; margin-bottom: 14px;
+      border: 1px solid #ececec;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
     }
-    .search-icon { font-size: 16px; margin-right: 8px; }
-    .search-placeholder { font-size: 14px; color: var(--text); opacity: 0.5; }
+    .search-icon { font-size: 16px; margin-right: 10px; color: #6b7280; }
+    .search-placeholder { font-size: 14px; color: #6b7280; }
 
-    .topic-strip { display: flex; gap: 10px; overflow: hidden; margin-bottom: 16px; }
-    .topic-tag { flex: 0 0 auto; }
+    .topic-scroll { margin-bottom: 14px; overflow-x: auto; }
+    .topic-list { display: flex; gap: 8px; }
+    .topic-strip { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 14px; }
 
-    .quick-row { display: flex; gap: 12px; margin-bottom: 18px; }
+    .quick-row { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 18px; }
     .quick-item {
       flex: 1; display: flex; flex-direction: column; align-items: center;
-      padding: 14px 8px; background: rgba(245,240,235,0.08); border-radius: 18px;
-      border: 1px solid rgba(139,92,246,0.3); position: relative; box-shadow: 0 6px 16px rgba(15,10,26,0.2);
+      padding: 14px 8px; background: #ffffff; border-radius: 16px;
+      border: 1px solid #ececec;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+      position: relative;
     }
-    .quick-icon { font-size: 26px; margin-bottom: 4px; filter: drop-shadow(2px 2px 0 rgba(0,0,0,0.3)); }
-    .quick-text { font-size: 11px; color: var(--paper-white); }
+    .quick-icon { font-size: 26px; margin-bottom: 6px; }
+    .quick-text { font-size: 12px; color: #111111; }
+    .quick-new {
+      position: absolute; top: -6px; right: -6px;
+      padding: 2px 6px; background: #111111; color: #ffffff;
+      font-size: 9px; font-weight: 700; border-radius: 8px;
+    }
 
-    .section-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px; }
-    .section-tag { font-size: 18px; color: #fff; font-weight: 700; text-shadow: 0 2px 0 var(--neon-pink); }
-    .section-sub { font-size: 11px; color: var(--neon-cyan); opacity: 0.8; }
+    .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; margin-top: 4px; }
+    .section-tag { font-size: 16px; color: #111111; font-weight: 700; }
+    .section-sub { font-size: 12px; color: #6b7280; margin-top: 2px; }
+    .sort-tabs {
+      display: flex; align-items: center;
+      background: #f3f4f6;
+      border-radius: 999px;
+      padding: 2px;
+    }
+    .sort-tab {
+      font-size: 12px; color: #6b7280;
+      padding: 6px 14px;
+      border-radius: 999px;
+    }
+    .sort-tab.active { background: #ffffff; color: #111111; font-weight: 700; box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
 
-    .swap-card { margin-bottom: 16px; }
+    .swap-card { padding: 14px; margin-bottom: 14px; border-radius: 18px; position: relative; overflow: hidden; }
     .swap-head { display: flex; align-items: center; margin-bottom: 12px; }
+    .swap-head .avatar { width: 40px; height: 40px; border: 1px solid #e5e7eb; border-radius: 50%; overflow: hidden; background: #f3f4f6; }
+    .swap-head .avatar img { width: 100%; height: 100%; display: block; }
     .swap-user { margin-left: 12px; flex: 1; }
-    .user-name { font-size: 15px; font-weight: 700; color: var(--text); }
-    .verified { font-size: 10px; color: var(--neon-orange); margin-left: 6px; font-weight: 600; }
-    .user-meta { font-size: 10px; color: var(--text); opacity: 0.6; margin-top: 2px; }
-    .swap-image-wrap {
-      position: relative; border-radius: 18px; overflow: hidden; margin-bottom: 12px;
-      height: 150px; background: linear-gradient(135deg, #E8E6F8 0%, #F2F0FC 100%);
-      display: grid; place-items: center; font-size: 60px;
+    .user-name { font-size: 15px; font-weight: 700; color: #111111; }
+    .verified { font-size: 11px; color: #6b7280; margin-left: 6px; font-weight: 600; }
+    .user-meta { font-size: 12px; color: #6b7280; margin-top: 2px; }
+    .swap-title { font-size: 17px; color: #111111; font-weight: 700; margin-bottom: 10px; }
+    .swap-line { font-size: 13px; color: #111111; line-height: 1.8; margin-bottom: 2px; }
+    .swap-label { font-weight: 700; color: #111111; }
+    .badge-row { display: flex; gap: 8px; margin: 12px 0; flex-wrap: wrap; }
+    .otaku-badge { display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 8px; font-size: 11px; }
+    .otaku-badge-cyan { background: #e0f7fa; color: #007c91; }
+    .otaku-badge-pink { background: #fce4ec; color: #c2185b; }
+    .otaku-badge-orange { background: #fff3e0; color: #ef6c00; }
+    .swap-actions { display: flex; gap: 8px; margin-top: 8px; }
+    .chat-btn { flex: 1; height: 40px; background: #ffffff; color: #111111; border: 1px solid #d1d5db; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; }
+    .swap-btn { flex: 1.2; height: 40px; background: #111111; color: #ffffff; border: 1px solid #111111; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; }
+
+    .empty-hint {
+      text-align: center;
+      padding: 24px 0 36px;
+      font-size: 13px; color: #6b7280;
     }
-    .swap-title { font-size: 18px; color: var(--neon-violet); font-weight: 700; margin-bottom: 8px; transform: rotate(-1.5deg); transform-origin: left center; }
-    .swap-line { font-size: 12px; color: var(--text); line-height: 1.5; margin-bottom: 2px; }
-    .swap-label { font-weight: 700; color: var(--neon-pink); }
-    .badge-row { display: flex; gap: 8px; margin: 10px 0; flex-wrap: wrap; }
-    .swap-actions { display: flex; gap: 10px; }
-    .chat-btn { flex: 1; height: 36px; display: grid; place-items: center; background: transparent; color: var(--neon-cyan); border: 1.5px solid var(--neon-cyan); border-radius: 16px; font-size: 13px; box-shadow: 0 0 8px rgba(6,182,212,0.3); }
-    .swap-btn { flex: 1.2; height: 36px; display: grid; place-items: center; background: linear-gradient(135deg, #8B5CF6, #EC4899); color: #fff; border-radius: 16px; font-size: 13px; box-shadow: 0 0 10px rgba(236,72,153,0.4); }
+    .pixel-bar {
+      width: 120px; height: 8px;
+      background: #f3f4f6;
+      margin: 12px auto 0;
+      border-radius: 999px;
+      overflow: hidden;
+      border: 1px solid #e5e7eb;
+    }
+    .pixel-progress { width: 60%; height: 100%; background: #111111; }
+    .otaku-divider { text-align: center; color: #6b7280; font-size: 14px; margin: 14px 0; }
 
     /* =========================
        Scene 03: AI 发布助手
        ========================= */
-    .scene-03 { background: var(--dark-base); }
+    .scene-03 { background: var(--bg); }
+    .back-header {
+      position: absolute; top: 48px; left: 16px; right: 16px;
+      display: flex; align-items: center; gap: 10px; z-index: 50;
+    }
+    .back-btn {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: #ffffff; display: grid; place-items: center;
+      color: var(--text); font-size: 20px;
+      border: 1px solid var(--border);
+      box-shadow: var(--card-shadow);
+    }
+    .back-title { font-size: 17px; font-weight: 600; color: var(--text); }
     .publish-body {
-      position: absolute; top: 96px; left: 0; right: 0; bottom: 84px;
-      padding: 0 20px; overflow: hidden;
+      position: absolute; top: 16px; left: 0; right: 0; bottom: 48px;
+      padding: 0 16px; overflow: hidden; overflow-y: auto;
     }
-    .section-title { font-size: 22px; font-weight: 700; color: var(--paper-white); margin-bottom: 4px; }
-    .section-subtitle { font-size: 13px; color: var(--paper-60); margin-bottom: 16px; }
-    .form-card { padding: 18px; margin-bottom: 14px; }
+    .publish-body .section-title { font-size: 22px; font-weight: 700; color: var(--text-purple); margin-bottom: 4px; }
+    .publish-body .section-subtitle { font-size: 13px; color: var(--muted-purple); margin-bottom: 16px; }
+    .form-card { padding: 18px; margin-bottom: 14px; border-radius: 18px; }
     .field { margin-bottom: 14px; }
-    .field-label { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
-    .field-input {
-      width: 100%; background: #f7f8fc; border-radius: 12px; padding: 12px;
-      font-size: 13px; color: var(--text); border: none; font-family: inherit;
+    .field-input,
+    .field-textarea {
+      width: 100%; background: #f7f8fc; border-radius: 8px; padding: 10px 12px;
+      font-size: 14px; color: var(--text-purple); border: none; font-family: inherit;
     }
+    .field-textarea { min-height: 90px; line-height: 1.5; resize: none; }
     .upload-grid { display: flex; gap: 10px; }
-    .upload-slot { width: 64px; height: 64px; border-radius: 12px; background: #ecebff; color: var(--neon-violet); display: grid; place-items: center; font-size: 12px; border: 1.5px dashed var(--neon-violet); }
+    .upload-slot { width: 64px; height: 64px; border-radius: 12px; background: #ecebff; color: #111111; display: grid; place-items: center; font-size: 12px; border: 2px dashed #111111; }
+    .switch-row {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 14px; color: var(--text-purple);
+      margin-bottom: 14px;
+    }
+    .switch-toggle {
+      width: 44px; height: 24px; border-radius: 12px;
+      background: var(--purple); position: relative;
+    }
+    .switch-toggle::after {
+      content: ''; position: absolute; right: 3px; top: 3px;
+      width: 18px; height: 18px; border-radius: 50%; background: #fff;
+    }
     .ai-card {
-      padding: 14px; border-radius: 14px;
+      padding: 14px; border-radius: 16px;
       background: linear-gradient(135deg, #f5f4ff 0%, #fff7e6 100%);
-      border: 1px solid #ecebff; color: var(--text); opacity: 0;
-      transform: translateY(10px); animation: bubbleIn 0.5s var(--expo) forwards;
+      border: 2px solid #ecebff; color: var(--text);
+      opacity: 0; transform: translateY(10px); animation: bubbleIn 0.5s var(--expo) forwards;
     }
     .ai-card-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 8px; }
     .ai-title { font-size: 15px; font-weight: 700; color: #222; }
-    .ai-subtitle { font-size: 11px; color: var(--neon-violet); margin-top: 2px; }
-    .ai-value { padding: 4px 10px; border-radius: 20px; background: var(--neon-orange); color: #fff; font-size: 11px; font-weight: 700; }
+    .ai-subtitle { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .ai-value { padding: 4px 10px; border-radius: 20px; background: var(--orange); color: #fff; font-weight: 700; font-size: 11px; }
     .ai-tags { display: flex; gap: 6px; margin-top: 8px; }
-    .ai-tag { padding: 3px 8px; border-radius: 10px; background: rgba(139,92,246,0.1); color: var(--neon-violet); font-size: 10px; }
+    .ai-tag { padding: 3px 8px; border-radius: 10px; background: rgba(139,92,246,0.1); color: var(--purple); font-size: 10px; }
     .ai-reason { margin-top: 8px; font-size: 12px; color: #555; line-height: 1.5; }
-    .typing-cursor { display: inline-block; width: 2px; height: 1em; background: var(--neon-violet); margin-left: 2px; animation: blink 1s step-end infinite; vertical-align: middle; }
+    .suggest-box { margin-top: 10px; padding: 10px; border-radius: 10px; background: rgba(255,255,255,0.7); }
+    .suggest-title { font-size: 11px; color: #666; margin-bottom: 6px; }
+    .alt-chip { display: inline-block; padding: 3px 8px; margin: 0 6px 6px 0; border-radius: 999px; background: #e9f7ee; color: #2e8b57; font-size: 10px; }
+    .quest { margin-top: 8px; color: #d98200; font-size: 12px; font-weight: 700; }
+    .typing-cursor { display: inline-block; width: 2px; height: 1em; background: var(--purple); margin-left: 2px; animation: blink 1s step-end infinite; vertical-align: middle; }
 
     /* =========================
        Scene 04: 校园心愿池
        ========================= */
-    .scene-04 { background: var(--dark-base); }
-    .wish-header { position: absolute; top: 58px; left: 0; right: 0; text-align: center; z-index: 50; }
-    .wish-title { font-size: 18px; font-weight: 700; color: var(--paper-white); }
-    .wish-sub { font-size: 13px; color: var(--paper-60); margin-top: 4px; }
-    .wish-body { position: absolute; top: 120px; left: 20px; right: 20px; bottom: 84px; overflow: hidden; }
-    .wish-form { padding: 16px; margin-bottom: 14px; }
-    .wish-input { width: 100%; background: #f7f8fc; border-radius: 12px; padding: 12px; font-size: 13px; color: var(--text); border: none; margin-bottom: 10px; font-family: inherit; }
-    .wish-input.second { opacity: 0.8; }
-    .wish-btn { width: 100%; height: 42px; border-radius: 16px; background: linear-gradient(135deg, #8B5CF6, #EC4899); color: #fff; font-size: 14px; font-weight: 700; display: grid; place-items: center; box-shadow: 0 0 10px rgba(236,72,153,0.4); }
-    .wish-card { padding: 16px; margin-bottom: 12px; opacity: 0; transform: translateY(20px); }
+    .scene-04 { background: var(--bg); }
+    .wish-body {
+      position: absolute; top: 16px; left: 16px; right: 16px; bottom: 48px;
+      overflow: hidden; overflow-y: auto;
+    }
+    .wish-form { padding: 18px; margin-bottom: 14px; border-radius: 18px; }
+    .wish-form-title { font-size: 17px; font-weight: 900; color: var(--text-purple); margin-bottom: 12px; }
+    .wish-input {
+      display: flex; align-items: center;
+      height: 44px; padding: 0 14px; background: #f7f3ff; color: var(--text-purple);
+      border-radius: 12px; margin-bottom: 10px; font-size: 14px;
+    }
+    .wish-picker { display: flex; justify-content: space-between; align-items: center; height: 44px; padding: 0 14px; background: #f7f3ff; border-radius: 12px; font-size: 14px; color: var(--text-purple); margin-bottom: 10px; }
+    .wish-btn { width: 100%; height: 44px; border-radius: 14px; background: #111111; color: #ffffff; font-size: 14px; font-weight: 700; display: grid; place-items: center; }
+    .wish-card {
+      display: flex; align-items: center; justify-content: space-between; gap: 14px;
+      padding: 16px; margin-bottom: 12px; background: #ffffff;
+      border: 1px solid var(--border); border-radius: 16px;
+      box-shadow: var(--card-shadow);
+      opacity: 0; transform: translateY(20px);
+    }
     .wish-card.in { animation: wishIn 0.6s var(--expo) forwards; }
     @keyframes wishIn { to { opacity: 1; transform: translateY(0); } }
-    .wish-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-    .wish-name { font-size: 16px; font-weight: 700; color: var(--neon-violet); }
-    .wish-count { font-size: 12px; color: var(--neon-pink); font-weight: 600; }
-    .wish-muted { font-size: 12px; color: var(--text); opacity: 0.6; margin-bottom: 8px; }
-    .wish-tip { font-size: 12px; color: var(--neon-cyan); margin-bottom: 10px; }
-    .wish-go { height: 34px; display: grid; place-items: center; background: transparent; color: var(--neon-cyan); border: 1.5px solid var(--neon-cyan); border-radius: 14px; font-size: 12px; box-shadow: 0 0 8px rgba(6,182,212,0.25); }
-    .trend-row { display: flex; gap: 8px; margin-top: 10px; }
-    .trend-tag { padding: 4px 10px; border-radius: 10px; background: rgba(139,92,246,0.1); color: var(--neon-violet); font-size: 11px; }
+    .wish-main { flex: 1; min-width: 0; }
+    .wish-name { font-size: 16px; font-weight: 900; color: var(--text-purple); }
+    .wish-meta { margin-top: 4px; font-size: 12px; color: var(--muted-purple-light); }
+    .wish-tag { display: inline-block; margin-top: 8px; padding: 4px 10px; border-radius: 999px; background: #f7f3ff; color: #111111; font-size: 11px; font-weight: 700; }
+    .wish-count { width: 60px; text-align: center; flex-shrink: 0; }
+    .wish-count .count { font-size: 21px; font-weight: 900; color: #111111; }
+    .wish-count .count-label { font-size: 11px; color: var(--muted-purple-light); }
 
     /* =========================
-       Scene 05: 智能匹配页
+       Scene 05: 物品详情页
        ========================= */
-    .scene-04 { background: linear-gradient(180deg, #1A1025 0%, #0F0A1A 100%); }
-    .match-header {
-      position: absolute; top: 58px; left: 0; right: 0; text-align: center; z-index: 50;
+    .scene-05 { background: var(--bg); }
+    .detail-scroll {
+      position: absolute; top: 0; left: 0; right: 0; bottom: 48px;
+      padding: 16px; overflow: hidden; overflow-y: auto;
     }
-    .match-title { font-size: 18px; font-weight: 700; color: var(--paper-white); }
-    .match-sub { font-size: 13px; color: var(--paper-60); font-weight: 400; margin-top: 4px; }
-    .match-cards {
-      position: absolute; top: 130px; left: 0; right: 0; bottom: 84px;
-      padding: 0 20px; display: flex; flex-direction: column; gap: 16px; justify-content: center;
+    .detail-cover {
+      height: 210px; border-radius: 16px; overflow: hidden; margin-bottom: 16px;
+      background: #f3f4f6;
     }
-    .match-card {
-      background: var(--paper-white); border-radius: 24px; padding: 18px;
-      box-shadow: 0 10px 30px rgba(107,92,231,0.15);
-      opacity: 0; transform: translateY(60px) scale(0.92); will-change: transform, opacity;
-    }
-    .match-card.in { animation: matchCardIn 0.9s var(--back) forwards; }
-    @keyframes matchCardIn { to { opacity: 1; transform: translateY(0) scale(1); } }
-    .match-row { display: flex; gap: 12px; align-items: center; margin-bottom: 12px; }
-    .match-thumb { width: 56px; height: 56px; border-radius: 14px; background: linear-gradient(135deg, #E8E6F8, #F2F0FC); display: grid; place-items: center; font-size: 28px; }
-    .match-info h4 { font-size: 14px; font-weight: 700; color: var(--text); }
-    .match-info p { font-size: 11px; color: var(--text); opacity: 0.6; margin-top: 2px; }
-    .match-score { margin-left: auto; text-align: center; }
-    .score-num { font-size: 26px; font-weight: 700; color: var(--neon-violet); line-height: 1; }
-    .score-label { font-size: 10px; color: var(--text); opacity: 0.6; margin-top: 2px; }
-    .match-tags { display: flex; gap: 6px; flex-wrap: wrap; }
-    .match-tag { padding: 4px 8px; border-radius: 8px; font-size: 10px; background: rgba(139,92,246,0.08); color: var(--neon-violet); }
-    .match-action {
-      margin-top: 14px; height: 42px; border-radius: 16px;
-      background: linear-gradient(135deg, #8B5CF6, #EC4899); color: #fff;
-      font-size: 15px; font-weight: 700; display: grid; place-items: center;
-      opacity: 0; transform: translateY(10px); animation: fadeUp 0.5s var(--expo) 1.2s forwards;
-    }
-    @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
-    @keyframes bubbleIn { to { opacity: 1; transform: translateY(0); } }
+    .detail-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .detail-card { padding: 12px; margin-bottom: 11px; border-radius: 16px; }
+    .detail-user { display: flex; gap: 9px; align-items: center; margin-bottom: 10px; }
+    .detail-user .avatar { width: 44px; height: 44px; }
+    .detail-name { font-size: 15px; font-weight: 700; color: var(--text); }
+    .detail-name .badge { margin-left: 6px; font-size: 10px; background: #e9f7ee; color: #2e8b57; }
+    .detail-muted { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .ai-summary { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+    .detail-block { margin-top: 7px; font-size: 13px; color: var(--text); line-height: 1.6; }
+    .detail-block .label { font-weight: 700; }
+    .detail-link { color: #111; font-weight: 700; text-decoration: underline; }
+    .alt-chip { display: inline-block; margin: 0 6px 6px 0; padding: 4px 10px; border-radius: 999px; background: #e9f7ee; color: #2e8b57; font-size: 11px; }
+    .proposal-card { padding: 11px; margin-bottom: 9px; border-radius: 16px; }
+    .proposal-head { display: flex; justify-content: space-between; align-items: center; }
+    .proposal-name { font-size: 15px; font-weight: 700; }
+    .proposal-desc { margin-top: 8px; font-size: 14px; }
+    .proposal-desc .accent { color: var(--orange); font-weight: 700; }
+    .proposal-text { margin-top: 6px; font-size: 12px; color: #666; }
+    .proposal-result { margin-top: 12px; padding: 12px; border-radius: 12px; background: #f7f8fc; color: #111; text-align: center; font-size: 13px; font-weight: 700; }
+    .fixed-proposal { margin-top: 8px; height: 44px; }
 
     /* =========================
-       Scene 06: 多边交换挑战局
+       Scene 06: 交换挑战局
        ========================= */
-    .scene-06 { background: var(--dark-base); display: flex; align-items: center; justify-content: center; }
-    .chain-title { position: absolute; top: 70px; left: 0; right: 0; text-align: center; color: #fff; z-index: 10; }
-    .chain-title-main { font-size: 18px; font-weight: 700; }
-    .chain-sub { font-size: 13px; color: var(--paper-60); font-weight: 400; margin-top: 4px; }
-    .chain-card { position: absolute; top: 120px; left: 20px; right: 20px; padding: 20px; background: linear-gradient(135deg, #F5F0EB 0%, #EDE6DE 100%); border-radius: 24px; box-shadow: 0 14px 40px rgba(0,0,0,0.08); opacity: 0; transform: translateY(30px); }
-    .chain-card.in { animation: chainIn 0.7s var(--expo) forwards; }
-    @keyframes chainIn { to { opacity: 1; transform: translateY(0); } }
-    .chain-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-    .chain-name { font-size: 16px; font-weight: 700; color: var(--neon-violet); }
-    .chain-score { font-size: 18px; font-weight: 700; color: var(--neon-pink); }
-    .chain-reason { font-size: 12px; color: var(--text); opacity: 0.8; margin-bottom: 14px; line-height: 1.5; }
-    .chain-nodes { display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 14px; }
-    .chain-node { text-align: center; }
-    .chain-avatar { width: 46px; height: 46px; border-radius: 50%; background: linear-gradient(135deg, var(--neon-violet), var(--neon-pink)); display: grid; place-items: center; font-size: 22px; color: #fff; margin: 0 auto 6px; box-shadow: 0 0 10px rgba(139,92,246,0.4); }
-    .chain-user { font-size: 12px; font-weight: 700; color: var(--text); }
-    .chain-item { font-size: 10px; color: var(--text); opacity: 0.6; }
-    .chain-arrow { font-size: 20px; color: var(--neon-cyan); }
-    .chain-reward { font-size: 12px; color: var(--neon-cyan); margin-bottom: 12px; text-align: center; }
-    .chain-join { height: 40px; display: grid; place-items: center; background: linear-gradient(135deg, #8B5CF6, #EC4899); color: #fff; border-radius: 16px; font-size: 14px; font-weight: 700; box-shadow: 0 0 10px rgba(236,72,153,0.4); }
-    .poly-svg { width: 340px; height: 340px; overflow: visible; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); opacity: 0.25; }
-    .poly-line { fill: none; stroke: rgba(139,92,246,0.55); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 600; stroke-dashoffset: 600; }
-    .poly-node { fill: var(--dark-base); stroke: rgba(139,92,246,0.8); stroke-width: 2; filter: drop-shadow(0 0 12px rgba(139,92,246,0.35)); transform-origin: center; animation: nodePulse 2.5s ease-in-out infinite; }
-    @keyframes nodePulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); } }
+    .scene-06 { background: var(--bg); }
+    .chain-body {
+      position: absolute; top: 16px; left: 16px; right: 16px; bottom: 48px;
+      overflow: hidden; overflow-y: auto;
+    }
+    .chain-card { padding: 17px; margin-bottom: 14px; background: #ffffff; border: 1px solid var(--border); border-radius: 18px; box-shadow: var(--card-shadow); }
+    .chain-head { display: flex; justify-content: space-between; gap: 16px; margin-bottom: 10px; }
+    .chain-name { font-size: 17px; font-weight: 900; color: var(--text-purple); }
+    .chain-reason { font-size: 12px; color: var(--muted-purple-light); line-height: 1.5; }
+    .score-box { width: 55px; padding: 9px 0; border-radius: 14px; background: #f7f3ff; text-align: center; flex-shrink: 0; }
+    .score-box .score { font-size: 19px; font-weight: 900; color: #111111; }
+    .score-box .score-label { font-size: 10px; color: var(--muted-purple-light); }
+    .chain-nodes { display: flex; align-items: center; gap: 10px; margin: 18px 0; overflow-x: auto; }
+    .chain-node { min-width: 85px; padding: 11px; border-radius: 12px; background: #f7f3ff; text-align: center; flex-shrink: 0; }
+    .chain-node .avatar { width: 36px; height: 36px; margin: 0 auto 6px; background: #6c63ff; color: #fff; display: grid; place-items: center; font-size: 14px; }
+    .chain-node .node-name { font-size: 11px; color: var(--muted-purple-light); }
+    .chain-node .node-item { margin-top: 4px; font-size: 13px; font-weight: 900; color: var(--text-purple); }
+    .chain-arrow { font-size: 20px; color: #111111; font-weight: 900; }
+    .chain-reward { font-size: 12px; color: var(--muted-purple); margin: 14px 0 12px; }
+    .chain-join { height: 42px; display: grid; place-items: center; background: #111111; color: #ffffff; border-radius: 14px; font-size: 14px; font-weight: 700; }
 
     /* =========================
        Scene 07: 学生认证页
        ========================= */
-    .scene-07 { background: var(--dark-base); }
-    .trust-header { position: absolute; top: 58px; left: 0; right: 0; text-align: center; z-index: 50; }
-    .trust-title { font-size: 18px; font-weight: 700; color: var(--paper-white); }
-    .trust-sub { font-size: 13px; color: var(--paper-60); margin-top: 4px; }
-    .trust-card { position: absolute; top: 130px; left: 20px; right: 20px; background: linear-gradient(135deg, #F5F0EB 0%, #EDE6DE 100%); border-radius: 28px; padding: 24px; box-shadow: 0 14px 40px rgba(0,0,0,0.08); text-align: center; opacity: 0; transform: translateY(40px); }
-    .trust-card.in { animation: trustIn 0.8s var(--expo) forwards; }
-    @keyframes trustIn { to { opacity: 1; transform: translateY(0); } }
-    .trust-badge { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 20px; background: rgba(52,199,89,0.1); color: var(--success); font-size: 13px; font-weight: 600; margin-bottom: 20px; opacity: 0; transform: translateX(-20px); animation: slideRight 0.6s var(--expo) 0.4s forwards; }
-    @keyframes slideRight { to { opacity: 1; transform: translateX(0); } }
-    .auth-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; font-size: 14px; color: var(--text); border-bottom: 1px solid rgba(0,0,0,0.06); }
+    .scene-07 { background: var(--bg); }
+    .auth-body {
+      position: absolute; top: 16px; left: 16px; right: 16px; bottom: 48px;
+      overflow: hidden; overflow-y: auto;
+    }
+    .success-card {
+      text-align: center; padding: 18px;
+      background: #ffffff; border-radius: 18px;
+      border: 1px solid var(--border); box-shadow: var(--card-shadow);
+      opacity: 0; transform: translateY(20px);
+    }
+    .success-card.in { animation: wishIn 0.6s var(--expo) forwards; }
+    .success-icon { font-size: 56px; }
+    .success-card-title { margin-top: 16px; font-size: 18px; font-weight: 800; color: var(--text-purple); }
+    .success-card-text { margin-top: 8px; color: var(--muted-purple); font-size: 13px; }
+    .auth-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; font-size: 14px; color: var(--text-purple); border-bottom: 1px solid #f0f1f7; }
     .auth-row:last-child { border-bottom: none; }
     .auth-badge { padding: 4px 10px; border-radius: 10px; background: rgba(52,199,89,0.12); color: var(--success); font-size: 12px; font-weight: 600; }
-    .score-ring-wrap { position: relative; width: 150px; height: 150px; margin: 0 auto 18px; }
-    .score-ring-svg { width: 100%; height: 100%; transform: rotate(-90deg); }
-    .score-ring-track { fill: none; stroke: rgba(0,0,0,0.1); stroke-width: 12; }
-    .score-ring-fill { fill: none; stroke: var(--neon-violet); stroke-width: 12; stroke-linecap: round; stroke-dasharray: 471; stroke-dashoffset: 471; }
-    .score-ring-fill.draw { transition: stroke-dashoffset 1.4s var(--expo); stroke-dashoffset: 24; }
-    .score-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; }
-    .score-big { font-size: 44px; font-weight: 700; color: var(--text); line-height: 1; }
-    .score-small { font-size: 12px; color: var(--text); opacity: 0.6; margin-top: 4px; }
 
     /* =========================
-       Scene 08: 消息协商页
+       Scene 08: 消息中心
        ========================= */
-    .scene-08 { background: var(--dark-base); }
-    .msg-header { position: absolute; top: 58px; left: 0; right: 0; text-align: center; z-index: 50; }
-    .msg-title { font-size: 18px; font-weight: 700; color: var(--paper-white); }
-    .msg-sub { font-size: 13px; color: var(--paper-60); margin-top: 4px; }
-    .msg-body { position: absolute; top: 120px; left: 20px; right: 20px; bottom: 84px; overflow: hidden; }
-    .notice-card { padding: 14px; margin-bottom: 12px; opacity: 0; transform: translateX(-20px); }
-    .notice-card.in { animation: noticeIn 0.5s var(--expo) forwards; }
-    @keyframes noticeIn { to { opacity: 1; transform: translateX(0); } }
-    .notice-title { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
-    .notice-title .icon { margin-right: 6px; }
-    .notice-desc { font-size: 12px; color: var(--text); opacity: 0.7; line-height: 1.5; }
-    .notice-time { font-size: 10px; color: var(--text); opacity: 0.5; margin-top: 6px; }
-    .chat-card { padding: 16px; }
-    .chat-card-head { font-size: 14px; font-weight: 700; color: var(--neon-violet); margin-bottom: 12px; }
-    .chat-bubbles { display: flex; flex-direction: column; gap: 10px; }
-    .bubble { max-width: 80%; padding: 10px 14px; border-radius: 16px; font-size: 13px; line-height: 1.5; opacity: 0; transform: translateY(10px); }
-    .bubble.in { animation: bubbleIn 0.5s var(--expo) forwards; }
-    .bubble.left { align-self: flex-start; background: #f0f0f5; color: var(--text); border-bottom-left-radius: 4px; }
-    .bubble.right { align-self: flex-end; background: linear-gradient(135deg, #8B5CF6, #EC4899); color: #fff; border-bottom-right-radius: 4px; }
-    @keyframes bubbleIn { to { opacity: 1; transform: translateY(0); } }
-    .safe-point { margin-top: 12px; padding: 10px; border-radius: 12px; background: rgba(6,182,212,0.1); border: 1px solid var(--neon-cyan); color: var(--neon-cyan); font-size: 12px; text-align: center; opacity: 0; }
-    .safe-point.in { animation: fadeUp 0.5s var(--expo) forwards; }
+    .scene-08 { background: var(--bg); }
+    .msg-body {
+      position: absolute; top: 16px; left: 16px; right: 16px; bottom: 48px;
+      overflow: hidden; overflow-y: auto;
+    }
+    .summary-card {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 13px 16px; margin-bottom: 12px;
+      background: #ffffff; border-radius: 16px;
+      border: 1px solid var(--border); box-shadow: var(--card-shadow);
+      font-size: 14px; font-weight: 700; color: var(--text-purple);
+    }
+    .summary-card .count { font-size: 20px; font-weight: 900; color: #111111; }
+    .message-card {
+      position: relative; display: flex; gap: 12px;
+      padding: 15px; margin-bottom: 12px;
+      background: #ffffff; border-radius: 16px;
+      border: 1px solid var(--border); box-shadow: var(--card-shadow);
+      opacity: 0; transform: translateY(10px);
+    }
+    .message-card.is-unread { border: 1px solid rgba(108, 99, 255, 0.28); }
+    .message-card.is-read { opacity: 0.72; }
+    .message-card.in { animation: bubbleIn 0.5s var(--expo) forwards; }
+    .message-icon {
+      width: 38px; height: 38px; line-height: 38px; text-align: center;
+      border-radius: 12px; background: #f7f3ff; font-size: 18px; flex-shrink: 0;
+    }
+    .message-main { flex: 1; min-width: 0; }
+    .message-top { display: flex; justify-content: space-between; gap: 10px; }
+    .message-title { font-size: 15px; font-weight: 800; color: var(--text-purple); }
+    .message-time { font-size: 11px; color: #9ca3af; flex-shrink: 0; }
+    .message-desc { margin-top: 6px; font-size: 13px; color: var(--muted-purple); line-height: 1.5; }
+    .message-status { margin-top: 8px; font-size: 11px; color: #8b7ca8; }
+    .message-dot {
+      position: absolute; right: 12px; top: 12px;
+      width: 8px; height: 8px; border-radius: 50%; background: #9ca3af;
+    }
 
     /* =========================
-       Scene 09: 交换成功 + 个人中心
+       Scene 09: 个人中心
        ========================= */
-    .scene-09 { background: var(--dark-base); }
-    .success-wrap { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding-bottom: 60px; }
-    .success-circle { width: 120px; height: 120px; border-radius: 50%; background: rgba(52,199,89,0.1); display: grid; place-items: center; position: relative; margin-bottom: 22px; }
-    .success-check { width: 64px; height: 64px; }
-    .success-check path { fill: none; stroke: var(--success); stroke-width: 6; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 100; stroke-dashoffset: 100; }
-    .success-check.spring path { animation: checkSpring 0.7s var(--back) forwards; }
-    @keyframes checkSpring { to { stroke-dashoffset: 0; } }
-    .success-title { font-size: 22px; font-weight: 700; color: var(--paper-white); margin-bottom: 6px; opacity: 0; transform: translateY(14px); }
-    .success-title.in { animation: fadeUp 0.6s var(--expo) 0.5s forwards; }
-    .success-desc { font-size: 13px; color: var(--paper-60); margin-bottom: 24px; opacity: 0; }
-    .success-desc.in { animation: fadeUp 0.6s var(--expo) 0.65s forwards; }
-    .profile-overlay { position: absolute; inset: 0; background: var(--dark-base); opacity: 0; pointer-events: none; transition: opacity 0.6s ease; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px; }
-    .profile-overlay.show { opacity: 1; pointer-events: auto; }
-    .profile-card { width: 100%; background: linear-gradient(135deg, #F5F0EB 0%, #EDE6DE 100%); border-radius: 28px; padding: 24px; text-align: center; box-shadow: 0 14px 40px rgba(0,0,0,0.08); }
-    .profile-avatar { width: 70px; height: 70px; border-radius: 50%; background: linear-gradient(135deg, var(--neon-violet), var(--neon-pink)); margin: 0 auto 12px; display: grid; place-items: center; font-size: 32px; color: #fff; box-shadow: 0 0 16px rgba(139,92,246,0.4); }
-    .profile-name { font-size: 20px; font-weight: 700; color: var(--text); }
-    .profile-meta { font-size: 12px; color: var(--text); opacity: 0.6; margin: 4px 0 14px; }
-    .profile-stats { display: flex; justify-content: space-around; margin-bottom: 16px; }
-    .profile-stat { text-align: center; }
-    .profile-stat-num { font-size: 22px; font-weight: 700; color: var(--neon-violet); }
-    .profile-stat-label { font-size: 11px; color: var(--text); opacity: 0.6; margin-top: 2px; }
-    .badge-list { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 16px; }
-    .fun-badge { padding: 4px 10px; border-radius: 10px; background: rgba(139,92,246,0.1); color: var(--neon-violet); font-size: 11px; }
-    .task-progress { text-align: left; }
-    .task-line { display: flex; justify-content: space-between; font-size: 12px; color: var(--text); margin-bottom: 6px; }
-    .task-bar { height: 6px; background: rgba(0,0,0,0.08); border-radius: 3px; overflow: hidden; }
-    .task-bar-inner { height: 100%; background: linear-gradient(90deg, var(--neon-violet), var(--neon-pink)); border-radius: 3px; }
-
+    .scene-09 { background: var(--bg); }
+    .profile-scroll {
+      position: absolute; top: 16px; left: 16px; right: 16px; bottom: 48px;
+      overflow: hidden; overflow-y: auto;
+    }
+    .profile-card { padding: 14px; text-align: center; margin-bottom: 14px; border-radius: 18px; }
+    .profile-card .avatar { width: 60px; height: 60px; margin: 0 auto 12px; border: 2px solid #e5e7eb; }
+    .profile-name-row { display: flex; justify-content: center; align-items: center; gap: 8px; }
+    .profile-name { font-size: 17px; font-weight: 700; color: var(--text-purple); }
+    .profile-name .badge { background: #e9f7ee; color: #2e8b57; font-size: 11px; }
+    .profile-muted { font-size: 13px; color: var(--muted-purple); margin: 6px 0 14px; }
+    .score-row { display: flex; justify-content: space-around; font-size: 12px; color: #444; margin-bottom: 14px; }
+    .metrics { display: flex; gap: 10px; }
+    .metric { flex: 1; padding: 9px 4px; border-radius: 10px; background: #f7f8fc; }
+    .metric-value { font-size: 18px; font-weight: 700; color: #111111; }
+    .metric-label { margin-top: 4px; font-size: 11px; color: #777; }
+    .badges-card { padding: 12px; margin-bottom: 14px; border-radius: 18px; }
+    .badges-title { font-size: 15px; font-weight: 700; color: var(--text-purple); margin-bottom: 12px; }
+    .badge-list { display: flex; flex-wrap: wrap; gap: 8px; }
+    .fun-badge { padding: 5px 8px; border-radius: 999px; background: #fff7e6; color: #d98200; font-size: 12px; }
+    .menu-card { padding: 6px 0; margin-bottom: 14px; border-radius: 18px; }
+    .menu-item { padding: 14px; border-bottom: 1px solid #f0f1f7; font-size: 15px; color: var(--text-purple); }
+    .menu-item:last-child { border-bottom: none; }
+    .list-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(0,0,0,0.06); }
+    .list-row:last-child { border-bottom: none; }
+    .list-title { color: var(--text-purple); font-size: 15px; font-weight: 800; }
+    .list-desc { margin-top: 4px; color: var(--muted-purple-light); font-size: 12px; }
+    .list-status { padding: 4px 10px; border-radius: 999px; background: #f7f3ff; color: #111111; font-size: 11px; }
 
     /* =========================
        Scene 10: 结尾落版
        ========================= */
-    .scene-10 { background: radial-gradient(circle at 50% 45%, #1A1025 0%, #0F0A1A 70%); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+    .scene-10 { background: radial-gradient(circle at 50% 45%, #f8f5f2 0%, #e8e5e2 70%); display: flex; align-items: center; justify-content: center; overflow: hidden; }
     .ending-wrap { position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 40px; }
     .ending-logo {
       width: 100px; height: 100px; border-radius: 28px;
-      background: linear-gradient(135deg, var(--neon-violet) 0%, var(--neon-pink) 100%);
+      background: linear-gradient(135deg, #111111 0%, #6b7280 100%);
       display: grid; place-items: center; font-size: 48px; color: #fff;
-      margin-bottom: 28px; box-shadow: 0 20px 60px rgba(139,92,246,0.5), 0 0 40px rgba(236,72,153,0.35);
+      margin-bottom: 28px; box-shadow: 0 20px 60px rgba(0,0,0,0.15);
       opacity: 0; transform: scale(0.5) rotate(-15deg);
     }
     .ending-logo.in { animation: logoReveal 0.9s var(--back) forwards; }
     @keyframes logoReveal { to { opacity: 1; transform: scale(1) rotate(0deg); } }
-    .ending-title { font-size: 34px; font-weight: 700; color: #fff; letter-spacing: 0.08em; margin-bottom: 14px; opacity: 0; transform: translateY(20px); }
+    .ending-title { font-size: 34px; font-weight: 700; color: var(--text); letter-spacing: 0.08em; margin-bottom: 14px; opacity: 0; transform: translateY(20px); }
     .ending-title.in { animation: fadeUp 0.7s var(--expo) 0.4s forwards; }
-    .ending-sub { font-size: 15px; color: var(--paper-60); margin-bottom: 34px; opacity: 0; transform: translateY(16px); }
+    .ending-sub { font-size: 15px; color: var(--muted); margin-bottom: 34px; opacity: 0; transform: translateY(16px); }
     .ending-sub.in { animation: fadeUp 0.7s var(--expo) 0.6s forwards; }
     .ending-cta {
-      padding: 12px 32px; border-radius: 20px;
-      background: linear-gradient(135deg, var(--neon-violet), var(--neon-pink));
-      color: #fff; font-size: 15px; font-weight: 700;
-      box-shadow: 0 0 0 1px rgba(255,255,255,0.2) inset, 0 8px 0 var(--neon-pink), 0 14px 28px rgba(236,72,153,0.4);
+      padding: 14px 32px; border-radius: 14px;
+      background: #111111; color: #fff; font-size: 15px; font-weight: 700;
       opacity: 0; transform: scale(0.9);
     }
     .ending-cta.in { animation: ctaPop 0.7s var(--back) 1s forwards; }
     @keyframes ctaPop { 60% { opacity: 1; transform: scale(1.08); } 100% { opacity: 1; transform: scale(1); } }
-    .ending-loop { margin-top: 28px; font-size: 12px; color: var(--paper-60); opacity: 0; }
+    .ending-loop { margin-top: 28px; font-size: 12px; color: var(--muted); opacity: 0; }
     .ending-loop.in { animation: fadeIn 0.6s ease 1.6s forwards; }
     .floating-item {
       position: absolute; font-size: 28px; opacity: 0; pointer-events: none;
-      text-shadow: 0 0 18px rgba(139,92,246,0.6);
+      color: var(--text);
     }
     .floating-item.in { animation: floatUp 3.2s ease-out forwards; }
     @keyframes floatUp {
@@ -880,18 +943,15 @@
     }
     .ending-glow {
       position: absolute; width: 500px; height: 500px; border-radius: 50%;
-      background: radial-gradient(circle, rgba(139,92,246,0.18), transparent 60%);
+      background: radial-gradient(circle, rgba(0,0,0,0.05), transparent 60%);
       top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.8);
       animation: glowPulse 3s ease-in-out infinite;
       pointer-events: none;
     }
     @keyframes glowPulse { 0%, 100% { opacity: 0.6; transform: translate(-50%, -50%) scale(0.8); } 50% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); } }
 
-    /* =========================
-       音频控制
-       ========================= */
+    /* 音频控制 */
     .audio-control {
-
       position: absolute; right: 40px; bottom: 40px;
       width: 52px; height: 52px; border-radius: 50%;
       background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18);
@@ -918,17 +978,9 @@
 
         <!-- Scene 02: 首页交换广场 -->
         <section class="scene scene-02" id="scene02">
-          <div class="custom-nav">
-            <div class="nav-status">
-              <div class="nav-time" id="clock">9:41</div>
-              <div class="nav-hud">
-                <span>📶</span><span>HP</span>
-                <div class="battery"><div class="battery-fill"></div></div>
-              </div>
-            </div>
-            <div class="nav-title-row">
-              <div class="nav-title">交换广场</div>
-              <div class="nav-cursor">▌</div>
+          <div class="home-nav">
+            <div class="home-nav-row">
+              <div class="home-nav-title">交换广场</div>
             </div>
           </div>
           <div class="home-body" id="homeBody">
@@ -937,8 +989,8 @@
                 <div class="cassette-title">换个啥</div>
                 <div class="cassette-subtitle">你的闲置，可能正是别人眼里的宝藏。</div>
                 <div class="cassette-actions">
-                  <div class="otaku-btn cassette-btn">➕ 挂个闲置</div>
-                  <div class="otaku-btn otaku-btn-ghost cassette-btn">AI 撮合 ✦</div>
+                  <div class="cassette-btn primary">➕ 挂个闲置</div>
+                  <div class="cassette-btn ghost">AI 撮合 ✦</div>
                 </div>
                 <div class="cassette-counter">今日已撮合 <span class="counter-num">128</span> 次</div>
               </div>
@@ -947,46 +999,52 @@
                 <span class="search-placeholder">搜点啥？</span>
               </div>
               <div class="topic-strip" id="topicStrip">
-                <div class="otaku-tag topic-tag">教材</div>
-                <div class="otaku-tag topic-tag">数码</div>
-                <div class="otaku-tag topic-tag">日用</div>
-                <div class="otaku-tag topic-tag">美妆</div>
-                <div class="otaku-tag topic-tag">运动</div>
-                <div class="otaku-tag topic-tag">零食</div>
+                <div class="topic-tag">#奶茶换万物</div>
+                <div class="topic-tag">#毕业季清仓</div>
+                <div class="topic-tag">#离谱交换大赏</div>
+                <div class="topic-tag">#以技换物</div>
+                <div class="topic-tag">#本周热榜</div>
               </div>
               <div class="quick-row">
-                <div class="quick-item"><div class="quick-icon">🏆</div><div class="quick-text">排行榜</div><div class="otaku-new-badge">NEW</div></div>
+                <div class="quick-item"><div class="quick-icon">🏆</div><div class="quick-text">排行榜</div><div class="quick-new">NEW</div></div>
                 <div class="quick-item"><div class="quick-icon">🔥</div><div class="quick-text">今日离谱</div></div>
                 <div class="quick-item"><div class="quick-icon">📖</div><div class="quick-text">交换物语</div></div>
               </div>
               <div class="section-header">
-                <div class="section-tag">【推荐交换】</div>
-                <div class="section-sub">AI 正在派单…</div>
+                <div>
+                  <div class="section-tag">【交换广场】</div>
+                  <div class="section-sub">发现校园闲置</div>
+                </div>
+                <div class="sort-tabs">
+                  <div class="sort-tab active">最新</div>
+                  <div class="sort-tab">最热</div>
+                </div>
               </div>
               <div id="homeCards"></div>
+              <div class="otaku-divider">⋆ ｡˚ ☆ ˚ ｡⋆</div>
+              <div class="empty-hint">
+                <div>正在读取更多交换情报…</div>
+                <div class="pixel-bar"><div class="pixel-progress"></div></div>
+              </div>
             </div>
           </div>
           <div class="tab-bar">
-            <div class="tab active"><div class="tab-icon">🏠</div><div>广场</div></div>
-            <div class="tab"><div class="tab-icon">➕</div><div>发布</div></div>
-            <div class="tab"><div class="tab-icon">💬</div><div>消息</div></div>
-            <div class="tab"><div class="tab-icon">👤</div><div>我的</div></div>
+            <div class="tab active"><div class="tab-icon-wrap">🏠</div><div>广场</div></div>
+            <div class="tab"><div class="tab-icon-wrap">＋</div><div>发布</div></div>
+            <div class="tab"><div class="tab-icon-wrap">💬</div><div>消息</div></div>
+            <div class="tab"><div class="tab-icon-wrap">👤</div><div>我的</div></div>
           </div>
         </section>
 
         <!-- Scene 03: AI 发布助手 -->
         <section class="scene scene-03" id="scene03">
-          <div class="back-header">
-            <div class="back-btn-dark">‹</div>
-            <div class="back-title">AI 发布助手</div>
-          </div>
           <div class="publish-body" id="publishBody">
             <div class="section-title">发起交换</div>
-            <div class="section-subtitle">填写你有什么、想换什么，生成一张 AI 交换卡。</div>
-            <div class="otaku-card form-card">
+            <div class="section-subtitle">填写你有什么、想换什么，生成一张可分享的 AI 交换卡。</div>
+            <div class="card form-card">
               <div class="field">
                 <div class="field-label">我有什么</div>
-                <div class="field-input" id="haveInput">例如：雨伞</div>
+                <div class="field-input" id="haveInput">例如：保温杯 / 计算器 / 手绘头像服务</div>
               </div>
               <div class="field">
                 <div class="field-label">上传图片</div>
@@ -996,188 +1054,296 @@
               </div>
               <div class="field">
                 <div class="field-label">我想换什么</div>
-                <div class="field-input" id="wantInput">例如：计算器</div>
+                <div class="field-input" id="wantInput">例如：奶茶 / 教材 / 任何有趣的东西</div>
               </div>
               <div class="field">
                 <div class="field-label">交换故事</div>
-                <div class="field-input" id="storyInput">介绍一下这个物品…</div>
+                <div class="field-textarea" id="storyInput">介绍一下这个物品的来历，让它更容易被提案</div>
               </div>
+              <div class="switch-row">
+                <span>接受脑洞提案</span>
+                <div class="switch-toggle"></div>
+              </div>
+              <div class="btn-secondary ai-btn" style="width:100%;margin-bottom:12px;">✨ 生成 AI 交换卡</div>
             </div>
             <div id="aiResult"></div>
+            <div class="btn-primary" style="margin-top:8px;">立即发起交换</div>
           </div>
         </section>
 
         <!-- Scene 04: 校园心愿池 -->
         <section class="scene scene-04" id="scene04">
-          <div class="wish-header">
-            <div class="wish-title">校园心愿池</div>
-            <div class="wish-sub">把“我想要”丢进池子，AI 反馈需求趋势</div>
-          </div>
           <div class="wish-body" id="wishBody">
-            <div class="otaku-card wish-form">
-              <div class="wish-input" id="wishName">我想要：科学计算器</div>
-              <div class="wish-input second" id="wishCategory">类别：学习用品</div>
-              <div class="wish-btn">✨ 点亮心愿 +10 脑洞</div>
+            <div class="hero-card" style="display:flex;align-items:center;justify-content:space-between;">
+              <div>
+                <div class="title">校园心愿池</div>
+                <div class="subtitle">把你想换到的东西丢进池子，看看大家都想要什么</div>
+              </div>
+              <button class="refresh-btn">刷新</button>
             </div>
+            <div class="card wish-form">
+              <div class="wish-form-title">许一个交换心愿</div>
+              <div class="wish-input" id="wishName">例如：二手显示器、考研资料、拍立得</div>
+              <div class="wish-picker">
+                <span>分类</span><span>学习用品</span>
+              </div>
+              <div class="wish-input" id="wishTag">标签，可选，例如 急需 / 毕业季 / 低预算</div>
+              <div class="wish-btn">加入心愿池</div>
+            </div>
+            <div class="section-title" style="margin-top:18px;font-size:17px;font-weight:900;color:var(--text-purple);">热门心愿</div>
             <div id="wishCards"></div>
           </div>
         </section>
 
-        <!-- Scene 05: 智能匹配页 -->
+        <!-- Scene 05: 物品详情页 -->
         <section class="scene scene-05" id="scene05">
-          <div class="match-header">
-            <div class="match-title">智能匹配</div>
-            <div class="match-sub">AI 正在为你寻找最佳交换对象</div>
-          </div>
-          <div class="match-cards" id="matchCards">
-            <div class="match-card" id="matchCard1">
-              <div class="match-row">
-                <div class="match-thumb">🌂</div>
-                <div class="match-info">
-                  <h4>折叠雨伞</h4>
-                  <p>用了两次，九成新</p>
-                </div>
-                <div class="match-score">
-                  <div class="score-num" data-target="87">0</div>
-                  <div class="score-label">匹配度</div>
-                </div>
-              </div>
-              <div class="match-tags">
-                <span class="match-tag">防水</span>
-                <span class="match-tag">便携</span>
-              </div>
+          <div class="detail-scroll" id="detailScroll">
+            <div class="detail-cover">
+              <img src="assets/mock-posts/post-calculator.png?v=2" alt="">
             </div>
-            <div class="match-card" id="matchCard2">
-              <div class="match-row">
-                <div class="match-thumb">🧮</div>
-                <div class="match-info">
-                  <h4>科学计算器</h4>
-                  <p>考试可用，功能完好</p>
-                </div>
-                <div class="match-score">
-                  <div class="score-num" data-target="72">0</div>
-                  <div class="score-label">匹配度</div>
+            <div class="card detail-card">
+              <div class="detail-user">
+                <div class="avatar"><img src="assets/avatars/avatar-3.png?v=2" alt=""></div>
+                <div>
+                  <div class="detail-name">Alice <span class="badge">已认证</span></div>
+                  <div class="detail-muted">商学院 · 信用 93</div>
                 </div>
               </div>
-              <div class="match-tags">
-                <span class="match-tag">学习</span>
-                <span class="match-tag">文具</span>
+              <div class="ai-summary">
+                <span class="pill">S级校园刚需</span>
+                <span class="pill">脑洞分 92</span>
+                <span class="pill">匹配 91%</span>
+                <span class="pill">参考约 35 元</span>
               </div>
+              <div class="badge-row">
+                <span class="badge">学习刚需</span>
+                <span class="badge">AI推荐</span>
+              </div>
+              <div class="detail-block"><span class="label">我有什么：</span>🧮 科学计算器</div>
+              <div class="detail-block"><span class="label">我想换：</span>🌂 折叠雨伞</div>
+              <div class="detail-block"><span class="label">交换故事：</span>考试周必备，九成新，所有功能正常。</div>
+              <div class="detail-block"><span class="label">交换状态：</span>开放中</div>
+              <div class="detail-block"><span class="label">AI 建议：</span>可以接受价值相近或故事感更强的脑洞提案。</div>
+              <div class="detail-block"><span class="label">推荐交易地点：</span><span class="detail-link">查看安全交易点</span></div>
+              <div class="detail-block"><span class="label">多边交换：</span><span class="detail-link">查看交换挑战局</span></div>
             </div>
-            <div class="match-action" id="matchAction">发起交换</div>
+            <div class="section-title" style="font-size:20px;font-weight:700;color:var(--text-purple);margin-bottom:12px;">提案列表</div>
+            <div class="card proposal-card">
+              <div class="proposal-head">
+                <div>
+                  <div class="proposal-name">小文</div>
+                  <div class="detail-muted">外语学院 · 信用 92 · 趣味 88</div>
+                </div>
+                <span class="badge">待回复</span>
+              </div>
+              <div class="proposal-desc">我愿意拿 <span class="accent">折叠雨伞</span> 和你交换</div>
+              <div class="proposal-text">雨伞九成新，轻便防晒两用，下午图书馆北门可面交。</div>
+              <div class="proposal-result">等待发布者回复</div>
+            </div>
+            <div class="btn-secondary fixed-proposal">我要提案</div>
           </div>
         </section>
 
-        <!-- Scene 06: 多边交换挑战局 -->
+        <!-- Scene 06: 交换挑战局 -->
         <section class="scene scene-06" id="scene06">
-          <div class="chain-title">
-            <div class="chain-title-main">多边交换挑战局</div>
-            <div class="chain-sub">A→B→C→A 的交换闭环</div>
-          </div>
-          <svg class="poly-svg" viewBox="0 0 340 340">
-            <path class="poly-line" id="polyLineAB" d="M170 60 L280 230" />
-            <path class="poly-line" id="polyLineBC" d="M280 230 L60 230" />
-            <path class="poly-line" id="polyLineCA" d="M60 230 L170 60" />
-            <circle class="poly-node" cx="170" cy="60" r="36" />
-            <circle class="poly-node" cx="280" cy="230" r="36" />
-            <circle class="poly-node" cx="60" cy="230" r="36" />
-          </svg>
-          <div class="chain-card" id="chainCard">
-            <div class="chain-head">
-              <div class="chain-name">雨伞 → 计算器 → 台灯</div>
-              <div class="chain-score">92%</div>
+          <div class="chain-body" id="chainBody">
+            <div class="hero-card" style="display:flex;align-items:center;justify-content:space-between;">
+              <div>
+                <div class="title">交换挑战局</div>
+                <div class="subtitle">发现多边交换机会，让闲置物品连起来</div>
+              </div>
+              <button class="refresh-btn">刷新</button>
             </div>
-            <div class="chain-reason">AI 发现：Alice 有雨伞想要台灯，Bob 有计算器想要雨伞，Coco 有台灯想要计算器，三方正好形成闭环。</div>
-            <div class="chain-nodes">
-              <div class="chain-node"><div class="chain-avatar">👩‍🎓</div><div class="chain-user">Alice</div><div class="chain-item">雨伞→台灯</div></div>
-              <div class="chain-arrow">→</div>
-              <div class="chain-node"><div class="chain-avatar">👨‍🎓</div><div class="chain-user">Bob</div><div class="chain-item">计算器→雨伞</div></div>
-              <div class="chain-arrow">→</div>
-              <div class="chain-node"><div class="chain-avatar">🧑‍🎓</div><div class="chain-user">Coco</div><div class="chain-item">台灯→计算器</div></div>
+            <div class="chain-card" id="chainCard">
+              <div class="chain-head">
+                <div>
+                  <div class="chain-name">雨伞 → 计算器 → 台灯</div>
+                  <div class="chain-reason">系统发现了潜在多边交换机会：三方正好形成闭环。</div>
+                </div>
+                <div class="score-box">
+                  <div class="score">92</div>
+                  <div class="score-label">匹配分</div>
+                </div>
+              </div>
+              <div class="chain-nodes">
+                <div class="chain-node">
+                  <div class="avatar">小文</div>
+                  <div class="node-name">小文</div>
+                  <div class="node-item">雨伞→台灯</div>
+                </div>
+                <div class="chain-arrow">→</div>
+                <div class="chain-node">
+                  <div class="avatar">Alice</div>
+                  <div class="node-name">Alice</div>
+                  <div class="node-item">计算器→雨伞</div>
+                </div>
+                <div class="chain-arrow">→</div>
+                <div class="chain-node">
+                  <div class="avatar">Bob</div>
+                  <div class="node-name">Bob</div>
+                  <div class="node-item">台灯→计算器</div>
+                </div>
+              </div>
+              <div class="chain-reward">奖励：+90 脑洞值 · +80 闲置能量</div>
+              <div class="chain-join">加入挑战局</div>
             </div>
-            <div class="chain-reward">奖励：+20 脑洞值 / +15 闲置能量</div>
-            <div class="chain-join">开启挑战局</div>
           </div>
         </section>
 
         <!-- Scene 07: 学生认证页 -->
         <section class="scene scene-07" id="scene07">
-          <div class="trust-header">
-            <div class="trust-title">学生认证</div>
-            <div class="trust-sub">校园邮箱认证，交换更安心</div>
-          </div>
-          <div class="trust-card" id="trustCard">
-            <div class="trust-badge">✓ 已认证大学生</div>
-            <div class="score-ring-wrap">
-              <svg class="score-ring-svg" viewBox="0 0 160 160">
-                <circle class="score-ring-track" cx="80" cy="80" r="75" />
-                <circle class="score-ring-fill" id="scoreRing" cx="80" cy="80" r="75" />
-              </svg>
-              <div class="score-center">
-                <div class="score-big" id="scoreNum">0</div>
-                <div class="score-small">信用分</div>
+          <div class="auth-body" id="authBody">
+            <div class="hero-card" style="margin-bottom:16px;">
+              <div class="title">学生认证</div>
+              <div class="subtitle">完成认证后，你的主页会显示“已认证大学生”，并提升初始信用分。</div>
+            </div>
+            <div class="success-card" id="trustCard">
+              <div class="success-icon">✅</div>
+              <div class="success-card-title">你已完成学生认证</div>
+              <div class="success-card-text">认证信息已同步到云端数据库。</div>
+              <div style="margin-top:20px;text-align:left;">
+                <div class="auth-row">
+                  <span style="color:var(--muted-purple);">当前状态</span>
+                  <span class="auth-badge">已认证大学生</span>
+                </div>
+                <div class="auth-row">
+                  <span style="color:var(--muted-purple);">认证方式</span>
+                  <span style="font-weight:700;">校园邮箱</span>
+                </div>
+                <div class="auth-row">
+                  <span style="color:var(--muted-purple);">信用分</span>
+                  <span style="font-weight:700;">95</span>
+                </div>
               </div>
             </div>
-            <div class="auth-row"><span>当前状态</span><span class="auth-badge">已认证</span></div>
-            <div class="auth-row"><span>认证方式</span><span>校园邮箱</span></div>
-            <div class="auth-row"><span>信用分</span><span class="auth-badge">95</span></div>
           </div>
         </section>
 
-        <!-- Scene 08: 消息协商页 -->
+        <!-- Scene 08: 消息中心 -->
         <section class="scene scene-08" id="scene08">
-          <div class="msg-header">
-            <div class="msg-title">消息中心</div>
-            <div class="msg-sub">提案、成功、奖励与聊天</div>
-          </div>
           <div class="msg-body" id="msgBody">
-            <div class="otaku-card notice-card" id="noticeCard">
-              <div class="notice-title"><span class="icon">🎯</span>交换提案</div>
-              <div class="notice-desc">Alice 对你的「科学计算器」发起了交换请求，愿意用折叠雨伞交换。</div>
-              <div class="notice-time">2 分钟前</div>
-            </div>
-            <div class="otaku-card chat-card">
-              <div class="chat-card-head">💬 与 Alice 协商中</div>
-              <div class="chat-bubbles" id="chatBubbles">
-                <div class="bubble left">你好，雨伞九成新，计算器功能都正常吗？</div>
-                <div class="bubble right">正常，考试周刚用过。可以图书馆门口面交吗？</div>
-                <div class="bubble left">可以，下午 4 点安全交易点见。</div>
+            <div class="hero-card" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+              <div>
+                <div class="title">消息中心</div>
+                <div class="subtitle">查看提案、交换和系统通知</div>
               </div>
-              <div class="safe-point" id="safePoint">📍 已推荐最近安全交易点：图书馆北门</div>
+              <button class="refresh-btn">全部已读</button>
+            </div>
+            <div class="summary-card">
+              <span>未读消息</span>
+              <span class="count">3</span>
+            </div>
+            <div class="message-card is-unread" id="noticeCard">
+              <div class="message-icon">🎯</div>
+              <div class="message-main">
+                <div class="message-top">
+                  <div class="message-title">交换提案</div>
+                  <div class="message-time">2 分钟前</div>
+                </div>
+                <div class="message-desc">小文想拿「折叠雨伞」交换你的「科学计算器」。</div>
+                <div class="message-status">未读，点击标记已读</div>
+              </div>
+              <div class="message-dot"></div>
+            </div>
+            <div class="message-card is-read">
+              <div class="message-icon">💬</div>
+              <div class="message-main">
+                <div class="message-top">
+                  <div class="message-title">协商消息</div>
+                  <div class="message-time">5 分钟前</div>
+                </div>
+                <div class="message-desc">Alice：下午 4 点图书馆北门安全交易点见。</div>
+                <div class="message-status">已读</div>
+              </div>
+            </div>
+            <div class="message-card is-read">
+              <div class="message-icon">✅</div>
+              <div class="message-main">
+                <div class="message-top">
+                  <div class="message-title">交换达成</div>
+                  <div class="message-time">10 分钟前</div>
+                </div>
+                <div class="message-desc">雨伞 ↔ 计算器 交换已达成，信用分 +5。</div>
+                <div class="message-status">已读</div>
+              </div>
             </div>
           </div>
         </section>
 
-        <!-- Scene 09: 交换成功 + 个人中心 -->
+        <!-- Scene 09: 个人中心 -->
         <section class="scene scene-09" id="scene09">
-          <div class="success-wrap" id="successWrap">
-            <div class="success-circle">
-              <svg class="success-check" viewBox="0 0 80 80">
-                <path d="M20 42 L34 56 L62 28" />
-              </svg>
-            </div>
-            <div class="success-title" id="successTitle">交换成功！</div>
-            <div class="success-desc" id="successDesc">雨伞 ↔ 计算器 已达成匹配</div>
-          </div>
-          <div class="profile-overlay" id="profileOverlay">
-            <div class="profile-card">
-              <div class="profile-avatar">👩‍🎓</div>
-              <div class="profile-name">Alice</div>
-              <div class="profile-meta">商学院 · 大三 · 认证玩家</div>
-              <div class="profile-stats">
-                <div class="profile-stat"><div class="profile-stat-num" id="profileCredit">93</div><div class="profile-stat-label">信用分</div></div>
-                <div class="profile-stat"><div class="profile-stat-num" id="profileExchange">13</div><div class="profile-stat-label">交换次数</div></div>
-                <div class="profile-stat"><div class="profile-stat-num" id="profileBrain">126</div><div class="profile-stat-label">脑洞值</div></div>
+          <div class="profile-scroll" id="profileScroll">
+            <div class="card profile-card">
+              <div class="avatar"><img src="assets/avatars/avatar-3.png?v=2" alt=""></div>
+              <div class="profile-name-row">
+                <div class="profile-name">Alice</div>
+                <span class="badge">Lv.3</span>
               </div>
+              <div class="profile-muted">武汉理工大学 · 已认证大学生</div>
+              <div class="score-row">
+                <span>信用分 95</span>
+                <span>交换 3 次</span>
+                <span>已认证</span>
+              </div>
+              <div class="metrics">
+                <div class="metric"><div class="metric-value" id="profilePublish">2</div><div class="metric-label">发布</div></div>
+                <div class="metric"><div class="metric-value" id="profileProposal">5</div><div class="metric-label">提案</div></div>
+                <div class="metric"><div class="metric-value" id="profileExchange">3</div><div class="metric-label">交换</div></div>
+              </div>
+              <div class="metrics" style="margin-top:10px;">
+                <div class="metric"><div class="metric-value" id="profileBrain">116</div><div class="metric-label">脑洞值</div></div>
+                <div class="metric"><div class="metric-value" id="profileEnergy">80</div><div class="metric-label">闲置能量</div></div>
+                <div class="metric"><div class="metric-value" id="profileBadge">3</div><div class="metric-label">徽章</div></div>
+              </div>
+            </div>
+            <div class="card badges-card">
+              <div class="badges-title">我的徽章</div>
               <div class="badge-list" id="profileBadges">
                 <span class="fun-badge">🌧 雨天守护</span>
                 <span class="fun-badge">📚 考试周救星</span>
-                <span class="fun-badge">🤝 靠谱交换者</span>
+                <span class="fun-badge">🤝 新手换物家</span>
               </div>
-              <div class="task-progress">
-                <div class="task-line"><span>任务：完成 3 次交换</span><span>2/3</span></div>
-                <div class="task-bar"><div class="task-bar-inner" style="width: 66%;"></div></div>
+            </div>
+            <div class="card badges-card">
+              <div class="badges-title">我的发布</div>
+              <div class="list-row">
+                <div>
+                  <div class="list-title">◤科学计算器，想换折叠雨伞◢</div>
+                  <div class="list-desc">科学计算器 换 折叠雨伞</div>
+                </div>
+                <div class="list-status">开放中</div>
               </div>
+              <div class="list-row">
+                <div>
+                  <div class="list-title">◤20寸行李箱◢</div>
+                  <div class="list-desc">20寸行李箱 换 床上桌</div>
+                </div>
+                <div class="list-status">已达成</div>
+              </div>
+            </div>
+            <div class="card badges-card">
+              <div class="badges-title">我的提案</div>
+              <div class="list-row">
+                <div>
+                  <div class="list-title">折叠雨伞</div>
+                  <div class="list-desc">提案状态：待回复</div>
+                </div>
+              </div>
+              <div class="list-row">
+                <div>
+                  <div class="list-title">奶茶券 × 2</div>
+                  <div class="list-desc">提案状态：已接受</div>
+                </div>
+              </div>
+            </div>
+            <div class="card menu-card">
+              <div class="menu-item">消息中心</div>
+              <div class="menu-item">学生认证</div>
+              <div class="menu-item">排行榜</div>
+              <div class="menu-item">任务中心</div>
+              <div class="menu-item">校园心愿池</div>
+              <div class="menu-item">交换挑战局</div>
+              <div class="menu-item">安全交易点</div>
             </div>
           </div>
         </section>
@@ -1196,7 +1362,6 @@
         </section>
       </div>
     </div>
-
 
     <div class="caption" id="caption"></div>
     <div id="progressTrack">
@@ -1227,12 +1392,6 @@
     };
     const easeOutExpo = (t) => t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
 
-    function updateClock() {
-      const now = new Date();
-      $('#clock').textContent = now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0');
-    }
-    updateClock(); setInterval(updateClock, 60000);
-
     function fitStage() {
       const w = window.innerWidth, h = window.innerHeight;
       const scale = Math.min(w / 1920, h / 1080);
@@ -1240,9 +1399,7 @@
     }
     window.addEventListener('resize', fitStage); fitStage();
 
-    /* =========================
-       音频系统（MP3 BGM + Web Audio 音效）
-       ========================= */
+    /* 音频系统 */
     let audioCtx = null, sfxGain = null, isMuted = false;
     const bgm = $('#bgm');
     function initAudio() {
@@ -1280,25 +1437,22 @@
     $('#audioControl').addEventListener('click', () => { initAudio(); if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume(); toggleAudio(); });
     document.body.addEventListener('click', function firstInteract() { initAudio(); if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume(); if (bgm.paused) bgm.play().catch(e => {}); document.body.removeEventListener('click', firstInteract); }, { once: true });
 
-    /* =========================
-       Scene 引擎
-       ========================= */
+    /* Scene 引擎 */
     const scenes = $$('.scene');
     const captions = [
       { pos: 'right', anim: 'pop', texts: ['校园闲置交换平台', '让闲置重新流动'] },
-      { pos: 'left', anim: 'blinds', texts: ['交换广场', 'AI 正在派单'] },
+      { pos: 'left', anim: 'blinds', texts: ['交换广场', '发现校园闲置'] },
       { pos: 'right', anim: 'rotate', texts: ['AI 发布助手', '一句话生成交换卡'] },
       { pos: 'left', anim: 'elastic', texts: ['校园心愿池', 'AI 捕捉需求趋势'] },
-      { pos: 'left', anim: 'pop', texts: ['智能匹配', '87% 高匹配度'] },
-      { pos: 'top', anim: 'blinds', texts: ['多边交换挑战局', 'A→B→C→A 闭环'] },
-      { pos: 'left', anim: 'rotate', texts: ['学生认证', '信用分 95'] },
-      { pos: 'right', anim: 'slide', texts: ['消息协商', '安全交易点'] },
-      { pos: 'bottom', anim: 'elastic', texts: ['交换成功', '信用 + 徽章 + 任务'] },
+      { pos: 'left', anim: 'pop', texts: ['物品详情', '查看提案与 AI 建议'] },
+      { pos: 'top', anim: 'blinds', texts: ['交换挑战局', 'A→B→C→A 闭环'] },
+      { pos: 'left', anim: 'rotate', texts: ['学生认证', '已认证大学生'] },
+      { pos: 'right', anim: 'slide', texts: ['消息中心', '提案、交换、通知'] },
+      { pos: 'bottom', anim: 'elastic', texts: ['个人中心', '信用 + 徽章 + 任务'] },
       { pos: 'center', anim: 'pop', texts: [] }
-
     ];
-    const sceneDurations = [0, 4000, 6000, 7000, 5000, 7000, 6000, 5000, 5000, 6000, 5000]; // 每个 Scene 内容展示时长（ms）
-    const sceneTimes = [0, 4000, 10600, 18200, 24200, 32200, 38800, 44800, 50800, 57400, 63400]; // 对应加速后的总时间轴，用于拖拽跳转
+    const sceneDurations = [0, 4000, 6000, 7000, 5000, 7000, 6000, 5000, 5000, 6000, 5000];
+    const sceneTimes = [0, 4000, 10600, 18200, 24200, 32200, 38800, 44800, 50800, 57400, 63400];
     const totalTime = 63400;
     const sceneTransitions = [null, 'push', 'push', 'push', 'dissolve', 'push', 'flip', 'push', 'scaleblur', 'scaleblur', 'scaleblur'];
 
@@ -1340,7 +1494,6 @@
       setTimeout(() => { container.innerHTML = ''; }, 550);
     }
     function timeToScene(ms) { return Math.min(Math.floor((ms / totalTime) * 10), 9) + 1; }
-
     function formatTime(ms) { const s = Math.floor(ms / 1000); const m = Math.floor(s / 60); const sec = s % 60; return `${m}:${String(sec).padStart(2, '0')}`; }
 
     /* Scene 01 */
@@ -1352,28 +1505,27 @@
     /* Scene 02 */
     function setupScene02() {
       const items = [
-        { icon: '📚', title: '◤高等数学（上）◢', have: '📚 高等数学', want: '🎮 游戏手柄', user: '小林', school: '计算机学院', badge: '教材', score: '87' },
-        { icon: '🎧', title: '◤无线降噪耳机◢', have: '🎧 降噪耳机', want: '📷 拍立得', user: '阿杰', school: '设计学院', badge: '数码', score: '72' },
-        { icon: '🌂', title: '◤折叠雨伞◢', have: '🌂 折叠雨伞', want: '🧮 计算器', user: 'Alice', school: '商学院', badge: '日用', score: '91' },
-        { icon: '🧮', title: '◤科学计算器◢', have: '🧮 科学计算器', want: '🌂 雨伞', user: 'Bob', school: '理学院', badge: '文具', score: '88' }
+        { avatar: 'assets/avatars/avatar-1.png?v=2', cover: 'assets/mock-posts/post-books.png?v=2', title: '◤my wechat，想换iPhone 18 promax◢', have: 'my wechat', want: 'iPhone 18 promax', user: 'yu', school: '武汉理工大学', score: '80', time: '2026.06.14' },
+        { avatar: 'assets/avatars/avatar-2.png?v=2', cover: 'assets/mock-posts/post-cup.png?v=2', title: '◤膳魔师保温杯◢', have: '膳魔师保温杯', want: '手绘头像', user: '阿杰', school: '设计学院', score: '85', time: '10分钟前' },
+        { avatar: 'assets/avatars/avatar-3.png?v=2', cover: 'assets/mock-posts/post-calculator.png?v=2', title: '◤科学计算器◢', have: '科学计算器', want: '折叠雨伞', user: 'Alice', school: '商学院', score: '91', time: '5分钟前' },
+        { avatar: 'assets/avatars/avatar-4.png?v=2', cover: 'assets/mock-posts/post-suitcase.png?v=2', title: '◤20寸行李箱◢', have: '20寸行李箱', want: '床上桌', user: 'Bob', school: '理学院', score: '88', time: '3分钟前' }
       ];
       $('#homeCards').innerHTML = items.map(it => `
-        <div class="otaku-card swap-card">
+        <div class="card swap-card">
           <div class="swap-head">
-            <div class="otaku-avatar">${it.icon}</div>
+            <div class="avatar"><img src="${it.avatar}" alt=""></div>
             <div class="swap-user">
               <div class="user-name">${it.user}<span class="verified">★认证玩家</span></div>
-              <div class="user-meta">${it.school} · 3分钟前在线</div>
+              <div class="user-meta">${it.school} Lv.3 · ${it.time} 在线</div>
             </div>
           </div>
-          <div class="swap-image-wrap">${it.icon}</div>
           <div class="swap-title">${it.title}</div>
-          <div class="swap-line"><span class="swap-label">我有什么：</span>${it.have}</div>
-          <div class="swap-line"><span class="swap-label">我想换：</span>${it.want}</div>
+          <div class="swap-line"><span class="swap-label">我有什么：</span>🧮 ${it.have}</div>
+          <div class="swap-line"><span class="swap-label">我想换：</span>🎮 ${it.want}</div>
           <div class="badge-row">
-            <span class="otaku-badge otaku-badge-cyan">距200m</span>
-            <span class="otaku-badge otaku-badge-pink">匹配${it.score}%</span>
-            <span class="otaku-badge otaku-badge-orange">急出</span>
+            <span class="badge badge-cyan">距 200m</span>
+            <span class="badge badge-pink">匹配 ${it.score}%</span>
+            <span class="badge badge-orange">${it.time === '刚刚' ? 'NEW' : '急出'}</span>
           </div>
           <div class="swap-actions">
             <div class="chat-btn">💬 聊一聊</div>
@@ -1384,7 +1536,6 @@
     }
     function startScene02Scroll() {
       $('#homeBody').classList.add('scrolling');
-      $$('#topicStrip .topic-tag').forEach((t, i) => { t.style.transform = `rotate(${(i % 2 === 0 ? -2 : 2)}deg) translateX(${(i % 2 === 0 ? 5 : -3)}px)`; });
     }
 
     /* Scene 03: AI 发布助手 */
@@ -1400,16 +1551,16 @@
       await wait(250);
       const card = document.createElement('div'); card.className = 'ai-card'; card.innerHTML = `
         <div class="ai-card-head">
-          <div><div class="ai-title">AI 交换卡已生成</div><div class="ai-subtitle">稀有度 SSR · 脑洞分 92 · 匹配 91%</div></div>
+          <div><div class="ai-title">折叠雨伞，想换科学计算器</div><div class="ai-subtitle">S级校园刚需 · 脑洞分 92 · 匹配 91%</div></div>
           <div class="ai-value">约35元</div>
         </div>
-        <div class="ai-tags"><span class="ai-tag">防晒</span><span class="ai-tag">便携</span><span class="ai-tag">考试必备</span></div>
-        <div class="ai-reason">AI 推荐理由：雨伞与计算器在校园场景下互补性强，雨天通勤与考试周需求高度匹配，建议立即交换。</div>
-        <div class="suggest-box" style="margin-top:10px;padding:10px;background:rgba(139,92,246,0.08);border-radius:10px;">
-          <div style="font-size:11px;font-weight:700;color:var(--neon-violet);margin-bottom:6px;">可接受替代品</div>
-          <div style="display:flex;gap:6px;flex-wrap:wrap;"><span class="ai-tag">错题本</span><span class="ai-tag">草稿纸</span><span class="ai-tag">便利贴</span></div>
+        <div class="ai-tags"><span class="ai-tag">生活小物</span><span class="ai-tag">学习刚需</span><span class="ai-tag">AI推荐</span></div>
+        <div class="ai-reason">校换小管家判断：折叠雨伞适合交换科学计算器，也可以接受价值接近、使用场景相近或更有故事感的脑洞提案。</div>
+        <div class="suggest-box">
+          <div class="suggest-title">可接受替代品</div>
+          <div><span class="alt-chip">考研资料</span><span class="alt-chip">台灯</span><span class="alt-chip">打印券</span></div>
         </div>
-        <div class="quest" style="margin-top:10px;font-size:12px;color:var(--neon-pink);font-weight:600;">🎯 任务：7 天内完成交换，额外 +15 脑洞值</div>
+        <div class="quest">🎯 建议：7 天内完成交换，额外 +15 脑洞值</div>
       `; result.appendChild(card);
     }
 
@@ -1418,67 +1569,51 @@
       const wishes = [
         { name: '科学计算器', count: 24, category: '学习用品', tag: '考试周', trend: '热度 ↑ 38%' },
         { name: '折叠雨伞', count: 18, category: '生活用品', tag: '雨季', trend: '热度 ↑ 22%' },
-        { name: '拍立得', count: 12, category: '数码', tag: '毕业季', trend: '热度 → 平稳' }
+        { name: '拍立得', count: 12, category: '数码', tag: '毕业季', trend: '持续收集中' },
+        { name: '考研资料', count: 9, category: '学习用品', tag: '复习季', trend: '热度 ↑ 15%' }
       ];
       $('#wishCards').innerHTML = wishes.map((w, i) => `
-        <div class="otaku-card wish-card" style="animation-delay:${i * 0.15}s;">
-          <div class="wish-head"><div class="wish-name">${w.name}</div><div class="wish-count">${w.count} 人想要</div></div>
-          <div class="wish-muted">${w.category} · ${w.tag} · ${w.trend}</div>
-          <div class="wish-tip">如果你有相关闲置，现在发布更容易被匹配。</div>
-          <div class="wish-go">我要换这个</div>
-          <div class="trend-row"><span class="trend-tag">AI 推荐</span><span class="trend-tag">同校需求</span></div>
+        <div class="wish-card" style="animation-delay:${i * 0.12}s;">
+          <div class="wish-main">
+            <div class="wish-name">${w.name}</div>
+            <div class="wish-meta">${w.category} · ${w.trend}</div>
+            <div class="wish-tag">#${w.tag}</div>
+          </div>
+          <div class="wish-count">
+            <div class="count">${w.count}</div>
+            <div class="count-label">人想要</div>
+          </div>
         </div>
       `).join('');
     }
     function runScene04Wish() { $$('.wish-card').forEach((c, i) => { setTimeout(() => c.classList.add('in'), i * 120); }); }
 
-    /* Scene 05: 智能匹配 */
-    function runScene05Match() {
-      $('#matchCard1').classList.add('in'); setTimeout(() => $('#matchCard2').classList.add('in'), 180);
-      setTimeout(() => $$('.score-num').forEach(el => animateNumber(el, +el.dataset.target, 1400)), 600);
-      setTimeout(() => $('#matchAction').classList.add('in'), 1200);
+    /* Scene 05: 物品详情 - 无需复杂动画 */
+    function runScene05Detail() { }
+
+    /* Scene 06: 交换挑战局 */
+    function runScene06Chain() { $('#chainCard').classList.add('in'); }
+
+    /* Scene 07: 学生认证 */
+    function runScene07Trust() { $('#trustCard').classList.add('in'); }
+
+    /* Scene 08: 消息中心 */
+    function runScene08Messages() { $$('.message-card').forEach((b, i) => { setTimeout(() => b.classList.add('in'), i * 200); }); }
+
+    /* Scene 09: 个人中心 */
+    function runScene09Profile() {
+      animateNumber($('#profilePublish'), 2, 1200);
+      animateNumber($('#profileProposal'), 5, 1200);
+      animateNumber($('#profileExchange'), 3, 1200);
+      animateNumber($('#profileBrain'), 116, 1200);
+      animateNumber($('#profileEnergy'), 80, 1200);
+      animateNumber($('#profileBadge'), 3, 1200);
     }
+
     function animateNumber(el, target, duration) {
       const start = performance.now();
       function frame(now) { const p = Math.min((now - start) / duration, 1); el.textContent = Math.round(target * easeOutExpo(p)); if (p < 1) requestAnimationFrame(frame); }
       requestAnimationFrame(frame);
-    }
-
-    /* Scene 06: 多边交换挑战局 */
-    function runScene06Chain() {
-      $('#chainCard').classList.add('in');
-      ['#polyLineAB', '#polyLineBC', '#polyLineCA'].forEach((sel, i) => {
-        const path = $(sel); const len = path.getTotalLength();
-        path.style.strokeDasharray = len; path.style.strokeDashoffset = len; path.style.transition = 'none';
-        void path.getBoundingClientRect();
-        setTimeout(() => { path.style.transition = `stroke-dashoffset 1.2s var(--expo)`; path.style.strokeDashoffset = '0'; }, 400 + i * 900);
-      });
-    }
-
-    /* Scene 07: 学生认证 */
-    function runScene07Trust() {
-      $('#trustCard').classList.add('in');
-      setTimeout(() => { $('#scoreRing').classList.add('draw'); animateNumber($('#scoreNum'), 95, 1500); }, 700);
-    }
-
-    /* Scene 08: 消息协商 */
-    function runScene08Messages() {
-      $('#noticeCard').classList.add('in');
-      $$('#chatBubbles .bubble').forEach((b, i) => { setTimeout(() => b.classList.add('in'), 400 + i * 450); });
-      setTimeout(() => $('#safePoint').classList.add('in'), 2000);
-    }
-
-    /* Scene 09: 交换成功 + 个人中心 */
-    function runScene09Success() {
-      $('.success-check').classList.add('spring'); $('#successTitle').classList.add('in'); $('#successDesc').classList.add('in'); playSuccessSfx();
-      setTimeout(() => {
-        $('#successWrap').style.transition = 'opacity 0.6s ease';
-        $('#successWrap').style.opacity = '0';
-        $('#profileOverlay').classList.add('show');
-        animateNumber($('#profileCredit'), 95, 1200);
-        animateNumber($('#profileExchange'), 13, 1200);
-        animateNumber($('#profileBrain'), 126, 1200);
-      }, 2200);
     }
 
     /* Scene 10: 结尾落版 */
@@ -1505,10 +1640,7 @@
       setTimeout(() => { $('#endingCta').style.animation = 'ctaPop 1.2s var(--back) infinite'; }, 1500);
     }
 
-    /* =========================
-       63.4s 时间轴（可中断、可拖拽跳转）
-       ========================= */
-
+    /* 时间轴 */
     let currentToken = null;
     function createToken() {
       if (currentToken && currentToken.cbs) currentToken.cbs.forEach(cb => cb());
@@ -1572,7 +1704,6 @@
       resetScenes();
       $('#device').classList.add('in');
 
-      // 初始化目标 Scene 并执行其内容
       if (startScene === 1) {
         setupScene01(); scenes[0].classList.add('active');
         if (!await wait(200, token)) return;
@@ -1585,7 +1716,10 @@
         if (!await wait(sceneDurations[1], token)) return;
         hideCaption();
       } else if (startScene === 3) {
-        $('#haveInput').textContent = '例如：雨伞'; $('#wantInput').textContent = '例如：计算器'; $('#storyInput').textContent = '介绍一下这个物品…'; $('#aiResult').innerHTML = '';
+        $('#haveInput').textContent = '例如：保温杯 / 计算器 / 手绘头像服务';
+        $('#wantInput').textContent = '例如：奶茶 / 教材 / 任何有趣的东西';
+        $('#storyInput').textContent = '介绍一下这个物品的来历，让它更容易被提案';
+        $('#aiResult').innerHTML = '';
         scenes[2].classList.add('active'); showCaption(3);
         if (!await wait(300, token)) return;
         runScene03Typing();
@@ -1598,43 +1732,36 @@
         if (!await wait(sceneDurations[3], token)) return;
         hideCaption();
       } else if (startScene === 5) {
-        $('#matchCard1').classList.remove('in'); $('#matchCard2').classList.remove('in'); $('#matchAction').classList.remove('in');
-        $$('.score-num').forEach(el => el.textContent = '0');
         scenes[4].classList.add('active'); showCaption(5);
         if (!await wait(300, token)) return;
-        runScene05Match();
+        runScene05Detail();
         if (!await wait(sceneDurations[4], token)) return;
         hideCaption();
       } else if (startScene === 6) {
         $('#chainCard').classList.remove('in');
-        ['#polyLineAB', '#polyLineBC', '#polyLineCA'].forEach(sel => {
-          const path = $(sel); path.style.transition = 'none'; path.style.strokeDashoffset = path.getTotalLength();
-        });
         scenes[5].classList.add('active'); showCaption(6);
         if (!await wait(400, token)) return;
         runScene06Chain();
         if (!await wait(sceneDurations[5], token)) return;
         hideCaption();
       } else if (startScene === 7) {
-        $('#trustCard').classList.remove('in'); $('#scoreRing').classList.remove('draw'); $('#scoreNum').textContent = '0';
+        $('#trustCard').classList.remove('in');
         scenes[6].classList.add('active'); showCaption(7);
         if (!await wait(300, token)) return;
         runScene07Trust();
         if (!await wait(sceneDurations[6], token)) return;
         hideCaption();
       } else if (startScene === 8) {
-        $('#noticeCard').classList.remove('in'); $$('#chatBubbles .bubble').forEach(b => b.classList.remove('in')); $('#safePoint').classList.remove('in');
+        $$('.message-card').forEach(b => b.classList.remove('in'));
         scenes[7].classList.add('active'); showCaption(8);
         if (!await wait(300, token)) return;
         runScene08Messages();
         if (!await wait(sceneDurations[7], token)) return;
         hideCaption();
       } else if (startScene === 9) {
-        $('.success-check').classList.remove('spring'); $('#successTitle').classList.remove('in'); $('#successDesc').classList.remove('in');
-        $('#successWrap').style.opacity = '1'; $('#profileOverlay').classList.remove('show');
         scenes[8].classList.add('active'); showCaption(9);
         if (!await wait(300, token)) return;
-        runScene09Success();
+        runScene09Profile();
         if (!await wait(sceneDurations[8], token)) return;
         hideCaption();
       } else if (startScene === 10) {
@@ -1647,7 +1774,6 @@
         hideCaption();
       }
 
-      // 继续播放后续 Scene
       for (let i = startScene + 1; i <= 10; i++) {
         if (!await wait(600, token)) return;
         if (i === 2) setupScene02();
@@ -1656,16 +1782,15 @@
         if (i === 2) { showCaption(2); startScene02Scroll(); }
         else if (i === 3) { showCaption(3); if (!await wait(300, token)) return; runScene03Typing(); }
         else if (i === 4) { showCaption(4); if (!await wait(300, token)) return; runScene04Wish(); }
-        else if (i === 5) { showCaption(5); if (!await wait(300, token)) return; runScene05Match(); }
+        else if (i === 5) { showCaption(5); if (!await wait(300, token)) return; runScene05Detail(); }
         else if (i === 6) { showCaption(6); if (!await wait(400, token)) return; runScene06Chain(); }
         else if (i === 7) { showCaption(7); if (!await wait(300, token)) return; runScene07Trust(); }
         else if (i === 8) { showCaption(8); if (!await wait(300, token)) return; runScene08Messages(); }
-        else if (i === 9) { showCaption(9); if (!await wait(300, token)) return; runScene09Success(); }
+        else if (i === 9) { showCaption(9); if (!await wait(300, token)) return; runScene09Profile(); }
         else if (i === 10) { showCaption(10); if (!await wait(300, token)) return; runScene10Ending(); }
         if (!await wait(sceneDurations[i - 1], token)) return;
         hideCaption();
       }
-
 
       await wait(1500, token);
     }

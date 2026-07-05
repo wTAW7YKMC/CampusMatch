@@ -1,3 +1,4 @@
+const { auth } = require('./utils/supabase');
 const { seedState, cloneDeep, ensureStateDefaults } = require('./utils/mock-data');
 
 App({
@@ -6,27 +7,7 @@ App({
   },
 
   onLaunch() {
-    this.loadCustomFonts();
-  },
-
-  onShow() {
-    this.loadCustomFonts();
-  },
-
-  loadCustomFonts() {
-    wx.loadFontFace({
-      family: 'ZCOOL KuaiLe',
-      source: 'url("https://fonts.cdnfonts.com/s/15322/ZCOOLKuaiLe-Regular.woff")',
-      success: () => console.log('ZCOOL KuaiLe 加载成功'),
-      fail: (err) => console.log('ZCOOL KuaiLe 加载失败，使用回退字体', err),
-    });
-
-    wx.loadFontFace({
-      family: 'DSEG14 Classic',
-      source: 'url("https://cdn.jsdelivr.net/gh/keshikan/DSEG@master/fonts/DSEG14-Classic/DSEG14Classic-Regular.woff2")',
-      success: () => console.log('DSEG14 Classic 加载成功'),
-      fail: (err) => console.log('DSEG14 Classic 加载失败，使用回退字体', err),
-    });
+    // Use system fonts only to avoid remote font loading failures in DevTools.
   },
 
   syncState(nextState) {

@@ -1,46 +1,133 @@
 <view class="container">
-  <swiper class="swiper card" autoplay interval="3000" circular>
-    <block wx:for="{{post.images}}" wx:key="*this"><swiper-item><image class="cover" src="{{item}}" mode="aspectFill"></image></swiper-item></block>
+  <swiper wx:if="{{post.images && post.images.length}}" class="swiper card" autoplay interval="3000" circular>
+    <block wx:for="{{post.images}}" wx:key="*this">
+      <swiper-item>
+        <image class="cover" src="{{item}}" mode="aspectFill"></image>
+      </swiper-item>
+    </block>
   </swiper>
+
+  <view wx:else class="empty-cover card">
+    暂无图片
+  </view>
 
   <view class="card detail">
     <view class="user-row">
       <image class="avatar" src="{{post.avatar}}" mode="aspectFill"></image>
+
       <view>
-        <view class="name">{{post.nickName}} <text class="badge">{{post.verified ? '已认证' : '未认证'}}</text></view>
-        <view class="muted">{{post.school}} · 信用 {{post.creditScore}}</view>
+        <view class="name">
+          {{post.nickName}}
+          <text class="badge">{{post.verified ? '已认证' : '未认证'}}</text>
+        </view>
+        <view class="muted">{{post.school || '未知学校'}} · 信用 {{post.creditScore}}</view>
       </view>
     </view>
+
     <view class="ai-summary">
-      <view class="ai-pill">{{post.rarity || 'A级好换'}}</view>
+      <view class="ai-pill">{{post.rarity || '普通'}}</view>
       <view class="ai-pill">脑洞分 {{post.brainScore || 80}}</view>
-      <view class="ai-pill">匹配 {{post.matchScore || 88}}%</view>
-      <view class="ai-pill">参考约 {{post.estimatedValue || 30}} 元</view>
+      <view class="ai-pill">匹配 {{post.matchScore || 80}}%</view>
+      <view class="ai-pill">参考约 {{post.estimatedValue || 0}} 元</view>
     </view>
-    <view class="detail-tags" wx:if="{{post.tags && post.tags.length}}"><block wx:for="{{post.tags}}" wx:key="*this"><text class="tag">{{item}}</text></block></view>
-    <view class="block"><text class="label">我有什么：</text>{{post.haveItem}}</view>
-    <view class="block"><text class="label">我想换：</text>{{post.wantItem}}</view>
-    <view class="block"><text class="label">交换故事：</text>{{post.story}}</view>
-    <view class="block"><text class="label">交换状态：</text>{{post.status === 'done' ? '已达成' : '开放中'}}</view>
-    <view class="block"><text class="label">AI 建议：</text>{{post.quest || '可以接受价值相近或故事感更强的脑洞提案。'}}</view>
-    <view class="block"><text class="label">推荐交易地点：</text><text bindtap="goMap" class="link">图书馆门口 / 教学楼大厅 / 食堂门口</text></view>
-    <view class="block"><text class="label">多边交换：</text><text bindtap="goChain" class="link">查看是否能进入交换挑战局</text></view>
-    <view wx:if="{{post.alternatives && post.alternatives.length}}" class="block"><text class="label">替代建议：</text><block wx:for="{{post.alternatives}}" wx:key="*this"><text class="alt-chip">{{item}}</text></block></view>
+
+    <view class="detail-tags" wx:if="{{post.tags && post.tags.length}}">
+      <block wx:for="{{post.tags}}" wx:key="*this">
+        <text class="tag">{{item}}</text>
+      </block>
+    </view>
+
+    <view class="block">
+      <text class="label">我有什么：</text>{{post.haveItem}}
+    </view>
+
+    <view class="block">
+      <text class="label">我想换：</text>{{post.wantItem}}
+    </view>
+
+    <view class="block">
+      <text class="label">交换故事：</text>{{post.story || '暂无补充说明'}}
+    </view>
+
+    <view class="block">
+      <text class="label">交换状态：</text>{{post.status === 'done' ? '已达成' : '开放中'}}
+    </view>
+
+    <view class="block">
+      <text class="label">AI 建议：</text>{{post.quest || '可以接受价值相近或故事感更强的脑洞提案。'}}
+    </view>
+
+    <view class="block">
+      <text class="label">推荐交易地点：</text>
+      <text bindtap="goMap" class="link">查看安全交易点</text>
+    </view>
+
+    <view class="block">
+      <text class="label">多边交换：</text>
+      <text bindtap="goChain" class="link">查看交换挑战局</text>
+    </view>
+
+    <view wx:if="{{post.alternatives && post.alternatives.length}}" class="block">
+      <text class="label">替代建议：</text>
+      <block wx:for="{{post.alternatives}}" wx:key="*this">
+        <text class="alt-chip">{{item}}</text>
+      </block>
+    </view>
   </view>
 
   <view class="section-title">提案列表</view>
+
+  <view wx:if="{{!proposals.length}}" class="empty-card card">
+    暂无提案
+  </view>
+
   <block wx:for="{{proposals}}" wx:key="proposalId">
     <view class="proposal card">
       <view class="proposal-head">
-        <view><view class="name">{{item.proposerName}}</view><view class="muted">{{item.school}} · 信用 {{item.creditScore}} · 趣味 {{item.funScore || 80}}</view></view>
+        <view>
+          <view class="name">{{item.proposerName}}</view>
+          <view class="muted">
+            {{item.school || '未知学校'}} · 信用 {{item.creditScore}} · 趣味 {{item.funScore || 80}}
+          </view>
+        </view>
+
         <text class="badge">{{item.statusLabel}}</text>
       </view>
-      <view class="proposal-desc">我愿意拿 <text class="accent">{{item.offerItem}}</text> 和你交换</view>
+
+      <view class="proposal-desc">
+        我愿意拿 <text class="accent">{{item.offerItem}}</text> 和你交换
+      </view>
+
       <view class="proposal-text">{{item.description}}</view>
-      <image class="proposal-img" src="{{item.images[0]}}" mode="aspectFill"></image>
-      <button wx:if="{{item.status === 'pending' && post.status !== 'done'}}" class="btn-primary accept" data-id="{{item.proposalId}}" bindtap="acceptProposal">接受提案并生成故事</button>
-      <view wx:else class="proposal-result">{{item.status === 'accepted' ? '🎉 已达成交换' : '已关闭'}}</view>
+
+      <image
+        wx:if="{{item.images && item.images.length}}"
+        class="proposal-img"
+        src="{{item.images[0]}}"
+        mode="aspectFill"
+      ></image>
+
+      <view wx:if="{{isOwner && item.status === 'pending' && post.status !== 'done'}}" class="action-row">
+        <button class="btn-primary accept action-btn" data-id="{{item.proposalId}}" bindtap="acceptProposal">
+          接受
+        </button>
+
+        <button class="reject-btn action-btn" data-id="{{item.proposalId}}" bindtap="rejectProposal">
+          婉拒
+        </button>
+      </view>
+
+      <view wx:else class="proposal-result">
+        {{item.status === 'accepted' ? '🎉 已达成交换' : item.status === 'rejected' ? '已关闭' : '等待发布者回复'}}
+      </view>
     </view>
   </block>
-  <button wx:if="{{post.status !== 'done'}}" class="btn-secondary fixed-proposal" bindtap="goProposal">我要提案</button>
+
+  <button
+    wx:if="{{post.status !== 'done' && !isOwner}}"
+    class="btn-secondary fixed-proposal"
+    bindtap="goProposal"
+  >
+    我要提案
+  </button>
 </view>

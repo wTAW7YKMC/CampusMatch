@@ -1,70 +1,183 @@
-page {
-  background: #f8f5f2;
-}
-
-.section-title {
-  color: #1a1025;
-}
-
-.section-subtitle {
-  color: #6b5b8a;
-}
-
-.chat-title {
-  color: #1a1025;
-}
-
-.msg {
-  padding: 22rpx;
-  margin-bottom: 18rpx;
-}
-
-.msg-title {
-  font-size: 28rpx;
-  font-weight: 700;
-  color: #1a1025;
-}
-
-.msg-desc {
-  margin-top: 8rpx;
-  font-size: 24rpx;
-  color: #666;
-}
-
-.msg-time {
-  margin-top: 10rpx;
-  font-size: 22rpx;
-  color: #999;
-}
-
-.chat {
-  padding: 22rpx;
-  margin-top: 10rpx;
-}
-
-.chat-title {
-  font-size: 28rpx;
-  font-weight: 700;
-  margin-bottom: 18rpx;
-}
-
-.bubble {
-  max-width: 78%;
-  padding: 18rpx 20rpx;
-  border-radius: 18rpx;
-  margin-bottom: 14rpx;
-  font-size: 26rpx;
-}
-
-.bubble.left {
-  background: #f0f1f7;
-  color: #222;
-}
-
-.bubble.right {
-  background: #6c63ff;
-  color: #fff;
-  margin-left: auto;
-}
-
-.msg-icon { margin-right: 8rpx; }
+.container {
+    min-height: 100vh;
+    padding: 28rpx;
+    padding-bottom: 160rpx;
+    box-sizing: border-box;
+    background: #f8f5f2;
+  }
+  
+  .header-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 36rpx;
+    border-radius: 36rpx;
+    background: linear-gradient(135deg, #111111, #9ca3af);
+    color: #ffffff;
+    box-shadow: 0 18rpx 60rpx rgba(31, 20, 71, 0.12);
+  }
+  
+  .title {
+    font-size: 44rpx;
+    font-weight: 900;
+  }
+  
+  .subtitle {
+    margin-top: 12rpx;
+    font-size: 26rpx;
+    opacity: 0.9;
+  }
+  
+  .read-btn {
+    margin: 0;
+    padding: 0 26rpx;
+    height: 64rpx;
+    line-height: 64rpx;
+    border-radius: 999rpx;
+    background: rgba(255, 255, 255, 0.8);
+    color: #ffffff;
+    font-size: 24rpx;
+  }
+  
+  .read-btn::after {
+    border: none;
+  }
+  
+  .summary-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 24rpx;
+    padding: 26rpx 32rpx;
+    border-radius: 28rpx;
+    background: #ffffff;
+    color: #1a1025;
+    font-size: 28rpx;
+    font-weight: 700;
+    box-shadow: 0 12rpx 40rpx rgba(31, 20, 71, 0.06);
+  }
+  
+  .count {
+    color: #111111;
+    font-size: 36rpx;
+    font-weight: 900;
+  }
+  
+  .message-card {
+    position: relative;
+    display: flex;
+    gap: 22rpx;
+    margin-top: 22rpx;
+    padding: 30rpx;
+    border-radius: 32rpx;
+    background: #ffffff;
+    box-shadow: 0 12rpx 40rpx rgba(31, 20, 71, 0.06);
+  }
+  
+  .is-unread {
+    border: 2rpx solid rgba(108, 99, 255, 0.28);
+  }
+  
+  .is-read {
+    opacity: 0.72;
+  }
+  
+  .icon-wrap {
+    width: 76rpx;
+    height: 76rpx;
+    line-height: 76rpx;
+    text-align: center;
+    border-radius: 24rpx;
+    background: #f7f3ff;
+    font-size: 36rpx;
+    flex-shrink: 0;
+  }
+  
+  .message-main {
+    flex: 1;
+    min-width: 0;
+  }
+  
+  .message-top {
+    display: flex;
+    justify-content: space-between;
+    gap: 20rpx;
+  }
+  
+  .message-title {
+    color: #1a1025;
+    font-size: 30rpx;
+    font-weight: 800;
+  }
+  
+  .message-time {
+    color: #9ca3af;
+    font-size: 22rpx;
+    flex-shrink: 0;
+  }
+  
+  .message-desc {
+    margin-top: 12rpx;
+    color: #6b5b8a;
+    font-size: 26rpx;
+    line-height: 1.55;
+  }
+  
+  .message-status {
+    margin-top: 16rpx;
+    color: #8b7ca8;
+    font-size: 22rpx;
+  }
+  
+  .dot {
+    position: absolute;
+    right: 24rpx;
+    top: 24rpx;
+    width: 16rpx;
+    height: 16rpx;
+    border-radius: 50%;
+    background: #9ca3af;
+  }
+  
+  .empty-card {
+    margin-top: 28rpx;
+    padding: 60rpx 36rpx;
+    border-radius: 36rpx;
+    background: #ffffff;
+    text-align: center;
+    box-shadow: 0 12rpx 40rpx rgba(31, 20, 71, 0.06);
+  }
+  
+  .empty-icon {
+    font-size: 72rpx;
+  }
+  
+  .empty-title {
+    margin-top: 22rpx;
+    color: #1a1025;
+    font-size: 34rpx;
+    font-weight: 900;
+  }
+  
+  .empty-text {
+    margin-top: 14rpx;
+    color: #8b7ca8;
+    font-size: 26rpx;
+    line-height: 1.6;
+  }
+  
+  .login-btn {
+    margin-top: 34rpx;
+    height: 84rpx;
+    line-height: 84rpx;
+    border-radius: 28rpx;
+    background: #111111;
+    color: #ffffff;
+    font-size: 28rpx;
+    font-weight: 800;
+  }
+  
+  .login-btn::after {
+    border: none;
+  }
+  

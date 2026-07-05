@@ -1,11 +1,68 @@
 <view class="container">
-  <view class="section-title">校园安全交易点</view>
-  <view class="section-subtitle">推荐公共、熟悉、便于验货的位置完成面交。</view>
-  <map class="map card" latitude="{{latitude}}" longitude="{{longitude}}" markers="{{markers}}" scale="16"></map>
-  <block wx:for="{{spots}}" wx:key="id">
-    <view class="spot card" data-id="{{item.id}}" bindtap="chooseSpot">
-      <view class="spot-head"><view class="spot-name">{{item.name}}</view><view class="spot-type">{{item.type}}</view></view>
-      <view class="desc">{{item.desc}}</view>
+  <view class="hero-card">
+    <view>
+      <view class="hero-title">安全交易点</view>
+      <view class="hero-subtitle">选择校内公开、安全、易找到的位置完成交换</view>
     </view>
+
+    <button class="refresh-btn" bindtap="refreshSpots">刷新</button>
+  </view>
+
+  <view class="map-card">
+    <map
+      class="map"
+      latitude="{{latitude}}"
+      longitude="{{longitude}}"
+      markers="{{markers}}"
+      scale="16"
+      show-location
+      bindmarkertap="onMarkerTap"
+    ></map>
+  </view>
+
+  <view wx:if="{{loading}}" class="empty-card">
+    <view class="empty-icon">⏳</view>
+    <view class="empty-title">交易点加载中</view>
+  </view>
+
+  <view wx:elif="{{!spots.length}}" class="empty-card">
+    <view class="empty-icon">📍</view>
+    <view class="empty-title">{{emptyText}}</view>
+    <view class="empty-text">请先在 Supabase 的 safe_spots 表中添加真实交易点。</view>
+  </view>
+
+  <block wx:else>
+    <view class="selected-card">
+      <view class="selected-title">当前选择</view>
+
+      <view wx:if="{{selectedSpot}}" class="selected-name">
+        {{selectedSpot.name}}
+      </view>
+
+      <view wx:if="{{selectedSpot}}" class="selected-desc">
+        {{selectedSpot.type}} · {{selectedSpot.description || '暂无说明'}}
+      </view>
+
+      <button class="nav-btn" bindtap="openLocation">
+        打开地图导航
+      </button>
+    </view>
+
+    <view class="section-title">全部交易点</view>
+
+    <block wx:for="{{spots}}" wx:key="id">
+      <view
+        class="spot-card {{selectedSpot && selectedSpot.id === item.id ? 'active' : ''}}"
+        data-id="{{item.id}}"
+        bindtap="chooseSpot"
+      >
+        <view>
+          <view class="spot-name">{{item.name}}</view>
+          <view class="spot-desc">{{item.type}} · {{item.description || '暂无说明'}}</view>
+        </view>
+
+        <view class="spot-tag">定位</view>
+      </view>
+    </block>
   </block>
 </view>

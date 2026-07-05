@@ -1,24 +1,163 @@
 const app = getApp();
-const { updateRankList, addBadge } = require('../../utils/mock-data');
+
+const { auth, db } = require('../../utils/supabase');
+
+function mapChain(row, joinedMap) {
+  return {
+    chainId: row.id,
+    title: row.title || '交换挑战局',
+    status: row.status || 'waiting',
+    score: Number(row.score || 0),
+    rewardBrain: Number(row.reward_brain || 0),
+    rewardEnergy: Number(row.reward_energy || 0),
+    nodes: Array.isArray(row.nodes) ? row.nodes : [],
+    reason: row.reason || '',
+    joined: Boolean(joinedMap[row.id]),
+    createdAt: row.created_at || '',
+  };
+}
+
 Page({
-  data: { chains: [] },
-  onShow() { const state = app.restoreState(); this.setData({ chains: state.chains }); },
-  joinChain(e) {
+  data: {
+    chains: [],
+    loading: false,
+    isLoggedIn: false,
+  },
+
+  async onShow() {
+    await this.loadChains();
+  },
+
+  async getCurrentUserId() {
+    const session = auth.getSession();
+
+    if (!session || !session.access_token) {
+      return '';
+    }
+
+    if (session.user && session.user.id) {
+      return session.user.id;
+    }
+
+    const user = await auth.getUser();
+    return user && user.id ? user.id : '';
+  },
+
+  async loadChains() {
+    this.setData({ loading: true });
+
+    try {
+      const userId = await this.getCurrentUserId();
+      const joinedMap = {};
+
+      if (userId) {
+        const joinedRows = await db.select(
+          'chain_participants',
+          `select=chain_id&user_id=eq.${userId}`,
+          true
+        );
+
+        (Array.isArray(joinedRows) ? joinedRows : []).forEach((item) => {
+          joinedMap[item.chain_id] = true;
+        });
+      }
+
+      const rows = await db.select(
+        'chains',
+        'select=*&active=eq.true&order=created_at.desc',
+        false
+      );
+
+      const chains = (Array.isArray(rows) ? rows : []).map((row) => mapChain(row, joinedMap));
+
+      const state = app.restoreState();
+      state.chains = chains;
+      app.syncState(state);
+
+      this.setData({
+        chains,
+        isLoggedIn: Boolean(userId),
+      });
+    } catch (err) {
+      console.error('交换挑战局加载失败：', err);
+
+      wx.showToast({
+        title: err.message || '加载失败',
+        icon: 'none',
+      });
+
+      const state = app.restoreState();
+
+      this.setData({
+        chains: Array.isArray(state.chains) ? state.chains : [],
+      });
+    } finally {
+      this.setData({ loading: false });
+    }
+  },
+
+  async joinChain(e) {
     const chainId = e.currentTarget.dataset.id;
-    const state = app.restoreState();
-    const chain = state.chains.find((c) => c.chainId === chainId);
+
+    if (!chainId) return;
+
+    const userId = await this.getCurrentUserId();
+
+    if (!userId) {
+      wx.showToast({
+        title: '请先登录',
+        icon: 'none',
+      });
+
+      wx.switchTab({
+        url: '/pages/profile/index',
+      });
+
+      return;
+    }
+
+    const chain = this.data.chains.find((item) => item.chainId === chainId);
+
     if (!chain) return;
-    if (chain.status === 'joined') { wx.showToast({ title: '已参与该挑战', icon: 'none' }); return; }
-    chain.status = 'joined';
-    state.currentUser.chainCount = (state.currentUser.chainCount || 0) + 1;
-    state.currentUser.brainPower = (state.currentUser.brainPower || 0) + (chain.rewardBrain || 60);
-    state.currentUser.energy = (state.currentUser.energy || 0) + (chain.rewardEnergy || 60);
-    addBadge(state.currentUser, '交换链大师');
-    state.messages.unshift({ id: `m-${Date.now()}`, type: 'task', title: '交换挑战局已开启', desc: `${chain.title} 已加入，获得 +${chain.rewardBrain} 脑洞值和 +${chain.rewardEnergy} 闲置能量`, time: '刚刚' });
-    state.stories.unshift({ storyId: `s-${Date.now()}`, type: 'chain', title: '新多边交换挑战开启', beforeItem: chain.nodes[0].have, afterItem: chain.nodes[chain.nodes.length - 1].have, likeCount: 0, liked: false });
-    updateRankList(state);
-    app.syncState(state);
-    this.setData({ chains: state.chains });
-    wx.showModal({ title: '挑战局开启', content: '你已参与多边交换闭环，奖励已发放，故事也进入广场。', showCancel: false });
+
+    if (chain.joined) {
+      wx.showToast({
+        title: '你已加入该挑战局',
+        icon: 'none',
+      });
+      return;
+    }
+
+    try {
+      wx.showLoading({
+        title: '加入中...',
+      });
+
+      await db.rpc('join_chain', {
+        p_chain_id: chainId,
+      });
+
+      wx.hideLoading();
+
+      wx.showToast({
+        title: '加入成功',
+        icon: 'success',
+      });
+
+      await this.loadChains();
+    } catch (err) {
+      wx.hideLoading();
+
+      console.error('加入挑战局失败：', err);
+
+      wx.showToast({
+        title: err.message || err.msg || '加入失败',
+        icon: 'none',
+      });
+    }
+  },
+
+  refreshChains() {
+    this.loadChains();
   },
 });

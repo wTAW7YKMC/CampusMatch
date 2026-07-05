@@ -16,18 +16,23 @@
     "pages/verify/index"
   ],
   "window": {
-    "backgroundColor": "#f8f5f2",
+    "backgroundColor": "#ffffff",
     "backgroundTextStyle": "dark",
-    "navigationBarBackgroundColor": "#f8f5f2",
+    "navigationBarBackgroundColor": "#ffffff",
     "navigationBarTextStyle": "black",
     "navigationBarTitleText": "换个啥"
   },
+  "permission": {
+    "scope.userLocation": {
+      "desc": "用于推荐附近的交易点和展示校园周边位置"
+    }
+  },
   "tabBar": {
     "custom": true,
-    "color": "#9CA3AF",
-    "selectedColor": "#8B5CF6",
-    "backgroundColor": "#0F0A1A",
-    "borderStyle": "black",
+    "color": "#6b7280",
+    "selectedColor": "#111111",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "white",
     "list": [
       {
         "pagePath": "pages/home/index",
@@ -48,9 +53,5 @@
     ]
   },
   "style": "v2",
-  "useExtendedLib": {
-    "kbone": false,
-    "weui": false
-  },
   "lazyCodeLoading": "requiredComponents"
 }

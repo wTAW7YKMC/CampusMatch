@@ -1,17 +1,83 @@
 <view class="container">
-  <view class="section-title">校园心愿池</view>
-  <view class="section-subtitle">把“我想要”先丢进池子，AI 会把需求趋势反馈给拥有闲置的同学。</view>
-  <view class="form card">
-    <input class="input" placeholder-class="placeholder" placeholder="我想要：计算器 / 雨伞 / 行李箱" value="{{wishName}}" bindinput="onNameInput" />
-    <input class="input second" placeholder-class="placeholder" placeholder="类别：学习用品 / 生活用品" value="{{category}}" bindinput="onCategoryInput" />
-    <button class="btn-primary submit" bindtap="addWish">点亮心愿 +10脑洞</button>
-  </view>
-  <block wx:for="{{wishes}}" wx:key="wishId">
-    <view class="wish card">
-      <view class="wish-head"><view class="wish-name">{{item.name}}</view><view class="count">{{item.count}} 人想要</view></view>
-      <view class="muted">{{item.category}} · {{item.tag}} · {{item.trend}}</view>
-      <view class="tip">如果你有相关闲置，现在发布更容易被匹配。</view>
-      <button class="btn-secondary go" data-name="{{item.name}}" bindtap="publishForWish">我要换这个</button>
+  <view class="hero-card">
+    <view>
+      <view class="hero-title">校园心愿池</view>
+      <view class="hero-subtitle">把你想换到的东西丢进池子，看看大家都想要什么</view>
     </view>
+
+    <button class="refresh-btn" bindtap="refreshWishes">刷新</button>
+  </view>
+
+  <view class="form-card">
+    <view class="form-title">许一个交换心愿</view>
+
+    <input
+      class="input"
+      placeholder="例如：二手显示器、考研资料、拍立得"
+      value="{{name}}"
+      bindinput="onNameInput"
+    />
+
+    <picker
+      mode="selector"
+      range="{{categories}}"
+      value="{{categoryIndex}}"
+      bindchange="onCategoryChange"
+    >
+      <view class="picker-row">
+        <text>分类</text>
+        <text>{{category}}</text>
+      </view>
+    </picker>
+
+    <input
+      class="input"
+      placeholder="标签，可选，例如 急需 / 毕业季 / 低预算"
+      value="{{tag}}"
+      bindinput="onTagInput"
+    />
+
+    <button class="submit-btn" bindtap="submitWish">
+      加入心愿池
+    </button>
+
+    <view wx:if="{{!isLoggedIn}}" class="login-tip" bindtap="goLogin">
+      未登录用户需要先登录后才能提交心愿
+    </view>
+  </view>
+
+  <view class="section-title">热门心愿</view>
+
+  <view wx:if="{{loading}}" class="empty-card">
+    <view class="empty-icon">⏳</view>
+    <view class="empty-title">加载中</view>
+  </view>
+
+  <view wx:elif="{{!wishes.length}}" class="empty-card">
+    <view class="empty-icon">💭</view>
+    <view class="empty-title">暂无心愿</view>
+    <view class="empty-text">提交第一个校园心愿吧。</view>
+  </view>
+
+  <block wx:else>
+    <block wx:for="{{wishes}}" wx:key="wishId">
+      <view class="wish-card">
+        <view class="wish-main">
+          <view class="wish-name">{{item.name}}</view>
+          <view class="wish-meta">
+            {{item.category}} · {{item.trend || '持续收集中'}}
+          </view>
+
+          <view wx:if="{{item.tag}}" class="tag">
+            #{{item.tag}}
+          </view>
+        </view>
+
+        <view class="wish-count">
+          <view class="count">{{item.count}}</view>
+          <view class="count-label">人想要</view>
+        </view>
+      </view>
+    </block>
   </block>
 </view>

@@ -1,51 +1,345 @@
 const app = getApp();
-const { createProposalId, updateRankList, addBadge } = require('../../utils/mock-data');
+
+const { auth, db, storage } = require('../../utils/supabase');
 
 Page({
-  data: { postId: '', offerItem: '', description: '', aiText: '', targetPost: {} },
+  data: {
+    postId: '',
+    post: null,
 
-  onLoad(query) {
-    const state = app.restoreState();
-    const postId = query.postId || (state.posts[0] && state.posts[0].postId) || '';
-    this.setData({ postId, targetPost: state.posts.find((p) => p.postId === postId) || {} });
-  },
-  onOfferInput(e) { this.setData({ offerItem: e.detail.value }); },
-  onDescInput(e) { this.setData({ description: e.detail.value }); },
+    offerItem: '',
+    description: '',
+    images: [],
 
-  generateProposal() {
-    const post = this.data.targetPost || {};
-    const offer = this.data.offerItem || '奶茶券';
-    const aiText = `AI 提案：用「${offer}」交换「${post.haveItem || '对方物品'}」很有故事感。建议补充：可线下图书馆门口面交，也可增加一份小零食提高接受率。`;
-    this.setData({ aiText, description: this.data.description || aiText });
+    funScore: 88,
+    submitting: false,
+    loading: false,
   },
 
-  submitProposal() {
-    const state = app.restoreState();
-    const proposalId = createProposalId(state);
-    const proposal = {
-      proposalId,
-      postId: this.data.postId || state.posts[0].postId,
-      fromUserId: state.currentUser.userId,
-      proposerName: state.currentUser.nickName,
-      school: state.currentUser.school,
-      offerItem: this.data.offerItem || '脑洞提案',
-      description: this.data.description || this.data.aiText || '我愿意拿一个有趣的交换方案来参与。',
-      images: ['../../assets/mock-posts/proposal-milktea.png'],
-      status: 'pending',
-      creditScore: state.currentUser.creditScore,
-      funScore: Math.floor(80 + Math.random() * 18),
-    };
-    const list = state.proposalsByPost[proposal.postId] || [];
-    list.unshift(proposal);
-    state.proposalsByPost[proposal.postId] = list;
-    state.posts = state.posts.map((item) => item.postId === proposal.postId ? { ...item, proposalCount: list.length } : item);
-    state.currentUser.proposalCount = (state.currentUser.proposalCount || 0) + 1;
-    state.currentUser.brainPower = (state.currentUser.brainPower || 0) + 30;
-    addBadge(state.currentUser, '脑洞提案大师');
-    updateRankList(state);
-    state.messages.unshift({ id: `m-${Date.now()}`, type: 'proposal', title: '提案已提交', desc: `你向 ${proposal.postId} 发送了新的交换提案，获得 +30 脑洞值`, time: '刚刚' });
-    app.syncState(state);
-    wx.showToast({ title: '已提交', icon: 'success' });
-    wx.navigateBack();
+  onLoad(options) {
+    const postId = options.postId || options.id || '';
+
+    this.setData({
+      postId,
+    });
+
+    this.loadPost(postId);
+  },
+
+  async loadPost(postId) {
+    if (!postId) {
+      wx.showToast({
+        title: '缺少帖子 ID',
+        icon: 'none',
+      });
+      return;
+    }
+
+    this.setData({
+      loading: true,
+    });
+
+    try {
+      const rows = await db.select(
+        'posts',
+        `select=*,profiles(nick_name,avatar_url,school,credit_score,verified)&id=eq.${postId}`,
+        false
+      );
+
+      const row = rows && rows[0];
+
+      if (!row) {
+        wx.showToast({
+          title: '帖子不存在',
+          icon: 'none',
+        });
+        return;
+      }
+
+      const profile = row.profiles || {};
+
+      const post = {
+        postId: row.id,
+        userId: row.user_id,
+        title: row.title,
+        haveItem: row.have_item,
+        wantItem: row.want_item,
+        story: row.story,
+        images: Array.isArray(row.image_urls) ? row.image_urls : [],
+        proposalCount: row.proposal_count || 0,
+        likeCount: row.like_count || 0,
+        status: row.status,
+        createdAt: row.created_at,
+        school: row.school || profile.school || '',
+        creditScore: profile.credit_score || 60,
+        verified: Boolean(profile.verified),
+        avatar: profile.avatar_url || '../../assets/avatars/avatar-1.png',
+        nickName: profile.nick_name || '校换用户',
+        estimatedValue: row.estimated_value || 0,
+        rarity: row.rarity || '普通',
+        brainScore: row.brain_score || 80,
+        matchScore: row.match_score || 80,
+        tags: row.tags || [],
+        alternatives: row.alternatives || [],
+        reason: row.reason || '',
+        quest: row.quest || '',
+      };
+
+      this.setData({
+        post,
+        offerItem: '',
+        description: `你好，我想用一个合适的物品和你交换「${post.haveItem}」。`,
+      });
+    } catch (err) {
+      console.error('加载帖子失败：', err);
+
+      wx.showToast({
+        title: err.message || '加载失败',
+        icon: 'none',
+      });
+    } finally {
+      this.setData({
+        loading: false,
+      });
+    }
+  },
+
+  onOfferInput(e) {
+    this.setData({
+      offerItem: e.detail.value,
+    });
+  },
+
+  onDescriptionInput(e) {
+    this.setData({
+      description: e.detail.value,
+    });
+  },
+
+  addImage() {
+    const images = this.data.images || [];
+    const remain = 3 - images.length;
+
+    if (remain <= 0) {
+      wx.showToast({
+        title: '最多 3 张图片',
+        icon: 'none',
+      });
+      return;
+    }
+
+    wx.chooseMedia({
+      count: remain,
+      mediaType: ['image'],
+      sourceType: ['album', 'camera'],
+      sizeType: ['compressed'],
+      success: (res) => {
+        const paths = (res.tempFiles || []).map((file) => file.tempFilePath);
+
+        this.setData({
+          images: images.concat(paths).slice(0, 3),
+        });
+      },
+      fail: (err) => {
+        console.log('选择图片失败：', err);
+      },
+    });
+  },
+
+  removeImage(e) {
+    const { index } = e.currentTarget.dataset;
+    const next = [...(this.data.images || [])];
+
+    next.splice(index, 1);
+
+    this.setData({
+      images: next,
+    });
+  },
+
+  previewImage(e) {
+    const { src } = e.currentTarget.dataset;
+
+    wx.previewImage({
+      current: src,
+      urls: this.data.images || [],
+    });
+  },
+
+  async getCurrentUserId() {
+    const session = auth.getSession();
+
+    if (!session || !session.access_token) {
+      return '';
+    }
+
+    if (session.user && session.user.id) {
+      return session.user.id;
+    }
+
+    const user = await auth.getUser();
+    return user && user.id ? user.id : '';
+  },
+
+  async uploadProposalImages(userId, images) {
+    const imageUrls = [];
+
+    if (!Array.isArray(images) || !images.length) {
+      return imageUrls;
+    }
+
+    for (let i = 0; i < images.length; i += 1) {
+      const localPath = images[i];
+
+      if (!localPath) continue;
+
+      if (String(localPath).startsWith('http')) {
+        imageUrls.push(localPath);
+        continue;
+      }
+
+      const ext = String(localPath).toLowerCase().includes('.png') ? 'png' : 'jpg';
+      const objectPath = `${userId}/proposals/${Date.now()}-${i}.${ext}`;
+      const url = await storage.uploadImage(localPath, objectPath);
+
+      imageUrls.push(url);
+    }
+
+    return imageUrls;
+  },
+
+  async submitProposal() {
+    if (this.data.submitting) return;
+
+    const {
+      postId,
+      post,
+      offerItem,
+      description,
+      images,
+      funScore,
+    } = this.data;
+
+    if (!postId || !post) {
+      wx.showToast({
+        title: '帖子不存在',
+        icon: 'none',
+      });
+      return;
+    }
+
+    if (!offerItem) {
+      wx.showToast({
+        title: '请输入你想拿什么交换',
+        icon: 'none',
+      });
+      return;
+    }
+
+    let userId = '';
+
+    try {
+      userId = await this.getCurrentUserId();
+    } catch (err) {
+      console.error('获取用户失败：', err);
+    }
+
+    if (!userId) {
+      wx.showToast({
+        title: '请先登录',
+        icon: 'none',
+      });
+
+      wx.switchTab({
+        url: '/pages/profile/index',
+      });
+
+      return;
+    }
+
+    if (post.userId === userId) {
+      wx.showToast({
+        title: '不能给自己的帖子提案',
+        icon: 'none',
+      });
+      return;
+    }
+
+    this.setData({
+      submitting: true,
+    });
+
+    wx.showLoading({
+      title: '提交中...',
+    });
+
+    try {
+      const imageUrls = await this.uploadProposalImages(userId, images);
+
+      await db.insert('proposals', {
+        post_id: postId,
+        from_user_id: userId,
+        offer_item: offerItem,
+        description: description || '我想和你交换这个物品。',
+        image_urls: imageUrls,
+        status: 'pending',
+        fun_score: funScore || 88,
+      });
+
+      const state = app.restoreState();
+      const posts = Array.isArray(state.posts) ? state.posts : [];
+
+      state.posts = posts.map((item) => {
+        if (item.postId !== postId) return item;
+
+        return {
+          ...item,
+          proposalCount: Number(item.proposalCount || 0) + 1,
+        };
+      });
+
+      state.currentUser = {
+        ...(state.currentUser || {}),
+        proposalCount: Number((state.currentUser || {}).proposalCount || 0) + 1,
+        brainPower: Number((state.currentUser || {}).brainPower || 0) + 30,
+      };
+
+      state.messages = [
+        {
+          id: `m-${Date.now()}`,
+          type: 'proposal',
+          title: '提案已提交',
+          desc: '你发送了新的交换提案，获得 +30 脑洞值',
+          time: '刚刚',
+        },
+        ...(Array.isArray(state.messages) ? state.messages : []),
+      ];
+
+      app.syncState(state);
+
+      wx.hideLoading();
+
+      wx.showToast({
+        title: '提案已提交',
+        icon: 'success',
+      });
+
+      setTimeout(() => {
+        wx.navigateBack();
+      }, 700);
+    } catch (err) {
+      wx.hideLoading();
+
+      console.error('提交提案失败：', err);
+
+      wx.showToast({
+        title: err.message || err.msg || '提交失败',
+        icon: 'none',
+      });
+    } finally {
+      this.setData({
+        submitting: false,
+      });
+    }
   },
 });

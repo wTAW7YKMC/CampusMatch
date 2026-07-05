@@ -1,6 +1,190 @@
-.story { padding: 24rpx; margin-bottom: 18rpx; }
-.story-type { display: inline-block; padding: 8rpx 14rpx; border-radius: 999rpx; background: #ecebff; color: #5d54ff; font-size: 22rpx; margin-bottom: 12rpx; }
-.story-title { font-size: 30rpx; font-weight: 700; }
-.story-flow { margin-top: 14rpx; font-size: 28rpx; color: #333; line-height: 42rpx; }
-.like-btn { margin-top: 18rpx; height: 70rpx; line-height: 66rpx; border-radius: 999rpx; background: #fff7e6; color: #d98200; font-size: 25rpx; }
-.like-btn.liked { background: #ffe3e3; color: #ff5c5c; }
+.container {
+    min-height: 100vh;
+    padding: 28rpx;
+    padding-bottom: 120rpx;
+    box-sizing: border-box;
+    background: #f8f5f2;
+  }
+  
+  .hero-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 38rpx;
+    border-radius: 36rpx;
+    background: linear-gradient(135deg, #111111, #9ca3af);
+    color: #ffffff;
+    box-shadow: 0 18rpx 60rpx rgba(31, 20, 71, 0.12);
+  }
+  
+  .hero-title {
+    font-size: 44rpx;
+    font-weight: 900;
+  }
+  
+  .hero-subtitle {
+    margin-top: 12rpx;
+    font-size: 26rpx;
+    opacity: 0.92;
+  }
+  
+  .refresh-btn {
+    margin: 0;
+    padding: 0 26rpx;
+    height: 64rpx;
+    line-height: 64rpx;
+    border-radius: 999rpx;
+    background: rgba(255, 255, 255, 0.8);
+    color: #ffffff;
+    font-size: 24rpx;
+  }
+  
+  .refresh-btn::after {
+    border: none;
+  }
+  
+  .story-card {
+    margin-top: 26rpx;
+    padding: 34rpx;
+    border-radius: 36rpx;
+    background: #ffffff;
+    box-shadow: 0 12rpx 40rpx rgba(31, 20, 71, 0.06);
+  }
+  
+  .story-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20rpx;
+  }
+  
+  .story-title {
+    color: #1a1025;
+    font-size: 34rpx;
+    font-weight: 900;
+  }
+  
+  .story-time {
+    margin-top: 10rpx;
+    color: #8b7ca8;
+    font-size: 24rpx;
+  }
+  
+  .story-type {
+    padding: 10rpx 20rpx;
+    border-radius: 999rpx;
+    background: #f7f3ff;
+    color: #111111;
+    font-size: 22rpx;
+    font-weight: 800;
+    flex-shrink: 0;
+  }
+  
+  .swap-line {
+    display: flex;
+    align-items: stretch;
+    gap: 18rpx;
+    margin-top: 30rpx;
+  }
+  
+  .swap-item {
+    flex: 1;
+    padding: 26rpx;
+    border-radius: 28rpx;
+    background: #f7f3ff;
+  }
+  
+  .label {
+    color: #8b7ca8;
+    font-size: 22rpx;
+    font-weight: 700;
+  }
+  
+  .item-name {
+    margin-top: 12rpx;
+    color: #1a1025;
+    font-size: 30rpx;
+    font-weight: 900;
+    line-height: 1.4;
+  }
+  
+  .arrow {
+    display: flex;
+    align-items: center;
+    color: #111111;
+    font-size: 40rpx;
+    font-weight: 900;
+  }
+  
+  .story-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 28rpx;
+  }
+  
+  .likes {
+    color: #8b7ca8;
+    font-size: 24rpx;
+  }
+  
+  .like-btn {
+    margin: 0;
+    padding: 0 28rpx;
+    height: 64rpx;
+    line-height: 64rpx;
+    border-radius: 999rpx;
+    background: #111111;
+    color: #ffffff;
+    font-size: 24rpx;
+    font-weight: 800;
+  }
+  
+  .like-btn.liked {
+    background: #f3f4f6;
+    color: #6b5b8a;
+  }
+  
+  .like-btn::after,
+  .home-btn::after {
+    border: none;
+  }
+  
+  .empty-card {
+    margin-top: 28rpx;
+    padding: 60rpx 36rpx;
+    border-radius: 36rpx;
+    background: #ffffff;
+    text-align: center;
+    box-shadow: 0 12rpx 40rpx rgba(31, 20, 71, 0.06);
+  }
+  
+  .empty-icon {
+    font-size: 72rpx;
+  }
+  
+  .empty-title {
+    margin-top: 22rpx;
+    color: #1a1025;
+    font-size: 34rpx;
+    font-weight: 900;
+  }
+  
+  .empty-text {
+    margin-top: 14rpx;
+    color: #8b7ca8;
+    font-size: 26rpx;
+    line-height: 1.6;
+  }
+  
+  .home-btn {
+    margin-top: 34rpx;
+    height: 84rpx;
+    line-height: 84rpx;
+    border-radius: 28rpx;
+    background: #111111;
+    color: #ffffff;
+    font-size: 28rpx;
+    font-weight: 800;
+  }
+  

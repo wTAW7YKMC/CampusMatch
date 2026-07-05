@@ -39,7 +39,7 @@
 }
 
 .label {
-  color: #6c63ff;
+  color: #111111;
   font-weight: 700;
 }
 
@@ -115,11 +115,52 @@
   padding: 20rpx;
   border-radius: 16rpx;
   background: #f7f8fc;
-  color: #6c63ff;
+  color: #111111;
   text-align: center;
   font-size: 26rpx;
   font-weight: 700;
 }
 
-.link { color: #6c63ff; font-weight: 700; }
+.link { color: #111111; font-weight: 700; }
 .alt-chip { display: inline-block; margin: 0 8rpx 8rpx 0; padding: 6rpx 12rpx; border-radius: 999rpx; background: #e9f7ee; color: #2e8b57; font-size: 22rpx; }
+
+.empty-cover {
+    height: 280rpx;
+    line-height: 280rpx;
+    margin-bottom: 20rpx;
+    text-align: center;
+    color: #8b7ca8;
+    font-size: 28rpx;
+    background: #f7f3ff;
+  }
+  
+  .empty-card {
+    padding: 36rpx;
+    text-align: center;
+    color: #8b7ca8;
+    font-size: 28rpx;
+  }
+  
+  .action-row {
+    display: flex;
+    gap: 18rpx;
+    margin-top: 18rpx;
+  }
+  
+  .action-btn {
+    flex: 1;
+    height: 80rpx;
+    line-height: 80rpx;
+    border-radius: 24rpx;
+    font-size: 26rpx;
+  }
+  
+  .reject-btn {
+    background: #f3f4f6;
+    color: #6b5b8a;
+  }
+  
+  .reject-btn::after {
+    border: none;
+  }
+  

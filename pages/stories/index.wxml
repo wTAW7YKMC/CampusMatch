@@ -1,12 +1,66 @@
 <view class="container">
-  <view class="section-title">交换故事广场</view>
-  <view class="section-subtitle">最离谱、最赚、最暖的交换故事都在这里，点赞也能完成任务。</view>
-  <block wx:for="{{stories}}" wx:key="storyId">
-    <view class="story card">
-      <view class="story-type">{{item.type === 'crazy' ? '离谱交换' : item.type === 'profit' ? '高价值交换' : item.type === 'warm' ? '暖心交换' : '校园交换'}}</view>
-      <view class="story-title">{{item.title}}</view>
-      <view class="story-flow">{{item.beforeItem}}  →  {{item.afterItem}}</view>
-      <button class="like-btn {{item.liked ? 'liked' : ''}}" data-id="{{item.storyId}}" bindtap="likeStory">❤️ {{item.likeCount}}</button>
+  <view class="hero-card">
+    <view>
+      <view class="hero-title">交换物语</view>
+      <view class="hero-subtitle">每一次交换，都是校园里的小故事</view>
     </view>
+
+    <button class="refresh-btn" bindtap="refreshStories">刷新</button>
+  </view>
+
+  <view wx:if="{{loading}}" class="empty-card">
+    <view class="empty-icon">⏳</view>
+    <view class="empty-title">故事加载中</view>
+  </view>
+
+  <view wx:elif="{{!stories.length}}" class="empty-card">
+    <view class="empty-icon">📖</view>
+    <view class="empty-title">{{emptyText}}</view>
+    <view class="empty-text">完成一次交换后，故事会自动出现在这里。</view>
+    <button class="home-btn" bindtap="goHome">去交换广场看看</button>
+  </view>
+
+  <block wx:else>
+    <block wx:for="{{stories}}" wx:key="storyId">
+      <view class="story-card">
+        <view class="story-head">
+          <view>
+            <view class="story-title">{{item.title}}</view>
+            <view class="story-time">{{item.timeLabel}}</view>
+          </view>
+
+          <view class="story-type">{{item.type === 'new' ? '新交换' : '故事'}}</view>
+        </view>
+
+        <view class="swap-line">
+          <view class="swap-item before">
+            <view class="label">换出</view>
+            <view class="item-name">{{item.beforeItem || '未知物品'}}</view>
+          </view>
+
+          <view class="arrow">→</view>
+
+          <view class="swap-item after">
+            <view class="label">换入</view>
+            <view class="item-name">{{item.afterItem || '未知物品'}}</view>
+          </view>
+        </view>
+
+        <view class="story-footer">
+          <view class="likes">
+            {{item.likeCount}} 人觉得这个交换很酷
+          </view>
+
+          <button
+            class="like-btn {{item.liked ? 'liked' : ''}}"
+            data-id="{{item.storyId}}"
+            bindtap="likeStory"
+          >
+            {{item.liked ? '已点赞' : '点赞'}}
+          </button>
+        </view>
+      </view>
+    </block>
   </block>
 </view>
+
