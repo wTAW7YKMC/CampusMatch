@@ -905,49 +905,131 @@
     .list-status { padding: 4px 10px; border-radius: 999px; background: #f7f3ff; color: #111111; font-size: 11px; }
 
     /* =========================
-       Scene 10: 真实交易故事
+       Scene 10: 买家 · 发起提案
        ========================= */
     .scene-10 { background: #f8f5f2; }
-    .trade-scroll { position: absolute; top: 0; left: 0; right: 0; bottom: 0; padding: 52px 16px 16px; overflow-y: auto; }
-    .trade-title { font-size: 20px; font-weight: 800; color: #111111; margin-bottom: 6px; }
-    .trade-subtitle { font-size: 13px; color: #6b7280; margin-bottom: 16px; }
-    .trade-step { display: flex; gap: 12px; margin-bottom: 18px; opacity: 0; transform: translateY(16px); }
-    .trade-step.in { animation: stepIn 0.6s var(--expo) forwards; }
-    @keyframes stepIn { to { opacity: 1; transform: translateY(0); } }
-    .step-num {
-      width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
-      background: #111111; color: #fff; font-size: 13px; font-weight: 700;
-      display: grid; place-items: center;
+    .page-nav {
+      position: absolute; top: 0; left: 0; right: 0; height: 48px;
+      background: rgba(255,255,255,0.98); backdrop-filter: blur(18px);
+      display: flex; align-items: center; justify-content: center;
+      border-bottom: 1px solid #ececec; z-index: 20;
     }
-    .step-body { flex: 1; }
-    .step-label { font-size: 12px; color: #6b7280; margin-bottom: 4px; }
-    .step-card {
+    .page-nav-title { font-size: 16px; font-weight: 700; color: #111111; }
+    .page-body {
+      position: absolute; top: 48px; left: 0; right: 0; bottom: 0;
+      padding: 12px 16px 80px; overflow-y: auto;
+    }
+    .detail-cover {
+      width: 100%; height: 220px; border-radius: 18px; overflow: hidden;
+      background: #f3f4f6; margin-bottom: 16px; position: relative;
+    }
+    .detail-cover img { width: 100%; height: 100%; object-fit: cover; }
+    .detail-title { font-size: 18px; font-weight: 800; color: #111111; margin-bottom: 6px; }
+    .detail-owner { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+    .detail-owner .avatar { width: 36px; height: 36px; }
+    .owner-name { font-size: 14px; font-weight: 700; color: #111111; }
+    .owner-meta { font-size: 12px; color: #6b7280; }
+    .ai-summary {
       background: #ffffff; border: 1px solid #ececec; border-radius: 16px;
-      padding: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+      padding: 14px; margin-bottom: 16px; box-shadow: 0 5px 15px rgba(0,0,0,0.05);
     }
-    .step-user { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
-    .step-user .avatar { width: 32px; height: 32px; }
-    .step-user-name { font-size: 13px; font-weight: 700; color: #111111; }
-    .step-user-role { font-size: 11px; color: #6b7280; }
-    .step-msg { font-size: 13px; color: #111111; line-height: 1.6; }
-    .step-action { margin-top: 10px; }
-    .step-action .btn-primary { height: 38px; border-radius: 12px; font-size: 13px; }
-    .mini-card {
-      background: #f7f7f7; border-radius: 10px; padding: 10px; margin-top: 8px;
+    .ai-summary-title { font-size: 13px; font-weight: 700; color: #111111; margin-bottom: 10px; }
+    .ai-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+    .ai-grid-item { text-align: center; }
+    .ai-grid-value { font-size: 16px; font-weight: 800; color: #111111; }
+    .ai-grid-label { font-size: 10px; color: #6b7280; margin-top: 2px; }
+    .proposal-list-title { font-size: 14px; font-weight: 700; color: #111111; margin-bottom: 10px; }
+    .proposal-item {
+      background: #ffffff; border: 1px solid #ececec; border-radius: 14px;
+      padding: 12px; margin-bottom: 10px; display: flex; gap: 10px; align-items: flex-start;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05); opacity: 0; transform: translateY(12px);
     }
-    .mini-card-title { font-size: 13px; font-weight: 700; color: #111111; margin-bottom: 4px; }
-    .mini-card-line { font-size: 12px; color: #6b7280; }
-    .status-pill {
-      display: inline-flex; align-items: center; padding: 4px 10px;
-      border-radius: 999px; background: #e8f5e9; color: #2e7d32;
-      font-size: 11px; font-weight: 700; margin-top: 8px;
+    .proposal-item.in { animation: fadeUp 0.5s var(--expo) forwards; }
+    .proposal-item .avatar { width: 34px; height: 34px; flex-shrink: 0; }
+    .proposal-content { flex: 1; }
+    .proposal-name { font-size: 13px; font-weight: 700; color: #111111; }
+    .proposal-text { font-size: 12px; color: #6b7280; margin-top: 2px; }
+    .proposal-score { font-size: 11px; color: #c2185b; font-weight: 700; background: #fce4ec; padding: 2px 8px; border-radius: 999px; }
+    .bottom-action {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      padding: 12px 16px 28px; background: #ffffff;
+      border-top: 1px solid #ececec; z-index: 10;
     }
-    .status-pill.waiting { background: #fff3e0; color: #ef6c00; }
+    .proposal-form {
+      position: absolute; inset: 48px 0 0 0; background: #f8f5f2;
+      padding: 16px; transform: translateY(100%); transition: transform 0.45s var(--expo);
+      z-index: 30;
+    }
+    .proposal-form.open { transform: translateY(0); }
+    .form-field { margin-bottom: 16px; opacity: 0; transform: translateY(12px); }
+    .form-field.in { animation: fadeUp 0.5s var(--expo) forwards; }
+    .form-field label { display: block; font-size: 13px; font-weight: 700; color: #111111; margin-bottom: 6px; }
+    .form-field .field-box {
+      background: #ffffff; border: 1px solid #ececec; border-radius: 12px;
+      padding: 12px; font-size: 14px; color: #111111; min-height: 46px;
+    }
 
     /* =========================
-       Scene 11: 结尾落版
+       Scene 11: 卖家 · 接受提案
        ========================= */
-    .scene-11 { background: radial-gradient(circle at 50% 45%, #f8f5f2 0%, #e8e5e2 70%); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+    .scene-11 { background: #f8f5f2; }
+    .msg-notify {
+      background: #ffffff; border: 1px solid #ececec; border-radius: 16px;
+      padding: 14px; margin-bottom: 14px; box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+      opacity: 0; transform: translateY(12px);
+    }
+    .msg-notify.in { animation: fadeUp 0.5s var(--expo) forwards; }
+    .msg-notify-head { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+    .msg-notify-dot { width: 8px; height: 8px; border-radius: 50%; background: #ef6c00; }
+    .msg-notify-title { font-size: 14px; font-weight: 700; color: #111111; }
+    .msg-notify-text { font-size: 12px; color: #6b7280; }
+    .proposal-detail {
+      background: #ffffff; border: 1px solid #ececec; border-radius: 18px;
+      padding: 16px; box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+      opacity: 0; transform: translateY(16px);
+    }
+    .proposal-detail.in { animation: fadeUp 0.6s var(--expo) forwards; }
+    .proposal-detail .detail-title { margin-bottom: 12px; }
+    .proposal-detail .swap-line { font-size: 13px; color: #111111; margin-bottom: 6px; }
+    .proposal-detail .swap-line span { color: #6b7280; }
+    .proposal-actions { display: flex; gap: 10px; margin-top: 16px; }
+    .proposal-actions .btn-primary { flex: 1; }
+    .proposal-actions .btn-secondary { flex: 1; }
+    .accepted-banner {
+      background: #e8f5e9; color: #2e7d32; border-radius: 12px;
+      padding: 12px; text-align: center; font-size: 13px; font-weight: 700;
+      margin-top: 14px; opacity: 0; transform: scale(0.95);
+    }
+    .accepted-banner.in { animation: popIn 0.5s var(--back) forwards; }
+
+    /* =========================
+       Scene 12: 成交 · 聊天确认
+       ========================= */
+    .scene-12 { background: #f8f5f2; }
+    .chat-wrap { display: flex; flex-direction: column; gap: 12px; padding-bottom: 80px; }
+    .chat-bubble {
+      max-width: 76%; padding: 10px 14px; border-radius: 18px;
+      font-size: 13px; line-height: 1.5; opacity: 0; transform: translateY(10px);
+    }
+    .chat-bubble.in { animation: fadeUp 0.45s var(--expo) forwards; }
+    .chat-bubble.left { align-self: flex-start; background: #ffffff; border: 1px solid #ececec; color: #111111; border-bottom-left-radius: 4px; }
+    .chat-bubble.right { align-self: flex-end; background: #111111; color: #ffffff; border-bottom-right-radius: 4px; }
+    .chat-meta { font-size: 10px; color: #6b7280; margin-top: 4px; text-align: right; }
+    .deal-card {
+      background: #ffffff; border: 1px solid #ececec; border-radius: 18px;
+      padding: 16px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+      opacity: 0; transform: scale(0.92);
+    }
+    .deal-card.in { animation: popIn 0.6s var(--back) forwards; }
+    .deal-icon { font-size: 40px; margin-bottom: 8px; }
+    .deal-title { font-size: 16px; font-weight: 800; color: #111111; margin-bottom: 4px; }
+    .deal-sub { font-size: 12px; color: #6b7280; margin-bottom: 12px; }
+    .badge-row-center { display: flex; justify-content: center; gap: 8px; }
+
+    /* =========================
+       Scene 13: 结尾落版
+       ========================= */
+    .scene-13 { background: radial-gradient(circle at 50% 45%, #f8f5f2 0%, #e8e5e2 70%); display: flex; align-items: center; justify-content: center; overflow: hidden; }
     .ending-wrap { position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 40px; }
     .ending-logo {
       width: 100px; height: 100px; border-radius: 28px;
@@ -1388,98 +1470,148 @@
           </div>
         </section>
 
-        <!-- Scene 10: 真实交易故事 -->
+        <!-- Scene 10: 买家 · 发起提案 -->
         <section class="scene scene-10" id="scene10">
-          <div class="trade-scroll" id="tradeScroll">
-            <div class="trade-title">真实交易故事</div>
-            <div class="trade-subtitle">从提案到成交，两个用户的完整交换过程</div>
-
-            <div class="trade-step" data-step="1">
-              <div class="step-num">1</div>
-              <div class="step-body">
-                <div class="step-label">买家 · 小 A 发现闲置</div>
-                <div class="step-card">
-                  <div class="step-user">
-                    <div class="avatar"><img src="assets/avatars/avatar-2.png?v=2" alt=""></div>
-                    <div>
-                      <div class="step-user-name">小 A（阿杰）</div>
-                      <div class="step-user-role">设计学院 · 认证玩家</div>
-                    </div>
-                  </div>
-                  <div class="step-msg">在交换广场看到 Alice 的「科学计算器」，正好缺一个考试用，决定发起提案。</div>
-                  <div class="mini-card">
-                    <div class="mini-card-title">◤科学计算器◢</div>
-                    <div class="mini-card-line">我有什么：科学计算器</div>
-                    <div class="mini-card-line">我想换：折叠雨伞</div>
-                  </div>
-                </div>
+          <div class="page-nav">
+            <div class="page-nav-title">物品详情</div>
+          </div>
+          <div class="page-body" id="buyerBody">
+            <div class="detail-cover" id="buyerCover">
+              <img src="assets/mock-posts/post-calculator.png?v=2" alt="">
+            </div>
+            <div class="detail-title">◤科学计算器◢</div>
+            <div class="detail-owner">
+              <div class="avatar"><img src="assets/avatars/avatar-3.png?v=2" alt=""></div>
+              <div>
+                <div class="owner-name">Alice <span class="verified">★认证玩家</span></div>
+                <div class="owner-meta">商学院 Lv.3 · 信用分 96</div>
               </div>
             </div>
-
-            <div class="trade-step" data-step="2">
-              <div class="step-num">2</div>
-              <div class="step-body">
-                <div class="step-label">买家 · 提交交换提案</div>
-                <div class="step-card">
-                  <div class="step-msg">小 A 填写提案：「九成新折叠雨伞，晴雨两用，可附赠图书馆座位预约小技巧。」</div>
-                  <div class="status-pill waiting">提案状态：待回复</div>
-                </div>
+            <div class="ai-summary">
+              <div class="ai-summary-title">AI 交换摘要</div>
+              <div class="ai-grid">
+                <div class="ai-grid-item"><div class="ai-grid-value">A</div><div class="ai-grid-label">稀有度</div></div>
+                <div class="ai-grid-item"><div class="ai-grid-value">87</div><div class="ai-grid-label">脑洞分</div></div>
+                <div class="ai-grid-item"><div class="ai-grid-value">91%</div><div class="ai-grid-label">匹配度</div></div>
+                <div class="ai-grid-item"><div class="ai-grid-value">¥45</div><div class="ai-grid-label">估值</div></div>
               </div>
             </div>
+            <div class="proposal-list-title">已有 2 条提案</div>
+            <div class="proposal-item">
+              <div class="avatar"><img src="assets/avatars/avatar-1.png?v=2" alt=""></div>
+              <div class="proposal-content">
+                <div class="proposal-name">yu</div>
+                <div class="proposal-text">马克杯 + 奶茶券可以吗？</div>
+              </div>
+              <div class="proposal-score">匹配 76%</div>
+            </div>
+            <div class="proposal-item">
+              <div class="avatar"><img src="assets/avatars/avatar-4.png?v=2" alt=""></div>
+              <div class="proposal-content">
+                <div class="proposal-name">Bob</div>
+                <div class="proposal-text">床上桌换不换？</div>
+              </div>
+              <div class="proposal-score">匹配 68%</div>
+            </div>
+          </div>
+          <div class="bottom-action">
+            <div class="btn-primary" id="buyerActionBtn">⚡ 立即交换</div>
+          </div>
+          <div class="proposal-form" id="buyerForm">
+            <div class="form-field">
+              <label>我有什么</label>
+              <div class="field-box" id="buyerHave">折叠雨伞（九成新，晴雨两用）</div>
+            </div>
+            <div class="form-field">
+              <label>我想换什么</label>
+              <div class="field-box" id="buyerWant">科学计算器</div>
+            </div>
+            <div class="form-field">
+              <label>交换故事</label>
+              <div class="field-box" id="buyerStory">考试周急需，可附赠图书馆座位预约技巧。</div>
+            </div>
+            <div class="form-field">
+              <div class="btn-primary">✨ 提交提案</div>
+            </div>
+          </div>
+        </section>
 
-            <div class="trade-step" data-step="3">
-              <div class="step-num">3</div>
-              <div class="step-body">
-                <div class="step-label">卖家 · 收到提案通知</div>
-                <div class="step-card">
-                  <div class="step-user">
-                    <div class="avatar"><img src="assets/avatars/avatar-3.png?v=2" alt=""></div>
-                    <div>
-                      <div class="step-user-name">小 B（Alice）</div>
-                      <div class="step-user-role">商学院 · 认证玩家</div>
-                    </div>
-                  </div>
-                  <div class="step-msg">Alice 在消息中心收到「新提案」提醒，点击查看小 A 的信用分和交换记录后，觉得靠谱。</div>
-                  <div class="mini-card">
-                    <div class="mini-card-title">来自小 A 的提案</div>
-                    <div class="mini-card-line">物品：折叠雨伞</div>
-                    <div class="mini-card-line">脑洞分：88 · 匹配度：91%</div>
-                  </div>
+        <!-- Scene 11: 卖家 · 接受提案 -->
+        <section class="scene scene-11" id="scene11">
+          <div class="page-nav">
+            <div class="page-nav-title">消息中心</div>
+          </div>
+          <div class="page-body" id="sellerBody">
+            <div class="msg-notify" id="sellerNotify">
+              <div class="msg-notify-head">
+                <div class="msg-notify-dot"></div>
+                <div class="msg-notify-title">新提案提醒</div>
+              </div>
+              <div class="msg-notify-text">你发布的「科学计算器」收到一条新提案</div>
+            </div>
+            <div class="proposal-detail" id="sellerProposal">
+              <div class="detail-title">来自 小 A 的提案</div>
+              <div class="detail-owner">
+                <div class="avatar"><img src="assets/avatars/avatar-2.png?v=2" alt=""></div>
+                <div>
+                  <div class="owner-name">小 A（阿杰）</div>
+                  <div class="owner-meta">设计学院 · 信用分 94 · 已交换 12 次</div>
                 </div>
               </div>
+              <div class="swap-line"><span>我有什么：</span>折叠雨伞（九成新，晴雨两用）</div>
+              <div class="swap-line"><span>我想换：</span>科学计算器</div>
+              <div class="swap-line"><span>交换故事：</span>考试周急需，可附赠图书馆座位预约技巧。</div>
+              <div class="badge-row" style="margin-top:10px;">
+                <span class="badge badge-pink">匹配 91%</span>
+                <span class="badge badge-cyan">脑洞 87</span>
+              </div>
+              <div class="proposal-actions" id="sellerActions">
+                <div class="btn-secondary">婉拒</div>
+                <div class="btn-primary" id="acceptBtn">接受提案</div>
+              </div>
+              <div class="accepted-banner" id="acceptedBanner">✅ 已接受，进入聊天确认交换细节</div>
             </div>
+          </div>
+        </section>
 
-            <div class="trade-step" data-step="4">
-              <div class="step-num">4</div>
-              <div class="step-body">
-                <div class="step-label">卖家 · 接受提案</div>
-                <div class="step-card">
-                  <div class="step-msg">Alice 点击「接受提案」，系统生成安全交易点推荐，双方进入聊天确认。</div>
-                  <div class="status-pill">提案状态：已接受</div>
-                  <div class="step-action">
-                    <div class="btn-primary">💬 进入聊天确认</div>
-                  </div>
-                </div>
+        <!-- Scene 12: 成交 · 聊天确认 -->
+        <section class="scene scene-12" id="scene12">
+          <div class="page-nav">
+            <div class="page-nav-title">小 A</div>
+          </div>
+          <div class="page-body" id="dealBody">
+            <div class="chat-wrap" id="chatWrap">
+              <div class="chat-bubble left">
+                同学你好，我的折叠雨伞是九成新的，晴雨两用，你看可以吗？
+                <div class="chat-meta">小 A · 14:32</div>
+              </div>
+              <div class="chat-bubble right">
+                可以的！科学计算器功能都正常，电池也是新的。
+                <div class="chat-meta">Alice · 14:33</div>
+              </div>
+              <div class="chat-bubble left">
+                那今晚 7 点图书馆门口见？
+                <div class="chat-meta">小 A · 14:34</div>
+              </div>
+              <div class="chat-bubble right">
+                好，我带计算器过去。
+                <div class="chat-meta">Alice · 14:35</div>
               </div>
             </div>
-
-            <div class="trade-step" data-step="5">
-              <div class="step-num">5</div>
-              <div class="step-body">
-                <div class="step-label">成交 · 双方互评</div>
-                <div class="step-card">
-                  <div class="step-msg">二人在图书馆门口完成交换，各自点亮「考试周救星」和「雨天守护」徽章。</div>
-                  <div class="mini-card">
-                    <div class="mini-card-line">🌧 雨天守护 · 📚 考试周救星</div>
-                  </div>
-                </div>
+            <div class="deal-card" id="dealCard">
+              <div class="deal-icon">🎉</div>
+              <div class="deal-title">交换成功</div>
+              <div class="deal-sub">二人在图书馆门口完成交换，各自点亮徽章</div>
+              <div class="badge-row-center">
+                <span class="badge badge-cyan">📚 考试周救星</span>
+                <span class="badge badge-pink">🌧 雨天守护</span>
               </div>
             </div>
           </div>
         </section>
 
-        <!-- Scene 11: 结尾落版 -->
-        <section class="scene scene-11" id="scene11">
+        <!-- Scene 13: 结尾落版 -->
+        <section class="scene scene-13" id="scene13">
           <div class="ending-glow"></div>
           <div class="ending-wrap" id="endingWrap">
             <div class="ending-logo" id="endingLogo">🔄</div>
@@ -1579,13 +1711,15 @@
       { pos: 'left', anim: 'rotate', texts: ['学生认证', '已认证大学生'] },
       { pos: 'right', anim: 'slide', texts: ['消息中心', '提案、交换、通知'] },
       { pos: 'bottom', anim: 'elastic', texts: ['个人中心', '信用 + 徽章 + 任务'] },
-      { pos: 'left', anim: 'blinds', texts: ['真实交易故事', '从提案到成交'] },
+      { pos: 'left', anim: 'pop', texts: ['买家 · 发起提案', '从详情到提交'] },
+      { pos: 'right', anim: 'pop', texts: ['卖家 · 接受提案', '从通知到成交'] },
+      { pos: 'left', anim: 'blinds', texts: ['成交 · 聊天确认', '安全交易点见面'] },
       { pos: 'center', anim: 'pop', texts: [] }
     ];
-    const sceneDurations = [0, 4000, 6000, 7000, 5000, 7000, 6000, 5000, 5000, 6000, 8000, 5000];
-    const sceneTimes = [0, 4000, 10600, 18200, 24200, 32200, 38800, 44800, 50800, 57400, 64000, 72000];
-    const totalTime = 72000;
-    const sceneTransitions = [null, 'push', 'push', 'push', 'dissolve', 'push', 'flip', 'push', 'scaleblur', 'scaleblur', 'scaleblur', 'scaleblur'];
+    const sceneDurations = [0, 4000, 6000, 7000, 5000, 7000, 6000, 5000, 5000, 6000, 7000, 7000, 6000, 5000];
+    const sceneTimes = [0, 4000, 10600, 18200, 24200, 32200, 38800, 44800, 50800, 57400, 65000, 72600, 79200, 84800];
+    const totalTime = 84800;
+    const sceneTransitions = [null, 'push', 'push', 'push', 'dissolve', 'push', 'flip', 'push', 'scaleblur', 'scaleblur', 'scaleblur', 'scaleblur', 'scaleblur', 'scaleblur'];
 
     function resetScenes() {
       scenes.forEach(s => {
@@ -1624,7 +1758,7 @@
       kws.forEach(el => { el.classList.remove('in'); el.classList.add('out'); });
       setTimeout(() => { container.innerHTML = ''; }, 550);
     }
-    function timeToScene(ms) { return Math.min(Math.floor((ms / totalTime) * 11), 10) + 1; }
+    function timeToScene(ms) { return Math.min(Math.floor((ms / totalTime) * 13), 12) + 1; }
     function formatTime(ms) { const s = Math.floor(ms / 1000); const m = Math.floor(s / 60); const sec = s % 60; return `${m}:${String(sec).padStart(2, '0')}`; }
 
     /* Scene 01 */
@@ -1747,16 +1881,43 @@
       requestAnimationFrame(frame);
     }
 
-    /* Scene 10: 真实交易故事 */
-    function runScene10Trade() {
-      $$('.trade-step').forEach((s, i) => {
-        s.classList.remove('in');
-        setTimeout(() => s.classList.add('in'), 300 + i * 550);
+    /* Scene 10: 买家 · 发起提案 */
+    function runScene10Buyer() {
+      $('#buyerForm').classList.remove('open');
+      $$('.proposal-item').forEach((el, i) => {
+        el.classList.remove('in');
+        setTimeout(() => el.classList.add('in'), 400 + i * 200);
+      });
+      setTimeout(() => { $('#buyerForm').classList.add('open'); }, 2200);
+      $$('#buyerForm .form-field').forEach((el, i) => {
+        el.classList.remove('in');
+        setTimeout(() => el.classList.add('in'), 2600 + i * 200);
       });
     }
 
-    /* Scene 11: 结尾落版 */
-    function runScene11Ending() {
+    /* Scene 11: 卖家 · 接受提案 */
+    function runScene11Seller() {
+      $('#sellerNotify').classList.remove('in');
+      $('#sellerProposal').classList.remove('in');
+      $('#acceptedBanner').classList.remove('in');
+      $('#sellerActions').style.display = 'flex';
+      setTimeout(() => $('#sellerNotify').classList.add('in'), 300);
+      setTimeout(() => $('#sellerProposal').classList.add('in'), 900);
+      setTimeout(() => { $('#sellerActions').style.display = 'none'; $('#acceptedBanner').classList.add('in'); }, 3600);
+    }
+
+    /* Scene 12: 成交 · 聊天确认 */
+    function runScene12Deal() {
+      $$('.chat-bubble').forEach(el => el.classList.remove('in'));
+      $('#dealCard').classList.remove('in');
+      $$('.chat-bubble').forEach((el, i) => {
+        setTimeout(() => el.classList.add('in'), 300 + i * 700);
+      });
+      setTimeout(() => $('#dealCard').classList.add('in'), 3600);
+    }
+
+    /* Scene 13: 结尾落版 */
+    function runScene13Ending() {
       $('#endingLogo').classList.add('in');
       $('#endingTitle').classList.add('in');
       $('#endingSub').classList.add('in');
@@ -1904,23 +2065,43 @@
         if (!await wait(sceneDurations[8], token)) return;
         hideCaption();
       } else if (startScene === 10) {
-        $$('.trade-step').forEach(s => s.classList.remove('in'));
+        $('#buyerForm').classList.remove('open');
+        $$('.proposal-item').forEach(el => el.classList.remove('in'));
+        $$('#buyerForm .form-field').forEach(el => el.classList.remove('in'));
         scenes[9].classList.add('active'); showCaption(10);
         if (!await wait(300, token)) return;
-        runScene10Trade();
+        runScene10Buyer();
         if (!await wait(sceneDurations[9], token)) return;
         hideCaption();
       } else if (startScene === 11) {
-        $('#endingLogo').classList.remove('in'); $('#endingTitle').classList.remove('in'); $('#endingSub').classList.remove('in'); $('#endingCta').classList.remove('in'); $('#endingLoop').classList.remove('in');
-        $('#floatLayer').innerHTML = ''; $('#endingCta').style.animation = '';
+        $('#sellerNotify').classList.remove('in');
+        $('#sellerProposal').classList.remove('in');
+        $('#acceptedBanner').classList.remove('in');
+        $('#sellerActions').style.display = 'flex';
         scenes[10].classList.add('active'); showCaption(11);
         if (!await wait(300, token)) return;
-        runScene11Ending();
+        runScene11Seller();
         if (!await wait(sceneDurations[10], token)) return;
+        hideCaption();
+      } else if (startScene === 12) {
+        $$('.chat-bubble').forEach(el => el.classList.remove('in'));
+        $('#dealCard').classList.remove('in');
+        scenes[11].classList.add('active'); showCaption(12);
+        if (!await wait(300, token)) return;
+        runScene12Deal();
+        if (!await wait(sceneDurations[11], token)) return;
+        hideCaption();
+      } else if (startScene === 13) {
+        $('#endingLogo').classList.remove('in'); $('#endingTitle').classList.remove('in'); $('#endingSub').classList.remove('in'); $('#endingCta').classList.remove('in'); $('#endingLoop').classList.remove('in');
+        $('#floatLayer').innerHTML = ''; $('#endingCta').style.animation = '';
+        scenes[12].classList.add('active'); showCaption(13);
+        if (!await wait(300, token)) return;
+        runScene13Ending();
+        if (!await wait(sceneDurations[12], token)) return;
         hideCaption();
       }
 
-      for (let i = startScene + 1; i <= 11; i++) {
+      for (let i = startScene + 1; i <= 13; i++) {
         if (!await wait(600, token)) return;
         if (i === 2) setupScene02();
         else if (i === 4) setupScene04Wish();
@@ -1933,8 +2114,10 @@
         else if (i === 7) { showCaption(7); if (!await wait(300, token)) return; runScene07Trust(); }
         else if (i === 8) { showCaption(8); if (!await wait(300, token)) return; runScene08Messages(); }
         else if (i === 9) { showCaption(9); if (!await wait(300, token)) return; runScene09Profile(); }
-        else if (i === 10) { showCaption(10); if (!await wait(300, token)) return; runScene10Trade(); }
-        else if (i === 11) { showCaption(11); if (!await wait(300, token)) return; runScene11Ending(); }
+        else if (i === 10) { showCaption(10); if (!await wait(300, token)) return; runScene10Buyer(); }
+        else if (i === 11) { showCaption(11); if (!await wait(300, token)) return; runScene11Seller(); }
+        else if (i === 12) { showCaption(12); if (!await wait(300, token)) return; runScene12Deal(); }
+        else if (i === 13) { showCaption(13); if (!await wait(300, token)) return; runScene13Ending(); }
         if (!await wait(sceneDurations[i - 1], token)) return;
         hideCaption();
       }
